@@ -1,5 +1,6 @@
 import { ScrollView, Text, View, TouchableOpacity, Platform } from "react-native";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
@@ -12,6 +13,7 @@ interface Style {
   category: string;
   prompt: string;
   icon: string;
+  exampleImage: any;
 }
 
 const STYLES: Style[] = [
@@ -20,48 +22,54 @@ const STYLES: Style[] = [
     name: "会议室",
     description: "专业会议室背景,正式商务风格",
     category: "办公室",
-    prompt: "professional business headshot portrait in modern boardroom setting, business attire, confident expression, corporate lighting, high quality, sharp focus",
+    prompt: "Transform this person into a professional business headshot in modern boardroom setting. KEEP the person's exact facial features, face shape, and identity. Only change: background to boardroom, lighting to corporate style, attire to business suit, expression to confident. High quality, sharp focus, photorealistic.",
     icon: "🏢",
+    exampleImage: require("@/assets/images/example-boardroom.jpg"),
   },
   {
     id: "office-lobby",
     name: "办公大堂",
     description: "现代办公楼大堂,简约专业",
     category: "办公室",
-    prompt: "professional headshot portrait in modern office lobby, business casual, natural lighting, glass windows background, contemporary architecture, high quality",
+    prompt: "Transform this person into a professional headshot in modern office lobby. PRESERVE the person's facial features and identity completely. Only modify: background to office lobby with glass windows, lighting to natural daylight, attire to business casual. High quality, photorealistic.",
     icon: "🏛️",
+    exampleImage: require("@/assets/images/example-office-lobby.jpg"),
   },
   {
     id: "outdoor-city",
     name: "城市街景",
     description: "都市建筑背景,时尚现代",
     category: "户外",
-    prompt: "professional headshot portrait outdoors in urban setting, modern buildings background, natural daylight, business casual style, city skyline, high quality",
+    prompt: "Transform this person into a professional outdoor headshot in urban setting. MAINTAIN the person's exact face and features. Only change: background to city skyline with modern buildings, lighting to natural daylight, attire to business casual. High quality, photorealistic.",
     icon: "🌆",
+    exampleImage: require("@/assets/images/example-city.jpg"),
   },
   {
     id: "outdoor-park",
     name: "公园绿地",
     description: "自然绿色背景,轻松亲和",
     category: "户外",
-    prompt: "professional headshot portrait in park setting, greenery background, natural soft lighting, approachable friendly style, outdoor environment, high quality",
+    prompt: "Transform this person into a professional headshot in park setting. KEEP the person's facial identity intact. Only modify: background to park with greenery, lighting to soft natural light, expression to friendly and approachable. High quality, photorealistic.",
     icon: "🌳",
+    exampleImage: require("@/assets/images/example-park.jpg"),
   },
   {
     id: "studio-white",
     name: "纯白背景",
     description: "经典白色背景,简洁专业",
     category: "工作室",
-    prompt: "professional studio headshot portrait with clean white background, professional studio lighting, minimalist style, sharp focus, high quality",
+    prompt: "Transform this person into a professional studio headshot with clean white background. PRESERVE all facial features and identity. Only change: background to pure white, lighting to professional studio setup, minimal shadows. High quality, sharp focus, photorealistic.",
     icon: "⚪",
+    exampleImage: require("@/assets/images/example-white.jpg"),
   },
   {
     id: "studio-gray",
     name: "灰色背景",
     description: "中性灰色背景,沉稳大气",
     category: "工作室",
-    prompt: "professional studio headshot portrait with neutral gray background, professional lighting, sophisticated elegant look, corporate style, high quality",
+    prompt: "Transform this person into a professional studio headshot with neutral gray background. MAINTAIN the person's face completely. Only modify: background to neutral gray, lighting to professional studio style, overall look to sophisticated and elegant. High quality, photorealistic.",
     icon: "⚫",
+    exampleImage: require("@/assets/images/example-gray.jpg"),
   },
 ];
 
@@ -131,7 +139,7 @@ export default function StyleSelectionScreen() {
             </Text>
           </View>
 
-          {/* Premium Style Cards */}
+          {/* Premium Style Cards with Examples */}
           <View className="gap-4">
             {STYLES.map((style) => {
               const isSelected = selectedStyle?.id === style.id;
@@ -153,22 +161,30 @@ export default function StyleSelectionScreen() {
                     elevation: isSelected ? 8 : 2,
                   }}
                 >
-                  <View className="flex-row items-center gap-5 p-5">
-                    {/* Icon */}
+                  <View className="flex-row items-center gap-4 p-4">
+                    {/* Example Image */}
                     <View 
-                      className="w-20 h-20 rounded-2xl items-center justify-center"
-                      style={{ 
-                        backgroundColor: isSelected 
-                          ? colors.primary + '25' 
-                          : colors.primary + '10'
+                      className="rounded-2xl overflow-hidden"
+                      style={{
+                        width: 90,
+                        height: 120,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
                       }}
                     >
-                      <Text className="text-4xl">{style.icon}</Text>
+                      <Image
+                        source={style.exampleImage}
+                        style={{ width: "100%", height: "100%" }}
+                        contentFit="cover"
+                      />
                     </View>
                     
                     {/* Content */}
                     <View className="flex-1 gap-2">
                       <View className="flex-row items-center gap-3">
+                        <Text className="text-2xl">{style.icon}</Text>
                         <Text 
                           className="text-xl font-bold"
                           style={{ color: colors.foreground }}
