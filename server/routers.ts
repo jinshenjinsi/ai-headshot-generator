@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { COOKIE_NAME } from "../shared/const.js";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -17,12 +18,41 @@ export const appRouter = router({
     }),
   }),
 
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  // AI Headshot Generation
+  headshot: router({
+    generate: publicProcedure
+      .input(
+        z.object({
+          stylePrompt: z.string(),
+          referenceImageUrl: z.string().url().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { generateImage } = await import("./_core/imageGeneration");
+        
+        try {
+          const result = await generateImage({
+            prompt: input.stylePrompt,
+            originalImages: input.referenceImageUrl
+              ? [
+                  {
+                    url: input.referenceImageUrl,
+                    mimeType: "image/jpeg",
+                  },
+                ]
+              : undefined,
+          });
+
+          return {
+            success: true,
+            imageUrl: result.url,
+          };
+        } catch (error) {
+          console.error("Headshot generation failed:", error);
+          throw new Error("Failed to generate headshot");
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
