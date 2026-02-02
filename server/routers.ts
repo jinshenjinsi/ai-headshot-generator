@@ -20,6 +20,35 @@ export const appRouter = router({
 
   // AI Headshot Generation
   headshot: router({
+    uploadPhoto: publicProcedure
+      .input(
+        z.object({
+          photoBase64: z.string(),
+          fileName: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { storagePut } = await import("./storage");
+        
+        try {
+          // Convert base64 to buffer
+          const base64Data = input.photoBase64.replace(/^data:image\/\w+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          
+          // Upload to S3
+          const timestamp = Date.now();
+          const key = `headshots/uploads/${timestamp}-${input.fileName}`;
+          const result = await storagePut(key, buffer, "image/jpeg");
+          
+          return {
+            success: true,
+            url: result.url,
+          };
+        } catch (error) {
+          console.error("Photo upload failed:", error);
+          throw new Error("Failed to upload photo");
+        }
+      }),
     generate: publicProcedure
       .input(
         z.object({

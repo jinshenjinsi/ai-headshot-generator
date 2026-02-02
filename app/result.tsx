@@ -5,7 +5,6 @@ import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system/legacy";
 import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 
@@ -23,14 +22,12 @@ export default function ResultScreen() {
 
     try {
       if (Platform.OS === "web") {
-        // Web: trigger download
         const link = document.createElement("a");
         link.href = generatedImage;
         link.download = `headshot-${Date.now()}.jpg`;
         link.click();
         Alert.alert("下载成功", "图片已保存");
       } else {
-        // Mobile: save to gallery
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== "granted") {
           Alert.alert("需要权限", "请允许访问相册以保存图片");
@@ -57,18 +54,6 @@ export default function ResultScreen() {
     router.push("/style-selection" as any);
   };
 
-  const handleShare = () => {
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
-    Alert.alert(
-      "分享",
-      "分享功能开发中...",
-      [{ text: "确定" }]
-    );
-  };
-
   const handleBackHome = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -79,28 +64,56 @@ export default function ResultScreen() {
 
   if (!generatedImage) {
     return (
-      <ScreenContainer className="p-6">
+      <ScreenContainer className="p-6 bg-background">
         <View className="flex-1 items-center justify-center">
-          <Text className="text-muted">未找到生成的图片</Text>
+          <Text style={{ color: colors.muted }}>未找到生成的图片</Text>
         </View>
       </ScreenContainer>
     );
   }
 
   return (
-    <ScreenContainer className="p-6">
+    <ScreenContainer className="bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 gap-6 pb-6">
-          {/* Header */}
-          <View>
-            <Text className="text-3xl font-bold text-foreground">生成完成</Text>
-            <Text className="text-base text-muted mt-2">
-              您的专业头像已生成
+        <View className="flex-1 gap-8 py-8 px-6 pb-12">
+          {/* Elegant Header */}
+          <View className="items-center gap-3">
+            <View 
+              className="w-16 h-16 rounded-2xl items-center justify-center mb-2"
+              style={{ backgroundColor: colors.primary + '20' }}
+            >
+              <Text className="text-4xl">✨</Text>
+            </View>
+            
+            <Text 
+              className="text-4xl font-bold text-center"
+              style={{ 
+                color: colors.foreground,
+                fontWeight: '800',
+                letterSpacing: -0.5,
+              }}
+            >
+              生成完成
+            </Text>
+            <Text 
+              className="text-lg text-center"
+              style={{ color: colors.muted }}
+            >
+              您的专业头像已完美呈现
             </Text>
           </View>
 
-          {/* Image Display */}
-          <View className="bg-surface rounded-3xl overflow-hidden">
+          {/* Premium Image Display */}
+          <View 
+            className="rounded-3xl overflow-hidden"
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.15,
+              shadowRadius: 24,
+              elevation: 12,
+            }}
+          >
             <Image
               source={{ uri: generatedImage }}
               style={{ width: "100%", aspectRatio: 3/4 }}
@@ -109,18 +122,58 @@ export default function ResultScreen() {
             />
           </View>
 
-          {/* Info */}
-          <View className="bg-surface rounded-2xl p-4">
+          {/* Premium Info Card */}
+          <View 
+            className="rounded-3xl p-6"
+            style={{ 
+              backgroundColor: colors.surface,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.05,
+              shadowRadius: 12,
+              elevation: 3,
+            }}
+          >
             <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-sm text-muted">风格</Text>
-                <Text className="text-base font-semibold text-foreground mt-1">
-                  {selectedStyle?.name || "未知"} · {selectedStyle?.category || ""}
+              <View className="gap-2">
+                <Text 
+                  className="text-sm font-semibold"
+                  style={{ color: colors.muted }}
+                >
+                  风格场景
                 </Text>
+                <View className="flex-row items-center gap-2">
+                  <Text 
+                    className="text-xl font-bold"
+                    style={{ color: colors.foreground }}
+                  >
+                    {selectedStyle?.name || "未知"}
+                  </Text>
+                  <View 
+                    className="px-3 py-1 rounded-full"
+                    style={{ backgroundColor: colors.primary + '20' }}
+                  >
+                    <Text 
+                      className="text-xs font-semibold"
+                      style={{ color: colors.primary }}
+                    >
+                      {selectedStyle?.category || ""}
+                    </Text>
+                  </View>
+                </View>
               </View>
-              <View>
-                <Text className="text-sm text-muted">生成时间</Text>
-                <Text className="text-base font-semibold text-foreground mt-1">
+              
+              <View className="items-end gap-2">
+                <Text 
+                  className="text-sm font-semibold"
+                  style={{ color: colors.muted }}
+                >
+                  生成时间
+                </Text>
+                <Text 
+                  className="text-xl font-bold"
+                  style={{ color: colors.foreground }}
+                >
                   {new Date().toLocaleTimeString("zh-CN", { 
                     hour: "2-digit", 
                     minute: "2-digit" 
@@ -130,47 +183,87 @@ export default function ResultScreen() {
             </View>
           </View>
 
-          {/* Action Buttons */}
-          <View className="gap-3">
+          {/* Premium Action Buttons */}
+          <View className="gap-4">
+            {/* Primary Download Button */}
             <TouchableOpacity
               onPress={handleDownload}
               activeOpacity={0.9}
-              className="w-full bg-primary px-8 py-4 rounded-2xl shadow-lg"
+              className="w-full rounded-2xl overflow-hidden"
+              style={{
+                backgroundColor: colors.primary,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 8,
+              }}
             >
-              <Text className="text-background font-bold text-lg text-center">
-                下载高清版
-              </Text>
+              <View className="w-full px-8 py-5">
+                <Text 
+                  className="font-bold text-xl text-center"
+                  style={{ 
+                    color: colors.background,
+                    fontWeight: '700',
+                  }}
+                >
+                  下载高清版
+                </Text>
+              </View>
             </TouchableOpacity>
 
-            <View className="flex-row gap-3">
+            {/* Secondary Actions */}
+            <View className="flex-row gap-4">
               <TouchableOpacity
                 onPress={handleRegenerate}
-                activeOpacity={0.7}
-                className="flex-1 bg-surface px-6 py-4 rounded-2xl border border-border"
+                activeOpacity={0.8}
+                className="flex-1 rounded-2xl overflow-hidden"
+                style={{
+                  backgroundColor: colors.surface,
+                  borderWidth: 2,
+                  borderColor: colors.border,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 8,
+                  elevation: 2,
+                }}
               >
-                <Text className="text-foreground font-semibold text-base text-center">
-                  重新生成
-                </Text>
+                <View className="px-6 py-4">
+                  <Text 
+                    className="font-semibold text-base text-center"
+                    style={{ color: colors.foreground }}
+                  >
+                    重新生成
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={handleShare}
-                activeOpacity={0.7}
-                className="bg-surface px-6 py-4 rounded-2xl border border-border"
+                onPress={handleBackHome}
+                activeOpacity={0.8}
+                className="flex-1 rounded-2xl overflow-hidden"
+                style={{
+                  backgroundColor: colors.surface,
+                  borderWidth: 2,
+                  borderColor: colors.border,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 8,
+                  elevation: 2,
+                }}
               >
-                <IconSymbol size={24} name="paperplane.fill" color={colors.foreground} />
+                <View className="px-6 py-4">
+                  <Text 
+                    className="font-semibold text-base text-center"
+                    style={{ color: colors.foreground }}
+                  >
+                    返回首页
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              onPress={handleBackHome}
-              activeOpacity={0.7}
-              className="w-full px-8 py-3 rounded-2xl"
-            >
-              <Text className="text-muted font-semibold text-base text-center">
-                返回首页
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 
@@ -16,7 +15,6 @@ export default function UploadScreen() {
   const colors = useColors();
   const { photos, setPhotos } = useApp();
 
-  // Reset photos when entering this screen
   useEffect(() => {
     setPhotos([]);
   }, []);
@@ -59,7 +57,7 @@ export default function UploadScreen() {
     }
 
     if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     
     router.push("/style-selection" as any);
@@ -68,87 +66,197 @@ export default function UploadScreen() {
   const canProceed = photos.length >= MIN_PHOTOS;
 
   return (
-    <ScreenContainer className="p-6">
+    <ScreenContainer className="bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 gap-6">
-          {/* Header */}
+        <View className="flex-1 gap-8 py-8 px-6">
+          {/* Elegant Header */}
           <View>
-            <View className="flex-row items-center gap-3 mb-4">
-              <View className="flex-1 h-1 bg-primary rounded-full" />
-              <View className="flex-1 h-1 bg-border rounded-full" />
-              <View className="flex-1 h-1 bg-border rounded-full" />
+            {/* Progress Indicator */}
+            <View className="flex-row items-center gap-3 mb-6">
+              <View 
+                className="flex-1 h-1 rounded-full"
+                style={{ backgroundColor: colors.primary }}
+              />
+              <View 
+                className="flex-1 h-1 rounded-full opacity-20"
+                style={{ backgroundColor: colors.primary }}
+              />
+              <View 
+                className="flex-1 h-1 rounded-full opacity-20"
+                style={{ backgroundColor: colors.primary }}
+              />
             </View>
             
-            <Text className="text-3xl font-bold text-foreground">上传照片</Text>
-            <Text className="text-base text-muted mt-2">
-              至少上传{MIN_PHOTOS}张照片,建议{MIN_PHOTOS}-{MAX_PHOTOS}张以获得最佳效果
+            <Text 
+              className="text-4xl font-bold mb-3"
+              style={{ 
+                color: colors.foreground,
+                fontWeight: '800',
+                letterSpacing: -0.5,
+              }}
+            >
+              上传您的照片
             </Text>
-            <Text className="text-sm text-muted mt-1">
-              已上传: {photos.length}/{MAX_PHOTOS}
+            <Text 
+              className="text-lg leading-relaxed"
+              style={{ color: colors.muted }}
+            >
+              至少{MIN_PHOTOS}张,建议{MIN_PHOTOS}-{MAX_PHOTOS}张照片{"\n"}
+              以获得最佳AI生成效果
             </Text>
+            
+            {/* Photo Counter */}
+            <View 
+              className="mt-4 self-start px-4 py-2 rounded-full"
+              style={{ backgroundColor: colors.primary + '15' }}
+            >
+              <Text 
+                className="text-sm font-semibold"
+                style={{ color: colors.primary }}
+              >
+                已上传 {photos.length}/{MAX_PHOTOS}
+              </Text>
+            </View>
           </View>
 
-          {/* Photo Grid */}
-          <View className="flex-row flex-wrap gap-3">
+          {/* Premium Photo Grid */}
+          <View className="flex-row flex-wrap gap-4">
             {photos.map((photo, index) => (
-              <View key={index} className="relative" style={{ width: "30%" }}>
+              <View 
+                key={index} 
+                className="relative rounded-2xl overflow-hidden"
+                style={{ 
+                  width: "30%",
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 4,
+                }}
+              >
                 <Image
                   source={{ uri: photo }}
-                  className="w-full aspect-square rounded-xl"
+                  className="w-full aspect-square"
                   resizeMode="cover"
                 />
                 <TouchableOpacity
                   onPress={() => removePhoto(index)}
-                  activeOpacity={0.7}
-                  className="absolute top-2 right-2 w-8 h-8 bg-error rounded-full items-center justify-center"
-                  style={{ backgroundColor: colors.error }}
+                  activeOpacity={0.8}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full items-center justify-center"
+                  style={{ 
+                    backgroundColor: colors.error,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                  }}
                 >
-                  <Text className="text-background font-bold">×</Text>
+                  <Text className="text-white font-bold text-lg">×</Text>
                 </TouchableOpacity>
               </View>
             ))}
             
-            {/* Add Photo Button */}
+            {/* Premium Add Button */}
             {photos.length < MAX_PHOTOS && (
               <TouchableOpacity
                 onPress={pickImages}
-                activeOpacity={0.7}
-                className="border-2 border-dashed border-border rounded-xl items-center justify-center"
-                style={{ width: "30%", aspectRatio: 1 }}
+                activeOpacity={0.8}
+                className="border-2 rounded-2xl items-center justify-center"
+                style={{ 
+                  width: "30%", 
+                  aspectRatio: 1,
+                  borderColor: colors.primary + '40',
+                  borderStyle: 'dashed',
+                  backgroundColor: colors.surface,
+                }}
               >
-                <IconSymbol size={32} name="plus.circle.fill" color={colors.primary} />
-                <Text className="text-xs text-muted mt-2">添加照片</Text>
+                <Text className="text-4xl mb-2">+</Text>
+                <Text 
+                  className="text-xs font-semibold"
+                  style={{ color: colors.primary }}
+                >
+                  添加照片
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Tips */}
-          <View className="bg-surface rounded-2xl p-4 gap-3">
-            <Text className="text-base font-semibold text-foreground">拍照建议:</Text>
-            <View className="gap-2">
-              <Text className="text-sm text-muted">• 确保光线充足,面部清晰</Text>
-              <Text className="text-sm text-muted">• 包含多个角度(正面、侧面)</Text>
-              <Text className="text-sm text-muted">• 避免戴帽子或墨镜</Text>
-              <Text className="text-sm text-muted">• 不要有其他人出现在照片中</Text>
+          {/* Premium Tips Card */}
+          <View 
+            className="rounded-3xl p-6 gap-4"
+            style={{ 
+              backgroundColor: colors.surface,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.05,
+              shadowRadius: 12,
+              elevation: 3,
+            }}
+          >
+            <View className="flex-row items-center gap-3">
+              <View 
+                className="w-10 h-10 rounded-xl items-center justify-center"
+                style={{ backgroundColor: colors.primary + '20' }}
+              >
+                <Text className="text-xl">💡</Text>
+              </View>
+              <Text 
+                className="text-lg font-bold flex-1"
+                style={{ color: colors.foreground }}
+              >
+                专业拍摄建议
+              </Text>
+            </View>
+            
+            <View className="gap-3 ml-13">
+              {[
+                "光线充足,面部清晰可见",
+                "包含正面、侧面等多角度",
+                "避免佩戴帽子或墨镜",
+                "照片中仅有您一人",
+              ].map((tip, index) => (
+                <View key={index} className="flex-row items-start gap-3">
+                  <View 
+                    className="w-1.5 h-1.5 rounded-full mt-2"
+                    style={{ backgroundColor: colors.primary }}
+                  />
+                  <Text 
+                    className="text-base flex-1"
+                    style={{ color: colors.muted }}
+                  >
+                    {tip}
+                  </Text>
+                </View>
+              ))}
             </View>
           </View>
 
-          {/* Next Button */}
+          {/* Premium Next Button */}
           <TouchableOpacity
             onPress={handleNext}
             activeOpacity={0.9}
             disabled={!canProceed}
-            className={`w-full px-8 py-4 rounded-2xl ${
-              canProceed ? "bg-primary" : "bg-border"
-            }`}
+            className="w-full rounded-2xl overflow-hidden"
+            style={{
+              backgroundColor: canProceed ? colors.primary : colors.border,
+              shadowColor: canProceed ? colors.primary : 'transparent',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.4,
+              shadowRadius: 16,
+              elevation: canProceed ? 8 : 0,
+            }}
           >
-            <Text
-              className={`font-bold text-lg text-center ${
-                canProceed ? "text-background" : "text-muted"
-              }`}
-            >
-              下一步
-            </Text>
+            <View className="w-full px-8 py-5">
+              <Text 
+                className="font-bold text-xl text-center"
+                style={{ 
+                  color: canProceed ? colors.background : colors.muted,
+                  fontWeight: '700',
+                }}
+              >
+                下一步：选择风格
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>

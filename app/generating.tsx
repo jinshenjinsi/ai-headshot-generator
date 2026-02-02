@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Text, View, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import * as FileSystem from "expo-file-system/legacy";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 import { trpc } from "@/lib/trpc";
 
 const TIPS = [
+  "正在上传您的照片...",
   "正在分析您的面部特征...",
   "正在应用专业光线效果...",
   "正在优化背景场景...",
@@ -20,6 +22,24 @@ export default function GeneratingScreen() {
   const { selectedStyle, photos, setGeneratedImage } = useApp();
   const [currentTip, setCurrentTip] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+
+  const uploadMutation = trpc.headshot.uploadPhoto.useMutation({
+    onSuccess: (data) => {
+      if (data.success && data.url) {
+        setUploadedPhotoUrl(data.url);
+        setProgress(30);
+      }
+    },
+    onError: (error) => {
+      console.error("Upload error:", error);
+      Alert.alert(
+        "上传失败",
+        "照片上传遇到问题,请稍后重试",
+        [{ text: "返回", onPress: () => router.back() }]
+      );
+    },
+  });
 
   const generateMutation = trpc.headshot.generate.useMutation({
     onSuccess: (data) => {
@@ -36,12 +56,7 @@ export default function GeneratingScreen() {
       Alert.alert(
         "生成失败",
         "头像生成遇到问题,请稍后重试",
-        [
-          {
-            text: "返回",
-            onPress: () => router.back(),
-          },
-        ]
+        [{ text: "返回", onPress: () => router.back() }]
       );
     },
   });
@@ -52,22 +67,31 @@ export default function GeneratingScreen() {
       return;
     }
 
-    // Start generation immediately
-    generateMutation.mutate({
-      stylePrompt: selectedStyle.prompt,
-      referenceImageUrl: photos.length > 0 ? photos[0] : undefined,
-    });
-
-    // Simulate progress for UI feedback
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95; // Cap at 95% until real generation completes
+    // Step 1: Upload first photo if available
+    if (photos.length > 0) {
+      const uploadPhoto = async () => {
+        try {
+          const photoUri = photos[0];
+          const base64 = await FileSystem.readAsStringAsync(photoUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          
+          uploadMutation.mutate({
+            photoBase64: `data:image/jpeg;base64,${base64}`,
+            fileName: `photo-${Date.now()}.jpg`,
+          });
+        } catch (error) {
+          console.error("Failed to read photo:", error);
+          // Continue without reference image
+          setUploadedPhotoUrl(null);
+          setProgress(30);
         }
-        return prev + 3;
-      });
-    }, 500);
+      };
+      
+      uploadPhoto();
+    } else {
+      setProgress(30);
+    }
 
     // Rotate tips every 5 seconds
     const tipInterval = setInterval(() => {
@@ -75,10 +99,32 @@ export default function GeneratingScreen() {
     }, 5000);
 
     return () => {
-      clearInterval(progressInterval);
       clearInterval(tipInterval);
     };
   }, []);
+
+  // Step 2: Generate when photo is uploaded (or skipped)
+  useEffect(() => {
+    if (progress >= 30 && !generateMutation.isPending && !generateMutation.isSuccess) {
+      generateMutation.mutate({
+        stylePrompt: selectedStyle!.prompt,
+        referenceImageUrl: uploadedPhotoUrl || undefined,
+      });
+      
+      // Simulate progress for UI feedback
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressInterval);
+            return 95;
+          }
+          return prev + 2;
+        });
+      }, 800);
+
+      return () => clearInterval(progressInterval);
+    }
+  }, [progress, uploadedPhotoUrl]);
 
   return (
     <ScreenContainer>
@@ -92,7 +138,7 @@ export default function GeneratingScreen() {
           {/* Progress Bar */}
           <View className="w-64 h-2 bg-surface rounded-full overflow-hidden">
             <View
-              className="h-full bg-primary rounded-full"
+              className="h-full bg-primary rounded-full transition-all"
               style={{ width: `${progress}%` }}
             />
           </View>

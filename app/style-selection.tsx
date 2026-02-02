@@ -11,6 +11,7 @@ interface Style {
   description: string;
   category: string;
   prompt: string;
+  icon: string;
 }
 
 const STYLES: Style[] = [
@@ -20,6 +21,7 @@ const STYLES: Style[] = [
     description: "专业会议室背景,正式商务风格",
     category: "办公室",
     prompt: "professional business headshot portrait in modern boardroom setting, business attire, confident expression, corporate lighting, high quality, sharp focus",
+    icon: "🏢",
   },
   {
     id: "office-lobby",
@@ -27,6 +29,7 @@ const STYLES: Style[] = [
     description: "现代办公楼大堂,简约专业",
     category: "办公室",
     prompt: "professional headshot portrait in modern office lobby, business casual, natural lighting, glass windows background, contemporary architecture, high quality",
+    icon: "🏛️",
   },
   {
     id: "outdoor-city",
@@ -34,6 +37,7 @@ const STYLES: Style[] = [
     description: "都市建筑背景,时尚现代",
     category: "户外",
     prompt: "professional headshot portrait outdoors in urban setting, modern buildings background, natural daylight, business casual style, city skyline, high quality",
+    icon: "🌆",
   },
   {
     id: "outdoor-park",
@@ -41,6 +45,7 @@ const STYLES: Style[] = [
     description: "自然绿色背景,轻松亲和",
     category: "户外",
     prompt: "professional headshot portrait in park setting, greenery background, natural soft lighting, approachable friendly style, outdoor environment, high quality",
+    icon: "🌳",
   },
   {
     id: "studio-white",
@@ -48,6 +53,7 @@ const STYLES: Style[] = [
     description: "经典白色背景,简洁专业",
     category: "工作室",
     prompt: "professional studio headshot portrait with clean white background, professional studio lighting, minimalist style, sharp focus, high quality",
+    icon: "⚪",
   },
   {
     id: "studio-gray",
@@ -55,6 +61,7 @@ const STYLES: Style[] = [
     description: "中性灰色背景,沉稳大气",
     category: "工作室",
     prompt: "professional studio headshot portrait with neutral gray background, professional lighting, sophisticated elegant look, corporate style, high quality",
+    icon: "⚫",
   },
 ];
 
@@ -84,93 +91,151 @@ export default function StyleSelectionScreen() {
   const canProceed = selectedStyle !== null;
 
   return (
-    <ScreenContainer className="p-6">
+    <ScreenContainer className="bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 gap-6 pb-6">
-          {/* Header */}
+        <View className="flex-1 gap-8 py-8 px-6 pb-12">
+          {/* Elegant Header */}
           <View>
-            <View className="flex-row items-center gap-3 mb-4">
-              <View className="flex-1 h-1 bg-primary rounded-full" />
-              <View className="flex-1 h-1 bg-primary rounded-full" />
-              <View className="flex-1 h-1 bg-border rounded-full" />
+            {/* Progress Indicator */}
+            <View className="flex-row items-center gap-3 mb-6">
+              <View 
+                className="flex-1 h-1 rounded-full"
+                style={{ backgroundColor: colors.primary }}
+              />
+              <View 
+                className="flex-1 h-1 rounded-full"
+                style={{ backgroundColor: colors.primary }}
+              />
+              <View 
+                className="flex-1 h-1 rounded-full opacity-20"
+                style={{ backgroundColor: colors.primary }}
+              />
             </View>
             
-            <Text className="text-3xl font-bold text-foreground">选择风格</Text>
-            <Text className="text-base text-muted mt-2">
-              选择您喜欢的头像风格和场景
+            <Text 
+              className="text-4xl font-bold mb-3"
+              style={{ 
+                color: colors.foreground,
+                fontWeight: '800',
+                letterSpacing: -0.5,
+              }}
+            >
+              选择专业风格
+            </Text>
+            <Text 
+              className="text-lg leading-relaxed"
+              style={{ color: colors.muted }}
+            >
+              精选6种顶级场景风格{"\n"}
+              打造独一无二的专业形象
             </Text>
           </View>
 
-          {/* Style Grid */}
+          {/* Premium Style Cards */}
           <View className="gap-4">
-            {STYLES.map((style) => (
-              <TouchableOpacity
-                key={style.id}
-                onPress={() => handleStyleSelect(style)}
-                activeOpacity={0.7}
-                className={`bg-surface rounded-2xl p-4 border-2 ${
-                  selectedStyle?.id === style.id ? "border-primary" : "border-transparent"
-                }`}
-                style={{
-                  borderColor: selectedStyle?.id === style.id ? colors.primary : "transparent",
-                }}
-              >
-                <View className="flex-row items-center gap-4">
-                  <View
-                    className="w-16 h-16 rounded-xl items-center justify-center"
-                    style={{ backgroundColor: colors.primary + "20" }}
-                  >
-                    <Text className="text-2xl">
-                      {style.category === "办公室" ? "🏢" : 
-                       style.category === "户外" ? "🌳" : "📸"}
-                    </Text>
-                  </View>
-                  
-                  <View className="flex-1">
-                    <View className="flex-row items-center gap-2">
-                      <Text className="text-lg font-bold text-foreground">
-                        {style.name}
-                      </Text>
-                      <View className="bg-primary/20 px-2 py-1 rounded-md">
-                        <Text className="text-xs text-primary font-semibold">
-                          {style.category}
-                        </Text>
-                      </View>
-                    </View>
-                    <Text className="text-sm text-muted mt-1">
-                      {style.description}
-                    </Text>
-                  </View>
-
-                  {selectedStyle?.id === style.id && (
-                    <View
-                      className="w-6 h-6 rounded-full items-center justify-center"
-                      style={{ backgroundColor: colors.primary }}
+            {STYLES.map((style) => {
+              const isSelected = selectedStyle?.id === style.id;
+              
+              return (
+                <TouchableOpacity
+                  key={style.id}
+                  onPress={() => handleStyleSelect(style)}
+                  activeOpacity={0.8}
+                  className="rounded-3xl overflow-hidden"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderWidth: 2,
+                    borderColor: isSelected ? colors.primary : 'transparent',
+                    shadowColor: isSelected ? colors.primary : '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: isSelected ? 0.3 : 0.05,
+                    shadowRadius: isSelected ? 16 : 8,
+                    elevation: isSelected ? 8 : 2,
+                  }}
+                >
+                  <View className="flex-row items-center gap-5 p-5">
+                    {/* Icon */}
+                    <View 
+                      className="w-20 h-20 rounded-2xl items-center justify-center"
+                      style={{ 
+                        backgroundColor: isSelected 
+                          ? colors.primary + '25' 
+                          : colors.primary + '10'
+                      }}
                     >
-                      <Text className="text-background text-sm font-bold">✓</Text>
+                      <Text className="text-4xl">{style.icon}</Text>
                     </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
+                    
+                    {/* Content */}
+                    <View className="flex-1 gap-2">
+                      <View className="flex-row items-center gap-3">
+                        <Text 
+                          className="text-xl font-bold"
+                          style={{ color: colors.foreground }}
+                        >
+                          {style.name}
+                        </Text>
+                        <View 
+                          className="px-3 py-1 rounded-full"
+                          style={{ backgroundColor: colors.primary + '20' }}
+                        >
+                          <Text 
+                            className="text-xs font-semibold"
+                            style={{ color: colors.primary }}
+                          >
+                            {style.category}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text 
+                        className="text-sm leading-relaxed"
+                        style={{ color: colors.muted }}
+                      >
+                        {style.description}
+                      </Text>
+                    </View>
+
+                    {/* Selection Indicator */}
+                    {isSelected && (
+                      <View 
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: colors.primary }}
+                      >
+                        <Text className="text-white text-lg font-bold">✓</Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Generate Button */}
+          {/* Premium Generate Button */}
           <TouchableOpacity
             onPress={handleGenerate}
             activeOpacity={0.9}
             disabled={!canProceed}
-            className={`w-full px-8 py-4 rounded-2xl ${
-              canProceed ? "bg-primary" : "bg-border"
-            }`}
+            className="w-full rounded-2xl overflow-hidden mt-4"
+            style={{
+              backgroundColor: canProceed ? colors.primary : colors.border,
+              shadowColor: canProceed ? colors.primary : 'transparent',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.4,
+              shadowRadius: 16,
+              elevation: canProceed ? 8 : 0,
+            }}
           >
-            <Text
-              className={`font-bold text-lg text-center ${
-                canProceed ? "text-background" : "text-muted"
-              }`}
-            >
-              生成预览
-            </Text>
+            <View className="w-full px-8 py-5">
+              <Text 
+                className="font-bold text-xl text-center"
+                style={{ 
+                  color: canProceed ? colors.background : colors.muted,
+                  fontWeight: '700',
+                }}
+              >
+                开始生成专业头像
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
