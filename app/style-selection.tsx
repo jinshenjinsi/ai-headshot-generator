@@ -14,6 +14,8 @@ interface Style {
   prompt: string;
   icon: string;
   exampleImage: any;
+  background: "white" | "black" | "neutral" | "gray" | "office";
+  gender?: "none" | "male" | "female";
 }
 
 const STYLES: Style[] = [
@@ -25,6 +27,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional business headshot in modern boardroom setting. KEEP the person's exact facial features, face shape, and identity. Only change: background to boardroom, lighting to corporate style, attire to business suit, expression to confident. High quality, sharp focus, photorealistic.",
     icon: "🏢",
     exampleImage: require("@/assets/images/example-boardroom.jpg"),
+    background: "office",
   },
   {
     id: "office-lobby",
@@ -34,6 +37,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional headshot in modern office lobby. PRESERVE the person's facial features and identity completely. Only modify: background to office lobby with glass windows, lighting to natural daylight, attire to business casual. High quality, photorealistic.",
     icon: "🏛️",
     exampleImage: require("@/assets/images/example-office-lobby.jpg"),
+    background: "office",
   },
   {
     id: "outdoor-city",
@@ -43,6 +47,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional outdoor headshot in urban setting. MAINTAIN the person's exact face and features. Only change: background to city skyline with modern buildings, lighting to natural daylight, attire to business casual. High quality, photorealistic.",
     icon: "🌆",
     exampleImage: require("@/assets/images/example-city.jpg"),
+    background: "neutral",
   },
   {
     id: "outdoor-park",
@@ -52,6 +57,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional headshot in park setting. KEEP the person's facial identity intact. Only modify: background to park with greenery, lighting to soft natural light, expression to friendly and approachable. High quality, photorealistic.",
     icon: "🌳",
     exampleImage: require("@/assets/images/example-park.jpg"),
+    background: "neutral",
   },
   {
     id: "studio-white",
@@ -61,6 +67,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional studio headshot with clean white background. PRESERVE all facial features and identity. Only change: background to pure white, lighting to professional studio setup, minimal shadows. High quality, sharp focus, photorealistic.",
     icon: "⚪",
     exampleImage: require("@/assets/images/example-white.jpg"),
+    background: "white",
   },
   {
     id: "studio-gray",
@@ -70,6 +77,7 @@ const STYLES: Style[] = [
     prompt: "Transform this person into a professional studio headshot with neutral gray background. MAINTAIN the person's face completely. Only modify: background to neutral gray, lighting to professional studio style, overall look to sophisticated and elegant. High quality, photorealistic.",
     icon: "⚫",
     exampleImage: require("@/assets/images/example-gray.jpg"),
+    background: "gray",
   },
 ];
 

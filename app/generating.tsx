@@ -107,8 +107,9 @@ export default function GeneratingScreen() {
   useEffect(() => {
     if (progress >= 30 && !generateMutation.isPending && !generateMutation.isSuccess) {
       generateMutation.mutate({
-        stylePrompt: selectedStyle!.prompt,
-        referenceImageUrl: uploadedPhotoUrl || undefined,
+        imageUrl: uploadedPhotoUrl!,
+        background: selectedStyle!.background,
+        gender: selectedStyle!.gender,
       });
       
       // Simulate progress for UI feedback

@@ -8,6 +8,8 @@ interface AppContextType {
     name: string;
     prompt: string;
     category: string;
+    background: "white" | "black" | "neutral" | "gray" | "office";
+    gender?: "none" | "male" | "female";
   } | null;
   setSelectedStyle: (style: AppContextType["selectedStyle"]) => void;
   generatedImage: string | null;

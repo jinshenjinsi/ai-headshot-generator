@@ -52,29 +52,28 @@ export const appRouter = router({
     generate: publicProcedure
       .input(
         z.object({
-          stylePrompt: z.string(),
-          referenceImageUrl: z.string().url().optional(),
+          imageUrl: z.string().url(),
+          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
+          gender: z.enum(["none", "male", "female"]).optional(),
         })
       )
       .mutation(async ({ input }) => {
-        const { generateImage } = await import("./_core/imageGeneration");
+        const { generateProfessionalHeadshot } = await import("./replicate-service");
         
         try {
-          const result = await generateImage({
-            prompt: input.stylePrompt,
-            originalImages: input.referenceImageUrl
-              ? [
-                  {
-                    url: input.referenceImageUrl,
-                    mimeType: "image/jpeg",
-                  },
-                ]
-              : undefined,
+          const result = await generateProfessionalHeadshot({
+            imageUrl: input.imageUrl,
+            background: input.background,
+            gender: input.gender,
           });
+
+          if (!result.success) {
+            throw new Error(result.error || "Failed to generate headshot");
+          }
 
           return {
             success: true,
-            imageUrl: result.url,
+            imageUrl: result.imageUrl!,
           };
         } catch (error) {
           console.error("Headshot generation failed:", error);
