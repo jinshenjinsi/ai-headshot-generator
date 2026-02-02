@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Text, View, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import * as FileSystem from "expo-file-system/legacy";
@@ -23,12 +23,14 @@ export default function GeneratingScreen() {
   const [currentTip, setCurrentTip] = useState(0);
   const [progress, setProgress] = useState(0);
   const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+  const [uploadComplete, setUploadComplete] = useState(false);
 
   const uploadMutation = trpc.headshot.uploadPhoto.useMutation({
     onSuccess: (data) => {
       if (data.success && data.url) {
         setUploadedPhotoUrl(data.url);
         setProgress(30);
+        setUploadComplete(true);
       }
     },
     onError: (error) => {
@@ -82,15 +84,21 @@ export default function GeneratingScreen() {
           });
         } catch (error) {
           console.error("Failed to read photo:", error);
-          // Continue without reference image
-          setUploadedPhotoUrl(null);
-          setProgress(30);
+          Alert.alert(
+            "读取照片失败",
+            "无法读取您的照片,请重新选择",
+            [{ text: "返回", onPress: () => router.back() }]
+          );
         }
       };
       
       uploadPhoto();
     } else {
-      setProgress(30);
+      Alert.alert(
+        "没有照片",
+        "请先上传照片",
+        [{ text: "返回", onPress: () => router.back() }]
+      );
     }
 
     // Rotate tips every 5 seconds
@@ -103,11 +111,11 @@ export default function GeneratingScreen() {
     };
   }, []);
 
-  // Step 2: Generate when photo is uploaded (or skipped)
+  // Step 2: Generate when photo is uploaded
   useEffect(() => {
-    if (progress >= 30 && !generateMutation.isPending && !generateMutation.isSuccess) {
+    if (uploadComplete && uploadedPhotoUrl && !generateMutation.isPending && !generateMutation.isSuccess) {
       generateMutation.mutate({
-        imageUrl: uploadedPhotoUrl!,
+        imageUrl: uploadedPhotoUrl,
         background: selectedStyle!.background,
         gender: selectedStyle!.gender,
       });
@@ -125,52 +133,72 @@ export default function GeneratingScreen() {
 
       return () => clearInterval(progressInterval);
     }
-  }, [progress, uploadedPhotoUrl]);
+  }, [uploadComplete, uploadedPhotoUrl]);
 
   return (
-    <ScreenContainer>
-      <View className="flex-1 items-center justify-center p-8 gap-8">
-        {/* Progress Indicator */}
-        <View className="items-center gap-6">
-          <View className="relative w-24 h-24 items-center justify-center">
+    <ScreenContainer className="bg-background">
+      <View className="flex-1 items-center justify-center px-8">
+        {/* Elegant Loading Animation */}
+        <View className="items-center gap-8 mb-12">
+          <View 
+            className="w-32 h-32 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: colors.primary + '10',
+              shadowColor: colors.primary,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.3,
+              shadowRadius: 24,
+            }}
+          >
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
 
           {/* Progress Bar */}
-          <View className="w-64 h-2 bg-surface rounded-full overflow-hidden">
-            <View
-              className="h-full bg-primary rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
+          <View className="w-full max-w-xs">
+            <View 
+              className="h-2 rounded-full overflow-hidden"
+              style={{ backgroundColor: colors.border }}
+            >
+              <View 
+                className="h-full rounded-full"
+                style={{
+                  backgroundColor: colors.primary,
+                  width: `${progress}%`,
+                }}
+              />
+            </View>
+            <Text 
+              className="text-center mt-3 text-sm font-semibold"
+              style={{ color: colors.primary }}
+            >
+              {progress}%
+            </Text>
           </View>
-          
-          <Text className="text-base font-semibold text-primary">
-            {progress}%
-          </Text>
         </View>
 
-        {/* Title */}
-        <View className="items-center gap-3">
-          <Text className="text-2xl font-bold text-foreground text-center">
-            AI正在生成您的专业头像
+        {/* Dynamic Tips */}
+        <View className="items-center gap-4">
+          <Text 
+            className="text-2xl font-bold text-center"
+            style={{ 
+              color: colors.foreground,
+              fontWeight: '800',
+            }}
+          >
+            AI正在创作中
           </Text>
-          <Text className="text-base text-muted text-center">
-            预计需要30-60秒...
-          </Text>
-        </View>
-
-        {/* Rotating Tips */}
-        <View className="items-center">
-          <Text className="text-base text-muted text-center">
+          <Text 
+            className="text-base text-center leading-relaxed"
+            style={{ color: colors.muted }}
+          >
             {TIPS[currentTip]}
           </Text>
-        </View>
-
-        {/* Progress Steps */}
-        <View className="flex-row items-center gap-3">
-          <View className="flex-1 h-1 bg-primary rounded-full" />
-          <View className="flex-1 h-1 bg-primary rounded-full" />
-          <View className="flex-1 h-1 bg-primary rounded-full" />
+          <Text 
+            className="text-sm text-center mt-2"
+            style={{ color: colors.muted }}
+          >
+            预计需要30-60秒
+          </Text>
         </View>
       </View>
     </ScreenContainer>
