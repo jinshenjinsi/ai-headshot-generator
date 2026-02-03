@@ -113,6 +113,60 @@ export const appRouter = router({
           throw new Error("Failed to generate headshot with two-step method");
         }
       }),
+    // Ideogram-character generation for best character consistency
+    generateIdeogram: publicProcedure
+      .input(
+        z.object({
+          imageUrl: z.string().url(),
+          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
+          gender: z.enum(["none", "male", "female"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { generateIdeogramCharacter } = await import("./ideogram-service");
+        
+        try {
+          // 根据背景和性别生成prompt
+          const backgroundMap = {
+            white: "white background",
+            black: "black background",
+            neutral: "neutral gray background",
+            gray: "gray background",
+            office: "modern office background",
+          };
+          
+          const genderMap = {
+            none: "",
+            male: "professional businessman",
+            female: "professional businesswoman",
+          };
+          
+          const backgroundText = input.background ? backgroundMap[input.background] : "neutral background";
+          const genderText = input.gender && input.gender !== "none" ? genderMap[input.gender] : "professional person";
+          
+          const prompt = `A professional corporate headshot photo of a ${genderText} in business attire, ${backgroundText}, studio lighting, high quality, sharp focus, professional photography`;
+          
+          const result = await generateIdeogramCharacter({
+            characterImageUrl: input.imageUrl,
+            prompt: prompt,
+            renderingSpeed: "Quality", // 使用Quality模式
+            styleType: "Realistic",
+            aspectRatio: "1:1",
+          });
+
+          if (!result.success) {
+            throw new Error(result.error || "Failed to generate headshot with ideogram-character");
+          }
+
+          return {
+            success: true,
+            imageUrl: result.imageUrl!,
+          };
+        } catch (error) {
+          console.error("Ideogram-character generation failed:", error);
+          throw new Error("Failed to generate headshot with ideogram-character");
+        }
+      }),
   }),
 });
 

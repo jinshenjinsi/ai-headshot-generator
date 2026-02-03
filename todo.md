@@ -244,11 +244,11 @@
 - [x] 用户反馈: face-swap能运行但面部特征变化太大
 
 ### 集成ideogram-character模型
-- [ ] 研究ideogram-character API文档
-- [ ] 创建ideogram-character服务模块
-- [ ] 添加generateIdeogram API路由
-- [ ] 前端切换到ideogram API
-- [ ] 配置Quality模式参数
+- [x] 研究ideogram-character API文档
+- [x] 创建ideogram-character服务模块
+- [x] 添加generateIdeogram API路由
+- [x] 前端切换到ideogram API
+- [x] 配置Quality模式参数
 
 ### 测试和对比
 - [ ] 测试ideogram-character效果

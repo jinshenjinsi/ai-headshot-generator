@@ -71,7 +71,7 @@ export default function GeneratingScreen() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const uploadMutation = trpc.headshot.uploadPhoto.useMutation();
-  const generateMutation = trpc.headshot.generateTwoStep.useMutation(); // 使用两步法API
+  const generateMutation = trpc.headshot.generateIdeogram.useMutation(); // 使用ideogram-character API
 
   useEffect(() => {
     // 检查必要数据
@@ -184,15 +184,10 @@ export default function GeneratingScreen() {
       setStatusMessage("AI正在分析您的面部特征...");
 
       // 等待一下让用户看到进度
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      setProgress(60);
-      setStatusMessage("正在生成专业背景...");
-
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setProgress(70);
-      setStatusMessage("正在保留您的面部特征...");
+      setStatusMessage("正在生成专业头像...(Quality模式)");
 
       // 调用生成API
       const result = await generateMutation.mutateAsync({
