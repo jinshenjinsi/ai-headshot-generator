@@ -64,7 +64,7 @@ export default function HomeScreen() {
                   letterSpacing: -1,
                 }}
               >
-                AI专业头像
+                AI证件照生成
               </Text>
               <Text 
                 className="text-xl text-center px-8 leading-relaxed"
@@ -73,8 +73,8 @@ export default function HomeScreen() {
                   fontWeight: '400',
                 }}
               >
-                顶级AI技术 · 专业摄影品质{"\n"}
-                让每一张照片都成为艺术
+                工作证 · 简历照 · 签证照{"\n"}
+                一键生成专业证件照
               </Text>
             </View>
 
@@ -115,8 +115,8 @@ export default function HomeScreen() {
             <View className="w-full gap-5 mt-8">
               {[
                 { icon: "⚡", title: "极速生成", desc: "30秒即可完成" },
-                { icon: "✨", title: "专业品质", desc: "媲美顶级摄影师" },
-                { icon: "🎨", title: "多样风格", desc: "6种精选场景" },
+                { icon: "💼", title: "证件照专用", desc: "符合各类证件要求" },
+                { icon: "🎯", title: "多种场景", desc: "办公室·白底·灰底" },
               ].map((feature, index) => (
                 <View 
                   key={index}

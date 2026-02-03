@@ -70,7 +70,18 @@ export default function ResultScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
+    // 重新选择风格
     router.push("/style-selection" as any);
+  };
+
+  const handleRegenerateUnsatisfied = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    
+    // 不满意重生成:保留当前参数但调整随机种子
+    // 直接跳转到生成页面,使用相同的照片和风格
+    router.push("/generating" as any);
   };
 
   const handleBackHome = () => {
@@ -232,6 +243,41 @@ export default function ResultScreen() {
               </View>
             </TouchableOpacity>
 
+            {/* Unsatisfied Button - Primary Secondary Action */}
+            <TouchableOpacity
+              onPress={handleRegenerateUnsatisfied}
+              activeOpacity={0.9}
+              className="w-full rounded-2xl overflow-hidden"
+              style={{
+                backgroundColor: colors.surface,
+                borderWidth: 2,
+                borderColor: colors.primary,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 12,
+                elevation: 4,
+              }}
+            >
+              <View className="w-full px-8 py-4">
+                <Text 
+                  className="font-bold text-lg text-center"
+                  style={{ 
+                    color: colors.primary,
+                    fontWeight: '600',
+                  }}
+                >
+                  🔄 不满意，免费重生成
+                </Text>
+                <Text 
+                  className="text-xs text-center mt-1"
+                  style={{ color: colors.muted }}
+                >
+                  自动调整参数，不额外收费
+                </Text>
+              </View>
+            </TouchableOpacity>
+
             {/* Secondary Actions */}
             <View className="flex-row gap-4">
               <TouchableOpacity
@@ -254,7 +300,7 @@ export default function ResultScreen() {
                     className="font-semibold text-base text-center"
                     style={{ color: colors.foreground }}
                   >
-                    重新生成
+                    换个风格
                   </Text>
                 </View>
               </TouchableOpacity>

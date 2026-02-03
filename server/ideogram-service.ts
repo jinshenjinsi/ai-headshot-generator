@@ -10,6 +10,7 @@ export interface IdeogramCharacterOptions {
   renderingSpeed?: "Turbo" | "Default" | "Quality";
   styleType?: "Auto" | "Fiction" | "Realistic";
   aspectRatio?: "1:1" | "9:16" | "16:9" | "4:3" | "3:4";
+  seed?: number; // 随机种子,用于控制生成结果的随机性
 }
 
 export interface IdeogramCharacterResult {
@@ -33,6 +34,11 @@ export async function generateIdeogramCharacter(
   try {
     console.log("Creating ideogram-character prediction:", options);
     
+    // Generate random seed if not provided (for retry variation)
+    const seed = options.seed || Math.floor(Math.random() * 1000000);
+    
+    console.log("Using seed:", seed);
+    
     // Use predictions.create and wait for completion
     let prediction = await replicate.predictions.create({
       model: "ideogram-ai/ideogram-character",
@@ -43,6 +49,7 @@ export async function generateIdeogramCharacter(
         style_type: options.styleType || "Realistic",
         aspect_ratio: options.aspectRatio || "1:1",
         magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
+        seed: seed, // 添加随机种子
       },
     });
     
