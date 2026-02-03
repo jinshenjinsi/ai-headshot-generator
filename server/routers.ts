@@ -80,6 +80,39 @@ export const appRouter = router({
           throw new Error("Failed to generate headshot");
         }
       }),
+    // Two-step generation with face-swap for better face preservation
+    generateTwoStep: publicProcedure
+      .input(
+        z.object({
+          imageUrl: z.string().url(),
+          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
+          gender: z.enum(["none", "male", "female"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { generateHeadshotTwoStep } = await import("./headshot-two-step-service");
+        
+        try {
+          const result = await generateHeadshotTwoStep({
+            userImageUrl: input.imageUrl,
+            background: input.background,
+            gender: input.gender,
+          });
+
+          if (!result.success) {
+            throw new Error(result.error || "Failed to generate headshot with two-step method");
+          }
+
+          return {
+            success: true,
+            imageUrl: result.finalImageUrl!,
+            backgroundImageUrl: result.backgroundImageUrl,
+          };
+        } catch (error) {
+          console.error("Two-step headshot generation failed:", error);
+          throw new Error("Failed to generate headshot with two-step method");
+        }
+      }),
   }),
 });
 
