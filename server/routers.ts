@@ -118,6 +118,7 @@ export const appRouter = router({
       .input(
         z.object({
           imageUrl: z.string().url(),
+          prompt: z.string(), // 使用完整的prompt而不是简单的background/gender
           background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
           gender: z.enum(["none", "male", "female"]).optional(),
         })
@@ -126,25 +127,38 @@ export const appRouter = router({
         const { generateIdeogramCharacter } = await import("./ideogram-service");
         
         try {
-          // 根据背景和性别生成prompt
-          const backgroundMap = {
-            white: "white background",
-            black: "black background",
-            neutral: "neutral gray background",
-            gray: "gray background",
-            office: "modern office background",
-          };
+          // 在prompt中添加随机变化词,增加重生成差异
+          const lightingVariations = [
+            "soft diffused lighting",
+            "natural window light",
+            "professional studio lighting",
+            "dramatic side lighting",
+            "balanced key light",
+          ];
           
-          const genderMap = {
-            none: "",
-            male: "professional businessman",
-            female: "professional businesswoman",
-          };
+          const angleVariations = [
+            "straight-on angle",
+            "slight 3/4 angle",
+            "head tilted slightly",
+            "shoulders angled",
+            "centered composition",
+          ];
           
-          const backgroundText = input.background ? backgroundMap[input.background] : "neutral background";
-          const genderText = input.gender && input.gender !== "none" ? genderMap[input.gender] : "professional person";
+          const detailVariations = [
+            "crisp details",
+            "subtle texture",
+            "smooth skin tone",
+            "natural skin texture",
+            "professional retouching",
+          ];
           
-          const prompt = `A professional corporate headshot photo of a ${genderText} in business attire, ${backgroundText}, studio lighting, high quality, sharp focus, professional photography`;
+          // 随机选择变化词
+          const randomLighting = lightingVariations[Math.floor(Math.random() * lightingVariations.length)];
+          const randomAngle = angleVariations[Math.floor(Math.random() * angleVariations.length)];
+          const randomDetail = detailVariations[Math.floor(Math.random() * detailVariations.length)];
+          
+          // 在原始prompt后面添加变化词
+          const prompt = `${input.prompt} Additional details: ${randomLighting}, ${randomAngle}, ${randomDetail}.`;
           
           const result = await generateIdeogramCharacter({
             characterImageUrl: input.imageUrl,

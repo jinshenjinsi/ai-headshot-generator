@@ -189,9 +189,10 @@ export default function GeneratingScreen() {
       setProgress(70);
       setStatusMessage("正在生成专业头像...(Quality模式)");
 
-      // 调用生成API
+      // 调用生成API,传递完整prompt
       const result = await generateMutation.mutateAsync({
         imageUrl: uploadResult.url,
+        prompt: selectedStyle!.prompt, // 使用风格的详细prompt
         background: selectedStyle!.background,
         gender: selectedStyle!.gender || "none",
       });
