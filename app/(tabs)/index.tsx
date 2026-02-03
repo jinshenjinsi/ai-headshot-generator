@@ -6,9 +6,9 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 
 const EXAMPLE_IMAGES = [
-  require("@/assets/images/example-boardroom.jpg"),
-  require("@/assets/images/example-city.jpg"),
-  require("@/assets/images/example-park.jpg"),
+  require("@/assets/images/example-id-photo-1.jpg"),
+  require("@/assets/images/example-id-photo-2.jpg"),
+  require("@/assets/images/example-id-photo-3.jpg"),
 ];
 
 export default function HomeScreen() {
