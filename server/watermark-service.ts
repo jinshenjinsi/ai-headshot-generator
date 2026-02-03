@@ -35,7 +35,90 @@ async function generateQRCode(url: string, size: number = 120): Promise<Buffer> 
 }
 
 /**
- * 为图片添加水印
+ * 直接在原图上添加水印(不降低分辨率)
+ * @param imageUrl 原图URL
+ * @param qrCodeUrl 二维码指向的URL
+ * @param options 水印选项
+ * @returns 带水印的图片和原图
+ */
+export async function addWatermarkToOriginal(
+  imageUrl: string,
+  qrCodeUrl: string,
+  options: {
+    qrSize?: number;        // 二维码尺寸,默认120px
+    opacity?: number;       // 透明度,0-1,默认0.3
+    padding?: number;       // 边距,默认20px
+  } = {}
+): Promise<{ watermarked: Buffer; original: Buffer }> {
+  const {
+    qrSize = 120,
+    opacity = 0.3,
+    padding = 20
+  } = options;
+
+  try {
+    // 1. 下载原图
+    console.log('下载原图:', imageUrl);
+    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const originalBuffer = Buffer.from(response.data);
+
+    // 2. 获取原图信息
+    const image = sharp(originalBuffer);
+    const metadata = await image.metadata();
+    const originalWidth = metadata.width || 640;
+    const originalHeight = metadata.height || 1536;
+
+    console.log('原图尺寸:', originalWidth, 'x', originalHeight);
+
+    // 3. 生成二维码
+    console.log('生成二维码:', qrCodeUrl);
+    const qrBuffer = await generateQRCode(qrCodeUrl, qrSize);
+
+    // 4. 创建半透明二维码
+    const transparentQR = await sharp(qrBuffer)
+      .ensureAlpha()
+      .composite([{
+        input: Buffer.from([255, 255, 255, Math.round(opacity * 255)]),
+        raw: {
+          width: 1,
+          height: 1,
+          channels: 4
+        },
+        tile: true,
+        blend: 'dest-in'
+      }])
+      .png()
+      .toBuffer();
+
+    // 5. 计算水印位置(右下角)
+    const left = originalWidth - qrSize - padding;
+    const top = originalHeight - qrSize - padding;
+
+    // 6. 在原图上添加水印(保持原分辨率)
+    console.log('在原图上添加水印...');
+    const watermarkedBuffer = await sharp(originalBuffer)
+      .composite([{
+        input: transparentQR,
+        left: left,
+        top: top
+      }])
+      .jpeg({ quality: 95 })  // 高质量
+      .toBuffer();
+
+    console.log('水印添加完成');
+
+    return {
+      watermarked: watermarkedBuffer,  // 带水印的原分辨率图
+      original: originalBuffer         // 无水印原图
+    };
+  } catch (error) {
+    console.error('添加水印失败:', error);
+    throw new Error('添加水印失败');
+  }
+}
+
+/**
+ * 为图片添加水印(旧版本,生成预览版)
  * @param imageUrl 原图URL
  * @param qrCodeUrl 二维码指向的URL
  * @param options 水印选项
@@ -142,21 +225,33 @@ export async function uploadToS3(buffer: Buffer, filename: string): Promise<stri
   const path = await import('path');
   const { execSync } = await import('child_process');
   
+  // 确保基础目录存在
   const tempDir = '/tmp/watermarked';
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir, { recursive: true });
   }
   
-  const tempPath = path.join(tempDir, filename);
-  fs.writeFileSync(tempPath, buffer);
+  // 解析文件名中的目录结构(例如: headshots/preview/123.jpg)
+  const fullPath = path.join(tempDir, filename);
+  const fileDir = path.dirname(fullPath);
+  
+  // 确保文件所在目录存在
+  if (!fs.existsSync(fileDir)) {
+    console.log('创建目录:', fileDir);
+    fs.mkdirSync(fileDir, { recursive: true });
+  }
+  
+  // 写入文件
+  fs.writeFileSync(fullPath, buffer);
+  console.log('文件已写入:', fullPath);
   
   try {
-    const result = execSync(`manus-upload-file ${tempPath}`, { encoding: 'utf-8' });
+    const result = execSync(`manus-upload-file ${fullPath}`, { encoding: 'utf-8' });
     const url = result.trim();
     console.log('上传成功:', url);
     
     // 清理临时文件
-    fs.unlinkSync(tempPath);
+    fs.unlinkSync(fullPath);
     
     return url;
   } catch (error) {

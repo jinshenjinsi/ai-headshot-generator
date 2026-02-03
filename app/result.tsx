@@ -20,54 +20,6 @@ export default function ResultScreen() {
   const MAX_FREE_REGENERATE = 3;
   const remainingRegenerate = Math.max(0, MAX_FREE_REGENERATE - regenerateCount);
 
-  // 下载预览版(带水印)
-  const handleDownloadPreview = async () => {
-    if (!generatedImage || downloading) return;
-
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-
-    setDownloading(true);
-
-    try {
-      if (Platform.OS === "web") {
-        const response = await fetch(generatedImage);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = `headshot-preview-${Date.now()}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-        
-        Alert.alert("下载成功", "预览版已保存");
-      } else {
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("需要权限", "请允许访问相册以保存图片");
-          setDownloading(false);
-          return;
-        }
-
-        const fileUri = FileSystem.documentDirectory + `headshot-preview-${Date.now()}.jpg`;
-        await FileSystem.downloadAsync(generatedImage, fileUri);
-        await MediaLibrary.saveToLibraryAsync(fileUri);
-        
-        Alert.alert("下载成功", "预览版已保存到相册");
-      }
-    } catch (error) {
-      console.error("Download error:", error);
-      Alert.alert("下载失败", "保存图片时出现问题,请稍后重试");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   // 付费下载高清版(无水印)
   const handleDownloadHD = async () => {
     if (!originalImageUrl || downloading) return;
@@ -346,37 +298,6 @@ export default function ResultScreen() {
                   style={{ color: colors.background + 'CC' }}
                 >
                   无水印·高清画质
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            {/* Preview Download Button (Free) */}
-            <TouchableOpacity
-              onPress={handleDownloadPreview}
-              disabled={downloading}
-              activeOpacity={0.9}
-              className="w-full rounded-2xl overflow-hidden"
-              style={{
-                backgroundColor: colors.surface,
-                borderWidth: 2,
-                borderColor: colors.border,
-              }}
-            >
-              <View className="w-full px-8 py-4">
-                <Text 
-                  className="font-semibold text-base text-center"
-                  style={{ 
-                    color: colors.foreground,
-                    fontWeight: '600',
-                  }}
-                >
-                  下载预览版(免费)
-                </Text>
-                <Text 
-                  className="text-xs text-center mt-1"
-                  style={{ color: colors.muted }}
-                >
-                  带水印·降低分辨率
                 </Text>
               </View>
             </TouchableOpacity>

@@ -125,7 +125,7 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { generateIdeogramCharacter } = await import("./ideogram-service");
-        const { addWatermark, uploadToS3 } = await import("./watermark-service");
+        const { addWatermarkToOriginal, uploadToS3 } = await import("./watermark-service");
         
         try {
           // 在prompt中添加随机变化词,增加重生成差异
@@ -173,31 +173,30 @@ export const appRouter = router({
             throw new Error(result.error || "Failed to generate headshot with ideogram-character");
           }
 
-          // 添加水印并生成预览版
-          console.log("添加水印并生成预览版...");
+          // 直接在原图上添加水印(不降低分辨率)
+          console.log("添加水印到原图...");
           const qrCodeUrl = "https://manus.im"; // TODO: 替换为实际的APP下载页URL
-          const { preview, original } = await addWatermark(
+          const { watermarked, original } = await addWatermarkToOriginal(
             result.imageUrl!,
             qrCodeUrl,
             {
-              qrSize: 120,      // 二维码尺寸稍大
+              qrSize: 120,      // 二维码尺寸
               opacity: 0.3,     // 透明度30%
               padding: 20,      // 边距20px
-              previewWidth: 512 // 预览版宽度512px
             }
           );
 
-          // 上传预览版和原图
+          // 上传带水印的图和原图
           const timestamp = Date.now();
-          const previewUrl = await uploadToS3(preview, `headshots/preview/${timestamp}.jpg`);
+          const watermarkedUrl = await uploadToS3(watermarked, `headshots/watermarked/${timestamp}.jpg`);
           const originalUrl = await uploadToS3(original, `headshots/original/${timestamp}.jpg`);
 
-          console.log("预览版URL:", previewUrl);
+          console.log("带水印图URL:", watermarkedUrl);
           console.log("原图URL:", originalUrl);
 
           return {
             success: true,
-            imageUrl: previewUrl,      // 返回带水印的预览版
+            imageUrl: watermarkedUrl,      // 返回带水印的原分辨率图
             originalUrl: originalUrl,  // 返回高清无水印原图URL
           };
         } catch (error) {
