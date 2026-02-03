@@ -47,7 +47,7 @@ export async function generateIdeogramCharacter(
         prompt: options.prompt,
         rendering_speed: options.renderingSpeed || "Quality",
         style_type: options.styleType || "Realistic",
-        aspect_ratio: options.aspectRatio || "1:1",
+        aspect_ratio: options.aspectRatio || "3:4", // 使用3:4比例提高清晰度(1152×1536)
         magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
         seed: seed, // 添加随机种子
       },
