@@ -313,3 +313,25 @@
 - [x] 汇总之前所有对话中提到的优化建议
 - [x] 整理成结构化文档 (OPTIMIZATION_ROADMAP.md)
 - [x] 按优先级和实施难度分类 (P0/P1/P2/P3)
+
+## 千问FaceChain API集成 (2026-02-03)
+
+### 备份当前版本
+- [ ] 保存当前Replicate版本checkpoint
+
+### 集成FaceChain API
+- [ ] 创建FaceChain服务模块(server/facechain-service.ts)
+- [ ] 实现trainfree模式API调用
+- [ ] 准备6个风格模板图片
+- [ ] 修改前端调用新API
+- [ ] 测试FaceChain生成效果
+
+### 腾讯云部署准备
+- [ ] 编写部署文档
+- [ ] 配置环境变量说明
+- [ ] 准备启动脚本
+
+### 测试验证
+- [ ] 测试面部特征保留效果
+- [ ] 对比Replicate vs FaceChain质量
+- [ ] 验证国内访问无需翻墙
