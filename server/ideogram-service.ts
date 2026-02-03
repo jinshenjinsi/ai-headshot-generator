@@ -10,6 +10,7 @@ export interface IdeogramCharacterOptions {
   renderingSpeed?: "Turbo" | "Default" | "Quality";
   styleType?: "Auto" | "Fiction" | "Realistic";
   aspectRatio?: "1:1" | "9:16" | "16:9" | "4:3" | "3:4";
+  resolution?: string; // 直接指定分辨率(覆盖aspect_ratio)
   seed?: number; // 随机种子,用于控制生成结果的随机性
 }
 
@@ -39,15 +40,18 @@ export async function generateIdeogramCharacter(
     
     console.log("Using seed:", seed);
     
+    // 在prompt中强调锐度和细节
+    const enhancedPrompt = `${options.prompt}, sharp focus, high detail, crisp, professional photography, 8k resolution`;
+    
     // Use predictions.create and wait for completion
     let prediction = await replicate.predictions.create({
       model: "ideogram-ai/ideogram-character",
       input: {
         character_reference_image: options.characterImageUrl,
-        prompt: options.prompt,
+        prompt: enhancedPrompt,
         rendering_speed: options.renderingSpeed || "Quality",
         style_type: options.styleType || "Realistic",
-        aspect_ratio: options.aspectRatio || "3:4", // 使用3:4比例提高清晰度(1152×1536)
+        resolution: options.resolution || "1280x1707", // 使用更高分辨率提升锐度(3:4比例)
         magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
         seed: seed, // 添加随机种子
       },

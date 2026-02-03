@@ -343,3 +343,19 @@
 - [x] 优化图片尺寸参数 (改为3:4比例,1152×1536)
 - [ ] 测试不同分辨率设置
 - [ ] 对比千问FaceChain的清晰度表现
+
+## 图片锐度优化 (2026-02-03 P0紧急)
+
+- [x] 检查当前ideogram API参数
+- [x] 添加resolution参数直接指定高分辨率(1280x1707)
+- [x] 在prompt中强调"sharp focus, high detail, crisp, professional photography, 8k resolution"
+- [x] magic_prompt_option设置为"Off"保持精确性
+- [ ] 验证锐度提升效果
+
+## 底色着装多样化 (2026-02-03 P0紧急)
+
+- [ ] 分析当前prompt为何无效
+- [ ] 研究ideogram-character模型限制
+- [ ] 考虑切换到千问FaceChain(支持底图库)
+- [ ] 生成18张多样化底图(6风格×3张)
+- [ ] 集成千问API实现真正的多样化
