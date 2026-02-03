@@ -247,7 +247,18 @@ export async function uploadToS3(buffer: Buffer, filename: string): Promise<stri
   
   try {
     const result = execSync(`manus-upload-file ${fullPath}`, { encoding: 'utf-8' });
-    const url = result.trim();
+    
+    // 提取CDN URL(最后一行包含CDN URL)
+    const lines = result.trim().split('\n');
+    const cdnLine = lines.find(line => line.includes('CDN URL:'));
+    
+    if (!cdnLine) {
+      console.error('未找到CDN URL:', result);
+      throw new Error('上传失败:未找到CDN URL');
+    }
+    
+    // 提取URL部分
+    const url = cdnLine.split('CDN URL:')[1].trim();
     console.log('上传成功:', url);
     
     // 清理临时文件
