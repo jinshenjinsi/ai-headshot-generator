@@ -60,7 +60,7 @@ async function blobUrlToBase64(blobUrl: string): Promise<string> {
 export default function GeneratingScreen() {
   const router = useRouter();
   const colors = useColors();
-  const { photos, selectedStyle, setGeneratedImage } = useApp();
+  const { photos, selectedStyle, setGeneratedImage, setOriginalImageUrl } = useApp();
   const [progress, setProgress] = useState(0);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [statusMessage, setStatusMessage] = useState("准备开始...");
@@ -202,6 +202,7 @@ export default function GeneratingScreen() {
       }
 
       console.log("Generation success:", result.imageUrl);
+      console.log("Original URL:", result.originalUrl);
 
       setProgress(90);
       setStatusMessage("正在优化图像质量...");
@@ -211,8 +212,9 @@ export default function GeneratingScreen() {
       setProgress(100);
       setStatusMessage("完成!");
 
-      // 保存生成的图片
-      setGeneratedImage(result.imageUrl);
+      // 保存生成的图片(预览版和原图)
+      setGeneratedImage(result.imageUrl);  // 带水印的预览版
+      setOriginalImageUrl(result.originalUrl || null);  // 高清无水印原图
 
       // 跳转到结果页面
       setTimeout(() => {

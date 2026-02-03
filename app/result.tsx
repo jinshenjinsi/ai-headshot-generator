@@ -8,14 +8,20 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 import { useState } from "react";
+import { trpc } from "@/lib/trpc";
 
 export default function ResultScreen() {
   const router = useRouter();
   const colors = useColors();
-  const { generatedImage, selectedStyle } = useApp();
+  const { generatedImage, selectedStyle, originalImageUrl, regenerateCount, setRegenerateCount } = useApp();
   const [downloading, setDownloading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  
+  const MAX_FREE_REGENERATE = 3;
+  const remainingRegenerate = Math.max(0, MAX_FREE_REGENERATE - regenerateCount);
 
-  const handleDownload = async () => {
+  // 下载预览版(带水印)
+  const handleDownloadPreview = async () => {
     if (!generatedImage || downloading) return;
 
     if (Platform.OS !== "web") {
@@ -26,24 +32,21 @@ export default function ResultScreen() {
 
     try {
       if (Platform.OS === "web") {
-        // Web环境:使用fetch下载并创建blob URL
         const response = await fetch(generatedImage);
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = `headshot-${Date.now()}.jpg`;
+        link.download = `headshot-preview-${Date.now()}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        // 清理blob URL
         setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
         
-        Alert.alert("下载成功", "图片已保存到下载文件夹");
+        Alert.alert("下载成功", "预览版已保存");
       } else {
-        // 原生环境:保存到相册
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== "granted") {
           Alert.alert("需要权限", "请允许访问相册以保存图片");
@@ -51,11 +54,11 @@ export default function ResultScreen() {
           return;
         }
 
-        const fileUri = FileSystem.documentDirectory + `headshot-${Date.now()}.jpg`;
+        const fileUri = FileSystem.documentDirectory + `headshot-preview-${Date.now()}.jpg`;
         await FileSystem.downloadAsync(generatedImage, fileUri);
         await MediaLibrary.saveToLibraryAsync(fileUri);
         
-        Alert.alert("下载成功", "高清头像已保存到相册");
+        Alert.alert("下载成功", "预览版已保存到相册");
       }
     } catch (error) {
       console.error("Download error:", error);
@@ -63,6 +66,73 @@ export default function ResultScreen() {
     } finally {
       setDownloading(false);
     }
+  };
+
+  // 付费下载高清版(无水印)
+  const handleDownloadHD = async () => {
+    if (!originalImageUrl || downloading) return;
+
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+
+    // TODO: 集成真实支付流程
+    // 目前使用占位提示
+    Alert.alert(
+      "付费下载",
+      "下载高清无水印版需要支付 ¥5.6\n\n支付功能即将开放,敬请期待!",
+      [
+        { text: "取消", style: "cancel" },
+        {
+          text: "确认支付",
+          onPress: async () => {
+            setDownloading(true);
+            
+            try {
+              // TODO: 调用支付API
+              // 模拟支付成功
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              
+              // 支付成功后下载高清版
+              if (Platform.OS === "web") {
+                const response = await fetch(originalImageUrl);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement("a");
+                link.href = blobUrl;
+                link.download = `headshot-hd-${Date.now()}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                
+                Alert.alert("下载成功", "高清无水印版已保存");
+              } else {
+                const { status } = await MediaLibrary.requestPermissionsAsync();
+                if (status !== "granted") {
+                  Alert.alert("需要权限", "请允许访问相册以保存图片");
+                  setDownloading(false);
+                  return;
+                }
+
+                const fileUri = FileSystem.documentDirectory + `headshot-hd-${Date.now()}.jpg`;
+                await FileSystem.downloadAsync(originalImageUrl, fileUri);
+                await MediaLibrary.saveToLibraryAsync(fileUri);
+                
+                Alert.alert("下载成功", "高清无水印版已保存到相册");
+              }
+            } catch (error) {
+              console.error("Download HD error:", error);
+              Alert.alert("下载失败", "保存图片时出现问题,请稍后重试");
+            } finally {
+      setDownloading(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleRegenerate = () => {
@@ -78,6 +148,22 @@ export default function ResultScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    
+    // 检查是否超过免费次数
+    if (regenerateCount >= MAX_FREE_REGENERATE) {
+      Alert.alert(
+        "免费次数已用完",
+        `您已使用了${MAX_FREE_REGENERATE}次免费重生成机会。\n\n要继续生成新的头像，请返回首页重新开始。`,
+        [
+          { text: "返回首页", onPress: handleBackHome },
+          { text: "取消", style: "cancel" }
+        ]
+      );
+      return;
+    }
+    
+    // 增加重生成计数
+    setRegenerateCount(regenerateCount + 1);
     
     // 不满意重生成:保留当前参数但调整随机种子
     // 直接跳转到生成页面,使用相同的照片和风格
@@ -215,9 +301,9 @@ export default function ResultScreen() {
 
           {/* Premium Action Buttons */}
           <View className="gap-4">
-            {/* Primary Download Button */}
+            {/* Primary HD Download Button */}
             <TouchableOpacity
-              onPress={handleDownload}
+              onPress={handleDownloadHD}
               disabled={downloading}
               activeOpacity={0.9}
               className="w-full rounded-2xl overflow-hidden"
@@ -231,14 +317,66 @@ export default function ResultScreen() {
               }}
             >
               <View className="w-full px-8 py-5">
+                <View className="flex-row items-center justify-center gap-3">
+                  <Text 
+                    className="font-bold text-xl text-center"
+                    style={{ 
+                      color: colors.background,
+                      fontWeight: '700',
+                    }}
+                  >
+                    {downloading ? "下载中..." : "下载高清版"}
+                  </Text>
+                  {!downloading && (
+                    <View 
+                      className="px-3 py-1 rounded-full"
+                      style={{ backgroundColor: colors.background + '30' }}
+                    >
+                      <Text 
+                        className="text-sm font-bold"
+                        style={{ color: colors.background }}
+                      >
+                        ¥5.6
+                      </Text>
+                    </View>
+                  )}
+                </View>
                 <Text 
-                  className="font-bold text-xl text-center"
+                  className="text-xs text-center mt-1"
+                  style={{ color: colors.background + 'CC' }}
+                >
+                  无水印·高清画质
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Preview Download Button (Free) */}
+            <TouchableOpacity
+              onPress={handleDownloadPreview}
+              disabled={downloading}
+              activeOpacity={0.9}
+              className="w-full rounded-2xl overflow-hidden"
+              style={{
+                backgroundColor: colors.surface,
+                borderWidth: 2,
+                borderColor: colors.border,
+              }}
+            >
+              <View className="w-full px-8 py-4">
+                <Text 
+                  className="font-semibold text-base text-center"
                   style={{ 
-                    color: colors.background,
-                    fontWeight: '700',
+                    color: colors.foreground,
+                    fontWeight: '600',
                   }}
                 >
-                  {downloading ? "下载中..." : "下载高清版"}
+                  下载预览版(免费)
+                </Text>
+                <Text 
+                  className="text-xs text-center mt-1"
+                  style={{ color: colors.muted }}
+                >
+                  带水印·降低分辨率
                 </Text>
               </View>
             </TouchableOpacity>
@@ -246,34 +384,41 @@ export default function ResultScreen() {
             {/* Unsatisfied Button - Primary Secondary Action */}
             <TouchableOpacity
               onPress={handleRegenerateUnsatisfied}
+              disabled={regenerateCount >= MAX_FREE_REGENERATE}
               activeOpacity={0.9}
               className="w-full rounded-2xl overflow-hidden"
               style={{
-                backgroundColor: colors.surface,
+                backgroundColor: regenerateCount >= MAX_FREE_REGENERATE ? colors.muted + '40' : colors.surface,
                 borderWidth: 2,
-                borderColor: colors.primary,
+                borderColor: regenerateCount >= MAX_FREE_REGENERATE ? colors.border : colors.primary,
                 shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
+                shadowOpacity: regenerateCount >= MAX_FREE_REGENERATE ? 0 : 0.2,
                 shadowRadius: 12,
-                elevation: 4,
+                elevation: regenerateCount >= MAX_FREE_REGENERATE ? 0 : 4,
               }}
             >
               <View className="w-full px-8 py-4">
                 <Text 
                   className="font-bold text-lg text-center"
                   style={{ 
-                    color: colors.primary,
+                    color: regenerateCount >= MAX_FREE_REGENERATE ? colors.muted : colors.primary,
                     fontWeight: '600',
                   }}
                 >
-                  🔄 不满意，免费重生成
+                  {regenerateCount >= MAX_FREE_REGENERATE 
+                    ? `免费次数已用完` 
+                    : `🔄 不满意，免费重生成`
+                  }
                 </Text>
                 <Text 
                   className="text-xs text-center mt-1"
                   style={{ color: colors.muted }}
                 >
-                  自动调整参数，不额外收费
+                  {regenerateCount >= MAX_FREE_REGENERATE
+                    ? `已使用${MAX_FREE_REGENERATE}次免费机会`
+                    : `剩余${remainingRegenerate}次免费机会 · 自动调整参数`
+                  }
                 </Text>
               </View>
             </TouchableOpacity>

@@ -14,6 +14,10 @@ interface AppContextType {
   setSelectedStyle: (style: AppContextType["selectedStyle"]) => void;
   generatedImage: string | null;
   setGeneratedImage: (image: string | null) => void;
+  originalImageUrl: string | null;
+  setOriginalImageUrl: (url: string | null) => void;
+  regenerateCount: number;
+  setRegenerateCount: (count: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -22,6 +26,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [photos, setPhotos] = useState<string[]>([]);
   const [selectedStyle, setSelectedStyle] = useState<AppContextType["selectedStyle"]>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [regenerateCount, setRegenerateCount] = useState<number>(0);
 
   return (
     <AppContext.Provider
@@ -32,6 +38,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSelectedStyle,
         generatedImage,
         setGeneratedImage,
+        originalImageUrl,
+        setOriginalImageUrl,
+        regenerateCount,
+        setRegenerateCount,
       }}
     >
       {children}
