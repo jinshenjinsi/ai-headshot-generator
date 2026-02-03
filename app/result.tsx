@@ -7,30 +7,47 @@ import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
+import { useState } from "react";
 
 export default function ResultScreen() {
   const router = useRouter();
   const colors = useColors();
   const { generatedImage, selectedStyle } = useApp();
+  const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
-    if (!generatedImage) return;
+    if (!generatedImage || downloading) return;
 
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
 
+    setDownloading(true);
+
     try {
       if (Platform.OS === "web") {
+        // Web环境:使用fetch下载并创建blob URL
+        const response = await fetch(generatedImage);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
         const link = document.createElement("a");
-        link.href = generatedImage;
+        link.href = blobUrl;
         link.download = `headshot-${Date.now()}.jpg`;
+        document.body.appendChild(link);
         link.click();
-        Alert.alert("下载成功", "图片已保存");
+        document.body.removeChild(link);
+        
+        // 清理blob URL
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        
+        Alert.alert("下载成功", "图片已保存到下载文件夹");
       } else {
+        // 原生环境:保存到相册
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== "granted") {
           Alert.alert("需要权限", "请允许访问相册以保存图片");
+          setDownloading(false);
           return;
         }
 
@@ -42,7 +59,9 @@ export default function ResultScreen() {
       }
     } catch (error) {
       console.error("Download error:", error);
-      Alert.alert("下载失败", "保存图片时出现问题");
+      Alert.alert("下载失败", "保存图片时出现问题,请稍后重试");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -188,13 +207,14 @@ export default function ResultScreen() {
             {/* Primary Download Button */}
             <TouchableOpacity
               onPress={handleDownload}
+              disabled={downloading}
               activeOpacity={0.9}
               className="w-full rounded-2xl overflow-hidden"
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: downloading ? colors.muted : colors.primary,
                 shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.4,
+                shadowOpacity: downloading ? 0.2 : 0.4,
                 shadowRadius: 16,
                 elevation: 8,
               }}
@@ -207,7 +227,7 @@ export default function ResultScreen() {
                     fontWeight: '700',
                   }}
                 >
-                  下载高清版
+                  {downloading ? "下载中..." : "下载高清版"}
                 </Text>
               </View>
             </TouchableOpacity>

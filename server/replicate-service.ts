@@ -24,33 +24,59 @@ export async function generateProfessionalHeadshot(
   options: HeadshotGenerationOptions
 ): Promise<HeadshotGenerationResult> {
   try {
-    const output = await replicate.run(
-      "flux-kontext-apps/professional-headshot",
-      {
-        input: {
-          input_image: options.imageUrl,
-          background: options.background || "neutral",
-          gender: options.gender || "none",
-          aspect_ratio: options.aspectRatio || "match_input_image",
-          output_format: "jpg",
-          safety_tolerance: 2,
-        },
+    console.log("Creating prediction with options:", options);
+    
+    // Create prediction
+    const prediction = await replicate.predictions.create({
+      model: "flux-kontext-apps/professional-headshot",
+      input: {
+        input_image: options.imageUrl,
+        background: options.background || "neutral",
+        gender: options.gender || "none",
+        aspect_ratio: options.aspectRatio || "match_input_image",
+        output_format: "jpg",
+        safety_tolerance: 2,
+      },
+    });
+
+    console.log("Prediction created:", prediction.id, "Status:", prediction.status);
+
+    // Wait for prediction to complete
+    let finalPrediction = prediction;
+    let attempts = 0;
+    const maxAttempts = 60; // 60 seconds timeout
+
+    while (
+      (finalPrediction.status === "starting" || finalPrediction.status === "processing") &&
+      attempts < maxAttempts
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      finalPrediction = await replicate.predictions.get(prediction.id);
+      console.log("Prediction status:", finalPrediction.status);
+      attempts++;
+    }
+
+    console.log("Final prediction status:", finalPrediction.status);
+    console.log("Output:", finalPrediction.output);
+
+    if (finalPrediction.status === "succeeded" && finalPrediction.output) {
+      const imageUrl = typeof finalPrediction.output === "string" 
+        ? finalPrediction.output 
+        : Array.isArray(finalPrediction.output) 
+        ? finalPrediction.output[0] 
+        : null;
+
+      if (imageUrl && typeof imageUrl === "string") {
+        return {
+          success: true,
+          imageUrl,
+        };
       }
-    );
-
-    // Output is a URL string or array of URLs
-    const imageUrl = Array.isArray(output) ? output[0] : output;
-
-    if (typeof imageUrl === "string") {
-      return {
-        success: true,
-        imageUrl,
-      };
     }
 
     return {
       success: false,
-      error: "Invalid output format from Replicate API",
+      error: (finalPrediction.error as string) || `Generation failed with status: ${finalPrediction.status}`,
     };
   } catch (error) {
     console.error("Replicate API error:", error);
@@ -66,8 +92,9 @@ export async function generateProfessionalHeadshot(
  */
 export async function testReplicateConnection(): Promise<boolean> {
   try {
-    // Simple test: list available models (lightweight operation)
-    const models = await replicate.models.list();
+    // Simple test: get account info
+    const account = await replicate.accounts.current() as any;
+    console.log("Replicate account:", account?.username || "unknown");
     return true;
   } catch (error) {
     console.error("Replicate connection test failed:", error);
