@@ -26,7 +26,7 @@ export async function swapFace(
     console.log("Creating face-swap prediction:", options);
     
     const prediction = await replicate.predictions.create({
-      model: "codeplugtech/face-swap",
+      version: "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b34",
       input: {
         input_image: options.targetImageUrl,  // 目标图(专业背景)
         swap_image: options.sourceImageUrl,   // 源图(用户面部)
