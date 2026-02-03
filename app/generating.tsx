@@ -1,19 +1,44 @@
-import { useState, useEffect } from "react";
-import { Text, View, ActivityIndicator, Alert, Platform } from "react-native";
+import { View, Text, Platform, Animated, Easing } from "react-native";
 import { useRouter } from "expo-router";
-import * as FileSystem from "expo-file-system/legacy";
+import { useEffect, useRef, useState } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 import { trpc } from "@/lib/trpc";
+import * as FileSystem from "expo-file-system/legacy";
 
-const TIPS = [
-  "正在上传您的照片...",
-  "正在分析您的面部特征...",
-  "正在应用专业光线效果...",
-  "正在优化背景场景...",
-  "正在生成高质量头像...",
-  "即将完成...",
+// 专业头像拍摄技巧
+const PHOTOGRAPHY_TIPS = [
+  {
+    icon: "💡",
+    title: "光线是关键",
+    description: "自然光最佳,避免顶光和逆光,45度侧光能塑造立体感"
+  },
+  {
+    icon: "👔",
+    title: "着装要得体",
+    description: "纯色衣服更专业,避免复杂图案,颜色与背景形成对比"
+  },
+  {
+    icon: "😊",
+    title: "表情要自然",
+    description: "微笑露出上排牙齿,眼神坚定有神,展现自信和亲和力"
+  },
+  {
+    icon: "📐",
+    title: "构图要规范",
+    description: "头部占画面1/3,眼睛在上1/3处,保持肩膀水平"
+  },
+  {
+    icon: "🎨",
+    title: "背景要简洁",
+    description: "纯色背景最专业,避免杂乱元素,突出人物主体"
+  },
+  {
+    icon: "📸",
+    title: "角度要合适",
+    description: "相机略高于眼睛,微微俯拍显脸小,正面或3/4侧面最佳"
+  },
 ];
 
 // Helper function to convert blob URL to base64 (Web only)
@@ -24,7 +49,6 @@ async function blobUrlToBase64(blobUrl: string): Promise<string> {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
-      // Remove data:image/...;base64, prefix
       const base64Data = base64.split(',')[1];
       resolve(base64Data);
     };
@@ -36,253 +60,329 @@ async function blobUrlToBase64(blobUrl: string): Promise<string> {
 export default function GeneratingScreen() {
   const router = useRouter();
   const colors = useColors();
-  const { selectedStyle, photos, setGeneratedImage } = useApp();
-  const [currentTip, setCurrentTip] = useState(0);
+  const { photos, selectedStyle, setGeneratedImage } = useApp();
   const [progress, setProgress] = useState(0);
-  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
-  const [uploadComplete, setUploadComplete] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("初始化中...");
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [statusMessage, setStatusMessage] = useState("准备开始...");
 
-  const uploadMutation = trpc.headshot.uploadPhoto.useMutation({
-    onSuccess: (data) => {
-      console.log("Upload success:", data);
-      if (data.success && data.url) {
-        setUploadedPhotoUrl(data.url);
-        setProgress(30);
-        setUploadComplete(true);
-        setStatusMessage("照片上传成功");
-      } else {
-        console.error("Upload returned success but no URL");
-        Alert.alert(
-          "上传异常",
-          "照片上传返回异常,请重试",
-          [{ text: "返回", onPress: () => router.back() }]
-        );
-      }
-    },
-    onError: (error) => {
-      console.error("Upload error:", error);
-      setStatusMessage("上传失败");
-      Alert.alert(
-        "上传失败",
-        `照片上传遇到问题: ${error.message}`,
-        [{ text: "返回", onPress: () => router.back() }]
-      );
-    },
-  });
+  // 动画值
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  const generateMutation = trpc.headshot.generate.useMutation({
-    onSuccess: (data) => {
-      console.log("Generation success:", data);
-      if (data.success && data.imageUrl) {
-        setGeneratedImage(data.imageUrl);
-        setProgress(100);
-        setStatusMessage("生成完成!");
-        setTimeout(() => {
-          router.push("/result" as any);
-        }, 500);
-      } else {
-        console.error("Generation returned success but no imageUrl");
-        Alert.alert(
-          "生成异常",
-          "头像生成返回异常,请重试",
-          [{ text: "返回", onPress: () => router.back() }]
-        );
-      }
-    },
-    onError: (error) => {
-      console.error("Generation error:", error);
-      setStatusMessage("生成失败");
-      Alert.alert(
-        "生成失败",
-        `头像生成遇到问题: ${error.message}`,
-        [{ text: "返回", onPress: () => router.back() }]
-      );
-    },
-  });
+  const uploadMutation = trpc.headshot.uploadPhoto.useMutation();
+  const generateMutation = trpc.headshot.generate.useMutation();
 
   useEffect(() => {
-    console.log("GeneratingScreen mounted");
-    console.log("Platform:", Platform.OS);
-    console.log("Selected style:", selectedStyle);
-    console.log("Photos:", photos);
-
-    if (!selectedStyle) {
-      console.log("No selected style, redirecting to home");
-      // Use setTimeout to avoid navigation before mounting
+    // 检查必要数据
+    if (!photos || photos.length === 0 || !selectedStyle) {
+      console.log("Missing required data, redirecting...");
       setTimeout(() => {
-        router.replace("/(tabs)" as any);
-      }, 0);
+        router.replace("/" as any);
+      }, 100);
       return;
     }
 
-    // Step 1: Upload first photo if available
-    if (photos.length > 0) {
-      const uploadPhoto = async () => {
-        try {
-          setStatusMessage("正在读取照片...");
-          setProgress(5);
-          
-          const photoUri = photos[0];
-          console.log("Reading photo from URI:", photoUri);
-          
-          let base64: string;
-          
-          // Use different methods for Web vs Native
-          if (Platform.OS === 'web') {
-            console.log("Using Web API to read blob URL");
-            base64 = await blobUrlToBase64(photoUri);
-          } else {
-            console.log("Using FileSystem API to read file");
-            base64 = await FileSystem.readAsStringAsync(photoUri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-          }
-          
-          console.log("Photo read successfully, base64 length:", base64.length);
-          setStatusMessage("正在上传照片...");
-          setProgress(10);
-          
-          uploadMutation.mutate({
-            photoBase64: `data:image/jpeg;base64,${base64}`,
-            fileName: `photo-${Date.now()}.jpg`,
-          });
-        } catch (error) {
-          console.error("Failed to read photo:", error);
-          setStatusMessage("读取照片失败");
-          Alert.alert(
-            "读取照片失败",
-            `无法读取您的照片: ${error instanceof Error ? error.message : String(error)}`,
-            [{ text: "返回", onPress: () => router.back() }]
-          );
-        }
-      };
-      
-      uploadPhoto();
-    } else {
-      console.log("No photos available");
-      Alert.alert(
-        "没有照片",
-        "请先上传照片",
-        [{ text: "返回", onPress: () => router.back() }]
-      );
-    }
+    // 启动旋转动画
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
 
-    // Rotate tips every 5 seconds
-    const tipInterval = setInterval(() => {
-      setCurrentTip((prev) => (prev + 1) % TIPS.length);
-    }, 5000);
+    // 启动脉冲动画
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.2,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
 
-    return () => {
-      clearInterval(tipInterval);
-    };
+    // 开始生成流程
+    startGeneration();
   }, []);
 
-  // Step 2: Generate when photo is uploaded
+  // 技巧轮播
   useEffect(() => {
-    console.log("Upload status changed:", { uploadComplete, uploadedPhotoUrl });
-    
-    if (uploadComplete && uploadedPhotoUrl && !generateMutation.isPending && !generateMutation.isSuccess) {
-      console.log("Starting generation with:", {
-        imageUrl: uploadedPhotoUrl,
-        background: selectedStyle!.background,
-        gender: selectedStyle!.gender,
+    const interval = setInterval(() => {
+      // 淡出
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        // 切换技巧
+        setCurrentTipIndex((prev) => (prev + 1) % PHOTOGRAPHY_TIPS.length);
+        // 淡入
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
       });
-      
-      setStatusMessage("正在生成头像...");
-      
-      generateMutation.mutate({
-        imageUrl: uploadedPhotoUrl,
-        background: selectedStyle!.background,
-        gender: selectedStyle!.gender,
-      });
-      
-      // Simulate progress for UI feedback
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressInterval);
-            return 95;
-          }
-          return prev + 2;
-        });
-      }, 800);
+    }, 4000);
 
-      return () => clearInterval(progressInterval);
+    return () => clearInterval(interval);
+  }, []);
+
+  const startGeneration = async () => {
+    try {
+      setProgress(10);
+      setStatusMessage("正在准备照片...");
+
+      // 选择第一张照片
+      const firstPhoto = photos[0];
+      console.log("Selected photo URI:", firstPhoto);
+
+      setProgress(20);
+      setStatusMessage("正在读取照片数据...");
+
+      // 读取照片数据
+      let base64Data: string;
+      
+      if (Platform.OS === "web") {
+        console.log("Platform: web, using Web API to read blob URL");
+        base64Data = await blobUrlToBase64(firstPhoto);
+      } else {
+        console.log("Platform: native, using FileSystem API");
+        base64Data = await FileSystem.readAsStringAsync(firstPhoto, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+      }
+
+      console.log("Photo read successfully, base64 length:", base64Data.length);
+
+      setProgress(40);
+      setStatusMessage("正在上传照片到服务器...");
+
+      // 上传照片
+      const uploadResult = await uploadMutation.mutateAsync({
+        photoBase64: `data:image/jpeg;base64,${base64Data}`,
+        fileName: `photo-${Date.now()}.jpg`,
+      });
+
+      if (!uploadResult.success || !uploadResult.url) {
+        throw new Error("照片上传失败");
+      }
+
+      console.log("Upload success:", uploadResult.url);
+
+      setProgress(60);
+      setStatusMessage("AI正在分析您的面部特征...");
+
+      // 等待一下让用户看到进度
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setProgress(70);
+      setStatusMessage("正在生成专业头像...");
+
+      // 调用生成API
+      const result = await generateMutation.mutateAsync({
+        imageUrl: uploadResult.url,
+        background: selectedStyle!.background,
+        gender: selectedStyle!.gender || "none",
+      });
+
+      if (!result.success || !result.imageUrl) {
+        throw new Error("生成失败");
+      }
+
+      console.log("Generation success:", result.imageUrl);
+
+      setProgress(90);
+      setStatusMessage("正在优化图像质量...");
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setProgress(100);
+      setStatusMessage("完成!");
+
+      // 保存生成的图片
+      setGeneratedImage(result.imageUrl);
+
+      // 跳转到结果页面
+      setTimeout(() => {
+        router.push("/result" as any);
+      }, 500);
+
+    } catch (error) {
+      console.error("Generation error:", error);
+      setStatusMessage("生成失败,请重试");
+      setTimeout(() => {
+        router.back();
+      }, 2000);
     }
-  }, [uploadComplete, uploadedPhotoUrl]);
+  };
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
+
+  const currentTip = PHOTOGRAPHY_TIPS[currentTipIndex];
 
   return (
     <ScreenContainer className="bg-background">
-      <View className="flex-1 items-center justify-center px-8">
-        {/* Elegant Loading Animation */}
-        <View className="items-center gap-8 mb-12">
-          <View 
-            className="w-32 h-32 rounded-full items-center justify-center"
-            style={{
-              backgroundColor: colors.primary + '10',
-              shadowColor: colors.primary,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 24,
-            }}
-          >
-            <ActivityIndicator size="large" color={colors.primary} />
+      <View className="flex-1 items-center justify-center px-6 gap-12">
+        {/* 动画区域 */}
+        <View className="items-center gap-6">
+          {/* 外圈旋转光环 */}
+          <View className="relative items-center justify-center">
+            <Animated.View
+              style={{
+                width: 200,
+                height: 200,
+                borderRadius: 100,
+                borderWidth: 3,
+                borderColor: colors.primary,
+                borderStyle: "dashed",
+                transform: [{ rotate: spin }],
+                opacity: 0.3,
+              }}
+            />
+            
+            {/* 中间相机图标 */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                transform: [{ scale: pulseAnim }],
+              }}
+            >
+              <View
+                className="w-24 h-24 rounded-full items-center justify-center"
+                style={{
+                  backgroundColor: colors.primary + "20",
+                  shadowColor: colors.primary,
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 16,
+                }}
+              >
+                <Text className="text-5xl">📸</Text>
+              </View>
+            </Animated.View>
           </View>
 
-          {/* Progress Bar */}
-          <View className="w-full max-w-xs">
-            <View 
-              className="h-2 rounded-full overflow-hidden"
-              style={{ backgroundColor: colors.border }}
-            >
-              <View 
-                className="h-full rounded-full"
-                style={{
-                  backgroundColor: colors.primary,
-                  width: `${progress}%`,
-                }}
-              />
-            </View>
-            <Text 
-              className="text-center mt-3 text-sm font-semibold"
-              style={{ color: colors.primary }}
+          {/* 进度文字 */}
+          <View className="items-center gap-2">
+            <Text
+              className="text-3xl font-bold"
+              style={{
+                color: colors.foreground,
+                fontWeight: "800",
+              }}
             >
               {progress}%
             </Text>
+            <Text
+              className="text-lg"
+              style={{ color: colors.muted }}
+            >
+              {statusMessage}
+            </Text>
+          </View>
+
+          {/* 进度条 */}
+          <View
+            className="w-full h-2 rounded-full overflow-hidden"
+            style={{ backgroundColor: colors.surface }}
+          >
+            <View
+              className="h-full rounded-full"
+              style={{
+                width: `${progress}%`,
+                backgroundColor: colors.primary,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.6,
+                shadowRadius: 8,
+              }}
+            />
           </View>
         </View>
 
-        {/* Dynamic Tips */}
-        <View className="items-center gap-4">
-          <Text 
-            className="text-2xl font-bold text-center"
-            style={{ 
-              color: colors.foreground,
-              fontWeight: '800',
+        {/* 技巧展示卡片 */}
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+            width: "100%",
+          }}
+        >
+          <View
+            className="rounded-3xl p-6"
+            style={{
+              backgroundColor: colors.surface,
+              borderWidth: 1,
+              borderColor: colors.border,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.1,
+              shadowRadius: 12,
+              elevation: 4,
             }}
           >
-            AI正在创作中
-          </Text>
-          <Text 
-            className="text-base text-center leading-relaxed"
-            style={{ color: colors.muted }}
-          >
-            {TIPS[currentTip]}
-          </Text>
-          <Text 
-            className="text-sm text-center mt-2 font-medium"
-            style={{ color: colors.primary }}
-          >
-            {statusMessage}
-          </Text>
-          <Text 
-            className="text-xs text-center mt-1 opacity-60"
-            style={{ color: colors.muted }}
-          >
-            预计需要30-60秒
-          </Text>
-        </View>
+            <View className="items-center gap-4">
+              {/* 图标 */}
+              <View
+                className="w-16 h-16 rounded-2xl items-center justify-center"
+                style={{ backgroundColor: colors.primary + "15" }}
+              >
+                <Text className="text-4xl">{currentTip.icon}</Text>
+              </View>
+
+              {/* 标题 */}
+              <Text
+                className="text-xl font-bold text-center"
+                style={{
+                  color: colors.foreground,
+                  fontWeight: "700",
+                }}
+              >
+                {currentTip.title}
+              </Text>
+
+              {/* 描述 */}
+              <Text
+                className="text-base text-center leading-relaxed"
+                style={{
+                  color: colors.muted,
+                  lineHeight: 24,
+                }}
+              >
+                {currentTip.description}
+              </Text>
+
+              {/* 指示器 */}
+              <View className="flex-row gap-2 mt-2">
+                {PHOTOGRAPHY_TIPS.map((_, index) => (
+                  <View
+                    key={index}
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor:
+                        index === currentTipIndex
+                          ? colors.primary
+                          : colors.border,
+                    }}
+                  />
+                ))}
+              </View>
+            </View>
+          </View>
+        </Animated.View>
       </View>
     </ScreenContainer>
   );
