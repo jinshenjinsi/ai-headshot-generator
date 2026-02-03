@@ -254,3 +254,11 @@
 - [ ] 测试ideogram-character效果
 - [ ] 对比三种方案(professional-headshot, face-swap, ideogram)
 - [ ] 根据效果和成本选择最终方案
+
+## Ideogram生成失败问题修复 (2026-02-03 紧急)
+
+- [x] 检查服务器端错误日志 ("No image generated")
+- [x] 定位ideogram API失败原因 (使用了错误的run方法)
+- [x] 修复API调用问题 (改用predictions.create + wait)
+- [x] 修复返回值处理 (从prediction.output获取URL)
+- [ ] 测试验证修复效果

@@ -33,37 +33,50 @@ export async function generateIdeogramCharacter(
   try {
     console.log("Creating ideogram-character prediction:", options);
     
-    const prediction = await replicate.run(
-      "ideogram-ai/ideogram-character" as any,
-      {
-        input: {
-          character_reference_image: options.characterImageUrl,
-          prompt: options.prompt,
-          rendering_speed: options.renderingSpeed || "Quality",
-          style_type: options.styleType || "Realistic",
-          aspect_ratio: options.aspectRatio || "1:1",
-          magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
-        },
-      }
-    );
+    // Use predictions.create and wait for completion
+    let prediction = await replicate.predictions.create({
+      model: "ideogram-ai/ideogram-character",
+      input: {
+        character_reference_image: options.characterImageUrl,
+        prompt: options.prompt,
+        rendering_speed: options.renderingSpeed || "Quality",
+        style_type: options.styleType || "Realistic",
+        aspect_ratio: options.aspectRatio || "1:1",
+        magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
+      },
+    });
+    
+    console.log("Prediction created:", prediction.id, "Status:", prediction.status);
+    
+    // Wait for completion
+    prediction = await replicate.wait(prediction);
+    
+    console.log("Prediction completed:", prediction.status);
 
-    console.log("Ideogram-character prediction result:", prediction);
-
-    if (prediction && typeof prediction === "string") {
+    console.log("Ideogram-character prediction result:", JSON.stringify(prediction, null, 2));
+    console.log("Prediction output:", prediction.output);
+    
+    // Check prediction.output field (standard Replicate response)
+    const output = prediction.output;
+    
+    if (Array.isArray(output) && output.length > 0) {
+      console.log("Found image URL:", output[0]);
       return {
         success: true,
-        imageUrl: prediction,
+        imageUrl: output[0],
       };
-    } else if (Array.isArray(prediction) && prediction.length > 0) {
+    } else if (typeof output === "string") {
+      console.log("Found image URL (string):", output);
       return {
         success: true,
-        imageUrl: prediction[0],
+        imageUrl: output,
       };
     }
 
+    console.error("No valid image URL found in prediction:", prediction);
     return {
       success: false,
-      error: "No image generated",
+      error: `No image generated. Prediction: ${JSON.stringify(prediction)}`,
     };
   } catch (error) {
     console.error("Ideogram-character API error:", error);
