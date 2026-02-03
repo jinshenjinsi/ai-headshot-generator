@@ -236,3 +236,21 @@
 - [x] 修复face-swap调用问题 (使用完整版本哈希)
 - [x] 添加详细错误日志
 - [ ] 测试验证修复效果
+
+## Ideogram-character Quality模式实施 (2026-02-03)
+
+### 备份face-swap版本
+- [x] Face-swap版本已保存 (version: 34ed27d5)
+- [x] 用户反馈: face-swap能运行但面部特征变化太大
+
+### 集成ideogram-character模型
+- [ ] 研究ideogram-character API文档
+- [ ] 创建ideogram-character服务模块
+- [ ] 添加generateIdeogram API路由
+- [ ] 前端切换到ideogram API
+- [ ] 配置Quality模式参数
+
+### 测试和对比
+- [ ] 测试ideogram-character效果
+- [ ] 对比三种方案(professional-headshot, face-swap, ideogram)
+- [ ] 根据效果和成本选择最终方案
