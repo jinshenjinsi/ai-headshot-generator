@@ -51,7 +51,7 @@ export async function generateIdeogramCharacter(
         prompt: enhancedPrompt,
         rendering_speed: options.renderingSpeed || "Quality",
         style_type: options.styleType || "Realistic",
-        resolution: options.resolution || "1280x1707", // 使用更高分辨率提升锐度(3:4比例)
+        resolution: options.resolution || "640x1536", // 使用竖向最高分辨率提升锐度
         magic_prompt_option: "Off", // 关闭magic prompt以保持prompt精确性
         seed: seed, // 添加随机种子
       },
