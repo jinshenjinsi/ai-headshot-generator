@@ -5,11 +5,9 @@ import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 
-const EXAMPLE_IMAGES = [
-  require("@/assets/images/example-id-photo-1.jpg"),
-  require("@/assets/images/example-id-photo-2.jpg"),
-  require("@/assets/images/example-id-photo-3.jpg"),
-];
+const EXAMPLE_IMAGES: any[] = [];
+// Example images removed to reduce bundle size
+// Can be added back from CDN URLs if needed
 
 export default function HomeScreen() {
   const router = useRouter();
