@@ -87,7 +87,15 @@ export default function StyleSelectionScreen() {
   const { selectedStyle, setSelectedStyle } = useApp();
 
   const handleStyleSelect = (style: Style) => {
-    setSelectedStyle(style);
+    // Only pass the required fields to context
+    setSelectedStyle({
+      id: style.id,
+      name: style.name,
+      prompt: style.prompt,
+      category: style.category,
+      background: style.background,
+      gender: style.gender,
+    });
     
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
