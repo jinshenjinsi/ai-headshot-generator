@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
@@ -26,7 +26,7 @@ const STYLES: Style[] = [
     category: "办公室",
     prompt: "Professional corporate headshot photo. Character: this person with their exact face. Setting: modern glass-walled boardroom with blurred meeting table. Attire: dark navy business suit, white dress shirt, solid color tie. Lighting: bright overhead LED lights creating sharp shadows, high contrast. Expression: confident and authoritative. Camera: 85mm lens, f/2.8, sharp focus on face. Style: corporate executive portrait, formal and powerful.",
     icon: "🏢",
-    exampleImage: require("@/assets/images/example-boardroom.jpg"),
+    exampleImage: null,
     background: "office",
   },
   {
@@ -36,7 +36,7 @@ const STYLES: Style[] = [
     category: "办公室",
     prompt: "Professional business casual headshot. Character: this person with their exact face. Setting: bright modern office lobby with floor-to-ceiling windows, natural daylight streaming in. Attire: light blue button-down shirt, no tie, smart casual. Lighting: soft natural window light from side, minimal shadows, bright and airy. Expression: friendly and approachable. Camera: 50mm lens, f/1.8, natural depth of field. Style: contemporary professional, warm and inviting.",
     icon: "🏛️",
-    exampleImage: require("@/assets/images/example-office-lobby.jpg"),
+    exampleImage: null,
     background: "office",
   },
   {
@@ -46,7 +46,7 @@ const STYLES: Style[] = [
     category: "户外",
     prompt: "Urban professional outdoor portrait. Character: this person with their exact face. Setting: city street with modern skyscrapers and glass buildings in background, slightly blurred. Attire: charcoal gray blazer over white shirt, open collar, modern business style. Lighting: golden hour sunlight from 45-degree angle, warm glow on face, soft shadows. Expression: confident and dynamic. Camera: 70mm lens, f/2.0, shallow depth of field. Style: editorial fashion meets corporate, energetic and contemporary.",
     icon: "🌆",
-    exampleImage: require("@/assets/images/example-city.jpg"),
+    exampleImage: null,
     background: "neutral",
   },
   {
@@ -56,7 +56,7 @@ const STYLES: Style[] = [
     category: "户外",
     prompt: "Natural outdoor professional portrait. Character: this person with their exact face. Setting: lush green park with trees and foliage, soft bokeh background. Attire: light-colored blazer or cardigan, casual shirt, relaxed professional look. Lighting: diffused natural daylight through tree canopy, soft and flattering, no harsh shadows. Expression: warm smile, friendly and approachable. Camera: 85mm lens, f/1.4, beautiful bokeh. Style: lifestyle professional, natural and authentic.",
     icon: "🌳",
-    exampleImage: require("@/assets/images/example-park.jpg"),
+    exampleImage: null,
     background: "neutral",
   },
   {
@@ -66,7 +66,7 @@ const STYLES: Style[] = [
     category: "工作室",
     prompt: "Classic studio headshot with pure white backdrop. Character: this person with their exact face. Setting: seamless white background, completely uniform. Attire: formal dark suit or professional attire, crisp and clean. Lighting: three-point studio lighting setup - key light from front-left, fill light from right, rim light from back, creating dimension while minimizing shadows. Expression: neutral professional, slight smile. Camera: 105mm lens, f/5.6, everything in sharp focus. Style: traditional ID photo / corporate directory, clean and standardized.",
     icon: "⚪",
-    exampleImage: require("@/assets/images/example-white.jpg"),
+    exampleImage: null,
     background: "white",
   },
   {
@@ -76,7 +76,7 @@ const STYLES: Style[] = [
     category: "工作室",
     prompt: "Sophisticated studio portrait with gray backdrop. Character: this person with their exact face. Setting: medium gray seamless background with subtle gradient. Attire: tailored charcoal or black suit, elegant and refined. Lighting: dramatic Rembrandt lighting - single key light from 45-degree angle creating triangle of light on cheek, deep shadows for depth and character. Expression: serious and contemplative, professional gravitas. Camera: 135mm lens, f/4.0, compressed perspective. Style: fine art portrait meets corporate, dramatic and distinguished.",
     icon: "⚫",
-    exampleImage: require("@/assets/images/example-gray.jpg"),
+    exampleImage: null,
     background: "gray",
   },
 ];
