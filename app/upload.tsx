@@ -7,8 +7,8 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 
-const MIN_PHOTOS = 5;
-const MAX_PHOTOS = 15;
+const MIN_PHOTOS = 1;
+const MAX_PHOTOS = 1;
 
 export default function UploadScreen() {
   const router = useRouter();
@@ -21,15 +21,14 @@ export default function UploadScreen() {
 
   const pickImages = async () => {
     if (photos.length >= MAX_PHOTOS) {
-      Alert.alert("提示", `最多只能上传${MAX_PHOTOS}张照片`);
+      Alert.alert("提示", "已上传照片,如需重新上传请先删除");
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
+      allowsMultipleSelection: false,
       quality: 0.8,
-      selectionLimit: MAX_PHOTOS - photos.length,
     });
 
     if (!result.canceled) {
@@ -52,7 +51,7 @@ export default function UploadScreen() {
 
   const handleNext = () => {
     if (photos.length < MIN_PHOTOS) {
-      Alert.alert("提示", `请至少上传${MIN_PHOTOS}张照片`);
+      Alert.alert("提示", "请上传一张照片后继续");
       return;
     }
 
@@ -101,8 +100,8 @@ export default function UploadScreen() {
               className="text-lg leading-relaxed"
               style={{ color: colors.muted }}
             >
-              至少{MIN_PHOTOS}张,建议{MIN_PHOTOS}-{MAX_PHOTOS}张照片{"\n"}
-              以获得最佳AI生成效果
+              只需上传1张正面人物照片{"\n"}
+              即可生成专业证件照
             </Text>
             
             {/* Photo Counter */}
@@ -210,9 +209,9 @@ export default function UploadScreen() {
             
             <View className="gap-3 ml-13">
               {[
-                "光线充足,面部清晰可见",
-                "包含正面、侧面等多角度",
-                "避免佩戴帽子或墨镜",
+                "正面人物照片,面部清晰可见",
+                "光线充足,不要逆光或阴暗",
+                "避免佩戴帽子、墨镜或遮挡物",
                 "照片中仅有您一人",
               ].map((tip, index) => (
                 <View key={index} className="flex-row items-start gap-3">
