@@ -8,8 +8,9 @@ import { ScreenContainer } from "@/components/screen-container";
 import { ImageEditor } from "@/components/image-editor";
 import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import { applyFiltersToImage, type ImageFilters } from "@/lib/image-processor";
 
 
 // 证件照尺寸预设
@@ -38,9 +39,38 @@ export default function ResultScreen() {
   const [showSizeEditor, setShowSizeEditor] = useState(false);
   const [showBrightnessEditor, setShowBrightnessEditor] = useState(false);
   const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
+  const [processedImageUrl, setProcessedImageUrl] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const MAX_FREE_REGENERATE = 3;
   const remainingRegenerate = Math.max(0, MAX_FREE_REGENERATE - regenerateCount);
+
+  // 当滤镜改变时,重新处理图片
+  useEffect(() => {
+    if (Platform.OS === "web" && generatedImage) {
+      const updateProcessedImage = async () => {
+        setIsProcessing(true);
+        try {
+          const filters: ImageFilters = {
+            brightness,
+            contrast,
+            saturation,
+            sharpness,
+          };
+          const result = await applyFiltersToImage(generatedImage, filters);
+          setProcessedImageUrl(result);
+        } catch (error) {
+          console.error("Failed to process image:", error);
+          setProcessedImageUrl(generatedImage);
+        } finally {
+          setIsProcessing(false);
+        }
+      };
+
+      const timer = setTimeout(updateProcessedImage, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [brightness, contrast, saturation, sharpness, generatedImage]);
 
   // 获取当前选中的尺寸
   const currentSize = PHOTO_SIZES[selectedSizeIndex];
@@ -48,9 +78,12 @@ export default function ResultScreen() {
   const imageDisplayWidth = screenWidth - 32; // 减去padding
   const imageDisplayHeight = imageDisplayWidth / currentSize.ratio;
 
+  // 获取显示的图片URL
+  const displayImageUrl = Platform.OS === "web" && processedImageUrl ? processedImageUrl : generatedImage;
+
   // 付费下载高清版(无水印)
   const handleDownloadHD = async () => {
-    if (!originalImageUrl || downloading) return;
+    if (!displayImageUrl || !generatedImage || downloading) return;
 
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -75,7 +108,7 @@ export default function ResultScreen() {
               
               // 支付成功后下载高清版
               if (Platform.OS === "web") {
-                const response = await fetch(originalImageUrl);
+                const response = await fetch(displayImageUrl);
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 
@@ -98,7 +131,7 @@ export default function ResultScreen() {
                 }
 
                 const fileUri = FileSystem.documentDirectory + `headshot-hd-${Date.now()}.jpg`;
-                await FileSystem.downloadAsync(originalImageUrl, fileUri);
+                await FileSystem.downloadAsync(displayImageUrl, fileUri);
                 await MediaLibrary.saveToLibraryAsync(fileUri);
                 
                 Alert.alert("下载成功", "高清无水印版已保存到相册");
@@ -169,20 +202,20 @@ export default function ResultScreen() {
   }
 
   return (
-    <ScreenContainer containerClassName="bg-slate-900">
+    <ScreenContainer containerClassName="bg-gradient-to-b from-blue-900 to-blue-800">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 gap-6 py-8 px-4 pb-12">
           {/* Header */}
-          <View className="items-center gap-2">
+          <View className="items-center gap-3 mb-2">
             <Text 
-              className="text-3xl font-bold text-center"
+              className="text-4xl font-bold text-center"
               style={{ color: "#FFFFFF" }}
             >
-              生成完成
+              ✨ 生成完成
             </Text>
             <Text 
-              className="text-sm text-center"
-              style={{ color: "#9CA3AF" }}
+              className="text-base text-center"
+              style={{ color: "#E0E7FF" }}
             >
               您的专业头像已完美呈现
             </Text>
@@ -190,22 +223,21 @@ export default function ResultScreen() {
 
           {/* Image Display Card - 白色卡片 */}
           <View 
-            className="rounded-2xl overflow-hidden"
+            className="rounded-3xl overflow-hidden"
             style={{
               backgroundColor: "#FFFFFF",
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 16,
-              elevation: 8,
+              shadowColor: '#0F172A',
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.4,
+              shadowRadius: 20,
+              elevation: 12,
             }}
           >
             <Image
-              source={{ uri: generatedImage }}
+              source={{ uri: Platform.OS === "web" && processedImageUrl ? processedImageUrl : generatedImage }}
               style={{ 
                 width: imageDisplayWidth, 
                 height: imageDisplayHeight,
-                opacity: brightness,
               }}
               contentFit="cover"
               transition={300}
@@ -214,12 +246,12 @@ export default function ResultScreen() {
 
           {/* 尺寸调整器 */}
           <View 
-            className="rounded-xl p-4"
-            style={{ backgroundColor: "#1F2937" }}
+            className="rounded-2xl p-5"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.2)" }}
           >
             <Text 
-              className="text-sm font-semibold mb-3"
-              style={{ color: "#E5E7EB" }}
+              className="text-base font-bold mb-4"
+              style={{ color: "#FFFFFF" }}
             >
               📐 调整尺寸
             </Text>
@@ -263,24 +295,24 @@ export default function ResultScreen() {
 
           {/* 亮度调整器 */}
           <View 
-            className="rounded-xl p-4"
-            style={{ backgroundColor: "#1F2937" }}
+            className="rounded-2xl p-5"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.2)" }}
           >
-            <View className="flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center justify-between mb-4">
               <Text 
-                className="text-sm font-semibold"
-                style={{ color: "#E5E7EB" }}
+                className="text-base font-bold"
+                style={{ color: "#FFFFFF" }}
               >
                 ☀️ 亮度调整
               </Text>
               <TouchableOpacity
                 onPress={() => setBrightness(1)}
                 className="px-3 py-1 rounded-lg"
-                style={{ backgroundColor: "#374151" }}
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
               >
                 <Text 
                   className="text-xs font-semibold"
-                  style={{ color: "#9CA3AF" }}
+                  style={{ color: "#E0E7FF" }}
                 >
                   重置
                 </Text>
@@ -325,12 +357,12 @@ export default function ResultScreen() {
             {/* 高级编辑按钮 */}
             <TouchableOpacity
               onPress={() => setShowAdvancedEditor(!showAdvancedEditor)}
-              className="mt-4 px-4 py-2 rounded-lg flex-row items-center justify-center gap-2"
-              style={{ backgroundColor: "#374151" }}
+              className="mt-4 px-4 py-3 rounded-xl flex-row items-center justify-center gap-2"
+              style={{ backgroundColor: "#3B82F6" }}
             >
-              <Text style={{ color: "#9CA3AF" }}>Settings</Text>
-              <Text style={{ color: "#9CA3AF" }} className="text-sm font-semibold">
-                {showAdvancedEditor ? "收起" : "高级"}
+              <Text style={{ color: "#FFFFFF" }} className="font-bold">⚙️</Text>
+              <Text style={{ color: "#FFFFFF" }} className="text-sm font-semibold">
+                {showAdvancedEditor ? "收起高级" : "高级编辑"}
               </Text>
             </TouchableOpacity>
 
@@ -353,37 +385,37 @@ export default function ResultScreen() {
           </View>
 
           {/* Premium Action Buttons */}
-          <View className="gap-3 mt-4">
-            {/* Primary HD Download Button - 绿色 */}
+          <View className="gap-4 mt-6">
+            {/* Primary HD Download Button - 蓝色 */}
             <TouchableOpacity
               onPress={handleDownloadHD}
               disabled={downloading}
               activeOpacity={0.9}
-              className="w-full rounded-xl overflow-hidden"
+              className="w-full rounded-2xl overflow-hidden"
               style={{
-                backgroundColor: downloading ? "#6B7280" : "#10B981",
-                shadowColor: "#10B981",
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: downloading ? 0.2 : 0.4,
-                shadowRadius: 12,
-                elevation: 6,
+                backgroundColor: downloading ? "#6B7280" : "#3B82F6",
+                shadowColor: "#3B82F6",
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: downloading ? 0.2 : 0.5,
+                shadowRadius: 16,
+                elevation: 8,
               }}
             >
-              <View className="w-full px-6 py-4">
-                <View className="flex-row items-center justify-center gap-2">
+              <View className="w-full px-6 py-5">
+                <View className="flex-row items-center justify-center gap-3">
                   <Text 
                     className="font-bold text-lg text-center"
                     style={{ color: "#FFFFFF" }}
                   >
-                    {downloading ? "下载中..." : "💎 下载高清版"}
+                    {downloading ? "下载中..." : "💫 下载高清版"}
                   </Text>
                   {!downloading && (
                     <View 
-                      className="px-2 py-1 rounded-full"
-                      style={{ backgroundColor: "#FFFFFF30" }}
+                      className="px-3 py-1 rounded-full"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }}
                     >
                       <Text 
-                        className="text-xs font-bold"
+                        className="text-sm font-bold"
                         style={{ color: "#FFFFFF" }}
                       >
                         ¥5.6
@@ -399,18 +431,18 @@ export default function ResultScreen() {
               onPress={handleRegenerateUnsatisfied}
               disabled={regenerateCount >= MAX_FREE_REGENERATE}
               activeOpacity={0.9}
-              className="w-full rounded-xl overflow-hidden"
+              className="w-full rounded-2xl overflow-hidden"
               style={{
-                backgroundColor: regenerateCount >= MAX_FREE_REGENERATE ? "#4B5563" : "#374151",
+                backgroundColor: regenerateCount >= MAX_FREE_REGENERATE ? "#4B5563" : "rgba(255, 255, 255, 0.15)",
                 borderWidth: 2,
-                borderColor: regenerateCount >= MAX_FREE_REGENERATE ? "#6B7280" : "#10B981",
+                borderColor: regenerateCount >= MAX_FREE_REGENERATE ? "#6B7280" : "rgba(255, 255, 255, 0.3)",
               }}
             >
-              <View className="w-full px-6 py-3">
+              <View className="w-full px-6 py-4">
                 <Text 
                   className="font-bold text-base text-center"
                   style={{ 
-                    color: regenerateCount >= MAX_FREE_REGENERATE ? "#9CA3AF" : "#10B981",
+                    color: regenerateCount >= MAX_FREE_REGENERATE ? "#9CA3AF" : "#E0E7FF",
                   }}
                 >
                   {regenerateCount >= MAX_FREE_REGENERATE 
@@ -435,28 +467,28 @@ export default function ResultScreen() {
               <TouchableOpacity
                 onPress={handleRegenerate}
                 activeOpacity={0.8}
-                className="flex-1 rounded-xl overflow-hidden py-3"
-                style={{ backgroundColor: "#374151" }}
+                className="flex-1 rounded-2xl overflow-hidden py-4"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.15)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.2)" }}
               >
                 <Text 
                   className="font-semibold text-center text-sm"
-                  style={{ color: "#E5E7EB" }}
+                  style={{ color: "#E0E7FF" }}
                 >
-                  🎨 重新选择风格
+                  🎎 重新选择
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleBackHome}
                 activeOpacity={0.8}
-                className="flex-1 rounded-xl overflow-hidden py-3"
-                style={{ backgroundColor: "#374151" }}
+                className="flex-1 rounded-2xl overflow-hidden py-4"
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.15)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.2)" }}
               >
                 <Text 
                   className="font-semibold text-center text-sm"
-                  style={{ color: "#E5E7EB" }}
+                  style={{ color: "#E0E7FF" }}
                 >
-                  🏠 返回首页
+                  🏠 首页
                 </Text>
               </TouchableOpacity>
             </View>
