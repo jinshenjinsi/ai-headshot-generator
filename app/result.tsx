@@ -244,6 +244,21 @@ export default function ResultScreen() {
             />
           </View>
 
+          {/* 风格标签 */}
+          <View className="items-center gap-2">
+            <View 
+              className="px-4 py-2 rounded-full"
+              style={{ backgroundColor: "rgba(255, 255, 255, 0.2)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.3)" }}
+            >
+              <Text 
+                className="text-sm font-semibold"
+                style={{ color: "#E0E7FF" }}
+              >
+                🎨 {typeof selectedStyle === 'string' ? selectedStyle : (selectedStyle?.name || "专业风格")}
+              </Text>
+            </View>
+          </View>
+
           {/* 尺寸调整器 */}
           <View 
             className="rounded-2xl p-5"
@@ -384,6 +399,51 @@ export default function ResultScreen() {
             )}
           </View>
 
+          {/* 多尺寸快速下载 */}
+          <View 
+            className="rounded-2xl p-5"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderWidth: 1, borderColor: "rgba(255, 255, 255, 0.2)" }}
+          >
+            <Text 
+              className="text-base font-bold mb-4"
+              style={{ color: "#FFFFFF" }}
+            >
+              📦 快速下载
+            </Text>
+            
+            {/* 常用尺寸快速下载 */}
+            <View className="gap-2">
+              {[
+                { name: "1寸证件照", size: "25×35mm" },
+                { name: "2寸证件照", size: "35×53mm" },
+                { name: "护照照", size: "35×45mm" },
+              ].map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={handleDownloadHD}
+                  className="flex-row items-center justify-between p-3 rounded-lg"
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                >
+                  <View>
+                    <Text 
+                      className="font-semibold text-sm"
+                      style={{ color: "#FFFFFF" }}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text 
+                      className="text-xs mt-1"
+                      style={{ color: "#9CA3AF" }}
+                    >
+                      {item.size}
+                    </Text>
+                  </View>
+                  <Text style={{ color: "#E0E7FF" }}>→</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           {/* Premium Action Buttons */}
           <View className="gap-4 mt-6">
             {/* Primary HD Download Button - 蓝色 */}
@@ -393,8 +453,8 @@ export default function ResultScreen() {
               activeOpacity={0.9}
               className="w-full rounded-2xl overflow-hidden"
               style={{
-                backgroundColor: downloading ? "#6B7280" : "#3B82F6",
-                shadowColor: "#3B82F6",
+                backgroundColor: downloading ? "#6B7280" : "#10B981",
+                shadowColor: "#10B981",
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: downloading ? 0.2 : 0.5,
                 shadowRadius: 16,
@@ -407,7 +467,7 @@ export default function ResultScreen() {
                     className="font-bold text-lg text-center"
                     style={{ color: "#FFFFFF" }}
                   >
-                    {downloading ? "下载中..." : "💫 下载高清版"}
+                    {downloading ? "下载中..." : "✨ 下载高清无水印版"}
                   </Text>
                   {!downloading && (
                     <View 
