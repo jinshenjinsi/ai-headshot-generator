@@ -217,6 +217,7 @@ export default function RepairGeneratingScreen() {
             image: result.imageUrl,
             originalImage: result.originalUrl || result.imageUrl,
             scale,
+            repairType,
           },
         } as any);
       }, 500);
