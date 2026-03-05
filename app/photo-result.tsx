@@ -1,6 +1,8 @@
 import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
+import * as FileSystem from "expo-file-system/legacy";
+import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 
@@ -33,21 +35,98 @@ export default function PhotoResultScreen() {
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [showAdjustments, setShowAdjustments] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    const size = PRESET_SIZES[selectedSize];
-    alert(`下载 ${size.name} 尺寸 (${size.specs}) 的免费预览版`);
+    
+    setIsDownloading(true);
+    try {
+      const size = PRESET_SIZES[selectedSize];
+      // 获取图片的base64数据
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 创建临时文件
+      const fileName = `photo_${size.name}_${Date.now()}.png`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 保存到相册
+      if (Platform.OS !== "web") {
+        const permission = await MediaLibrary.requestPermissionsAsync();
+        if (permission.granted) {
+          await MediaLibrary.createAssetAsync(fileUri);
+          Alert.alert("成功", `${size.name}尺寸图片已保存到相册`);
+        } else {
+          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
+        }
+      } else {
+        // Web平台：直接下载
+        const link = document.createElement("a");
+        link.href = `data:image/png;base64,${base64}`;
+        link.download = fileName;
+        link.click();
+        Alert.alert("成功", `${size.name}尺寸图片已下载`);
+      }
+    } catch (error) {
+      Alert.alert("下载失败", "无法保存图片，请重试");
+      console.error("Download error:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
-  const handleDownloadPaid = () => {
+  const handleDownloadPaid = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    const size = PRESET_SIZES[selectedSize];
-    alert(`付费下载 ${size.name} 尺寸 (${size.specs}) 的高清版 - 1.99元`);
+    
+    setIsDownloading(true);
+    try {
+      const size = PRESET_SIZES[selectedSize];
+      // 获取图片的base64数据
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 创建临时文件
+      const fileName = `photo_hd_${size.name}_${Date.now()}.png`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 保存到相册
+      if (Platform.OS !== "web") {
+        const permission = await MediaLibrary.requestPermissionsAsync();
+        if (permission.granted) {
+          await MediaLibrary.createAssetAsync(fileUri);
+          Alert.alert("成功", `${size.name}尺寸高清图片已保存到相册（已付费）`);
+        } else {
+          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
+        }
+      } else {
+        // Web平台：直接下载
+        const link = document.createElement("a");
+        link.href = `data:image/png;base64,${base64}`;
+        link.download = fileName;
+        link.click();
+        Alert.alert("成功", `${size.name}尺寸高清图片已下载（已付费）`);
+      }
+    } catch (error) {
+      Alert.alert("下载失败", "无法保存图片，请重试");
+      console.error("Download error:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // 获取图片的显示效果
@@ -357,14 +436,16 @@ export default function PhotoResultScreen() {
             </View>
             <TouchableOpacity
               onPress={handleDownload}
+              disabled={isDownloading}
               activeOpacity={0.7}
               className="rounded-lg py-3 items-center mt-4"
               style={{
                 backgroundColor: COLORS.success,
+                opacity: isDownloading ? 0.6 : 1,
               }}
             >
               <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                💚 下载免费预览版
+                {isDownloading ? "下载中..." : "💚 下载标准版"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -372,15 +453,17 @@ export default function PhotoResultScreen() {
           {/* 付费下载 */}
           <TouchableOpacity
             onPress={handleDownloadPaid}
+            disabled={isDownloading}
             activeOpacity={0.7}
             className="rounded-lg py-4 px-4 mb-8 items-center"
             style={{
               backgroundColor: COLORS.accent,
+              opacity: isDownloading ? 0.6 : 1,
             }}
           >
             <View style={{ alignItems: 'center', gap: 2 }}>
               <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
-                ⭐ 付费下载高清版
+                ⭐ 下载高清版
               </Text>
               <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '500', opacity: 0.8 }}>
                 ￥1.99

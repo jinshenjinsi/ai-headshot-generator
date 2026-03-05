@@ -1,6 +1,8 @@
 import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
+import * as FileSystem from "expo-file-system/legacy";
+import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 
@@ -15,37 +17,103 @@ const COLORS = {
   success: "#10B981",
 };
 
-const STYLE_CATEGORIES = [
-  { id: "oil", name: "油画", emoji: "🎨" },
-  { id: "watercolor", name: "水彩", emoji: "🌊" },
-  { id: "anime", name: "动漫", emoji: "✨" },
-  { id: "sketch", name: "素描", emoji: "✏️" },
-  { id: "cartoon", name: "卡通", emoji: "🎭" },
-  { id: "vintage", name: "复古", emoji: "📷" },
-];
-
 export default function StyleResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const image = params.image as string;
-  const style = params.style as string;
 
-  const [selectedStyle, setSelectedStyle] = useState(style || "oil");
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    alert("下载功能将在后续实现");
+    
+    setIsDownloading(true);
+    try {
+      // 获取图片的base64数据
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 创建临时文件
+      const fileName = `style_${Date.now()}.png`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 保存到相册
+      if (Platform.OS !== "web") {
+        const permission = await MediaLibrary.requestPermissionsAsync();
+        if (permission.granted) {
+          await MediaLibrary.createAssetAsync(fileUri);
+          Alert.alert("成功", "图片已保存到相册");
+        } else {
+          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
+        }
+      } else {
+        // Web平台：直接下载
+        const link = document.createElement("a");
+        link.href = `data:image/png;base64,${base64}`;
+        link.download = fileName;
+        link.click();
+        Alert.alert("成功", "图片已下载");
+      }
+    } catch (error) {
+      Alert.alert("下载失败", "无法保存图片，请重试");
+      console.error("Download error:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
-  const handleDownloadPaid = () => {
+  const handleDownloadPaid = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    alert("付费下载功能将在后续实现");
+    
+    setIsDownloading(true);
+    try {
+      // 获取图片的base64数据
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 创建临时文件
+      const fileName = `style_hd_${Date.now()}.png`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // 保存到相册
+      if (Platform.OS !== "web") {
+        const permission = await MediaLibrary.requestPermissionsAsync();
+        if (permission.granted) {
+          await MediaLibrary.createAssetAsync(fileUri);
+          Alert.alert("成功", "高清图片已保存到相册（已付费）");
+        } else {
+          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
+        }
+      } else {
+        // Web平台：直接下载
+        const link = document.createElement("a");
+        link.href = `data:image/png;base64,${base64}`;
+        link.download = fileName;
+        link.click();
+        Alert.alert("成功", "高清图片已下载（已付费）");
+      }
+    } catch (error) {
+      Alert.alert("下载失败", "无法保存图片，请重试");
+      console.error("Download error:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // 获取图片的显示效果
@@ -72,9 +140,6 @@ export default function StyleResultScreen() {
     return baseStyle;
   };
 
-  const currentStyleName = STYLE_CATEGORIES.find(s => s.id === selectedStyle)?.name || "油画";
-  const currentStyleEmoji = STYLE_CATEGORIES.find(s => s.id === selectedStyle)?.emoji || "🎨";
-
   return (
     <ScreenContainer className="bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -100,7 +165,7 @@ export default function StyleResultScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 14 }}
             >
-              您的美照已生成,可以下载或更换风格
+              您的美照已生成,可以下载保留
             </Text>
           </View>
 
@@ -197,21 +262,9 @@ export default function StyleResultScreen() {
                 </View>
               </View>
             </View>
-            <View className="p-4" style={{ backgroundColor: COLORS.background }}>
-              <Text 
-                style={{ color: COLORS.text, fontSize: 12, fontWeight: '600', marginBottom: 4 }}
-              >
-                {currentStyleEmoji} 风格: {currentStyleName}
-              </Text>
-              <Text 
-                style={{ color: COLORS.muted, fontSize: 11 }}
-              >
-                您可以下载或更换风格重新生成
-              </Text>
-            </View>
           </View>
 
-          {/* 更换风格 */}
+          {/* 下载选项 */}
           <View 
             className="rounded-2xl p-6 mb-8"
             style={{
@@ -226,92 +279,43 @@ export default function StyleResultScreen() {
             <Text 
               style={{ color: COLORS.primary, fontSize: 18, fontWeight: '700', marginBottom: 4 }}
             >
-              更换风格
+              下载图片
             </Text>
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
             >
-              选择您喜欢的风格,重新生成美照
+              选择您喜欢的版本下载保留
             </Text>
 
-            <View style={{ gap: 8 }}>
-              {STYLE_CATEGORIES.map((styleItem) => (
-                <TouchableOpacity
-                  key={styleItem.id}
-                  onPress={() => setSelectedStyle(styleItem.id)}
-                  activeOpacity={0.7}
-                  className="rounded-lg p-3 flex-row items-center justify-between"
-                  style={{
-                    backgroundColor: selectedStyle === styleItem.id ? COLORS.accent + "15" : COLORS.background,
-                    borderWidth: selectedStyle === styleItem.id ? 2 : 0,
-                    borderColor: selectedStyle === styleItem.id ? COLORS.accent : "transparent",
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 20 }}>
-                      {styleItem.emoji}
-                    </Text>
-                    <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600' }}>
-                      {styleItem.name}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 10,
-                      borderWidth: 2,
-                      borderColor: selectedStyle === styleItem.id ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedStyle === styleItem.id ? COLORS.accent : "transparent",
-                    }}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* 快速下载 */}
-          <View 
-            className="rounded-2xl p-6 mb-8"
-            style={{
-              backgroundColor: COLORS.white,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
-          >
-            <Text 
-              style={{ color: COLORS.primary, fontSize: 18, fontWeight: '700', marginBottom: 4 }}
-            >
-              快速下载
-            </Text>
-            <View className="gap-2">
+            <View className="gap-3">
               <TouchableOpacity
                 onPress={handleDownload}
+                disabled={isDownloading}
                 activeOpacity={0.7}
                 className="rounded-lg py-3 items-center"
                 style={{
                   backgroundColor: COLORS.success,
+                  opacity: isDownloading ? 0.6 : 1,
                 }}
               >
                 <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                  💚 免费预览版
+                  {isDownloading ? "下载中..." : "💚 下载标准版"}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleDownloadPaid}
+                disabled={isDownloading}
                 activeOpacity={0.7}
                 className="rounded-lg py-3 items-center"
                 style={{
                   backgroundColor: COLORS.accent,
+                  opacity: isDownloading ? 0.6 : 1,
                 }}
               >
                 <View style={{ alignItems: 'center', gap: 2 }}>
                   <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600' }}>
-                    ⭐ 付费下载高清版
+                    ⭐ 下载高清版
                   </Text>
                   <Text style={{ color: COLORS.primary, fontSize: 11, fontWeight: '500', opacity: 0.8 }}>
                     ￥1.99
