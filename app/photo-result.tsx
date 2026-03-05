@@ -216,7 +216,7 @@ export default function PhotoResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      亮度
+                      亮度调整
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {brightness}%

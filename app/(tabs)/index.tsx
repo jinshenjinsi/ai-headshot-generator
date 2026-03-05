@@ -274,12 +274,11 @@ export default function HomeScreen() {
                     style={{ color: COLORS.text }}
                   >
                     价格实惠
-                  </Text>
-                  <Text 
+                  </Text>                  <Text 
                     className="text-sm leading-relaxed"
                     style={{ color: COLORS.lightText }}
                   >
-                    预览版免费，高清版仅需¥3.9
+                    预览版免费，高清版仅需¥1.99
                   </Text>
                 </View>
               </View>
