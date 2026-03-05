@@ -242,7 +242,7 @@ export default function RepairResultScreen() {
                     <View>
                       <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
                         <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
-                          亮度调整
+                          亮度
                         </Text>
                         <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
                           {brightness}%
@@ -258,11 +258,10 @@ export default function RepairResultScreen() {
                               paddingVertical: 5,
                               backgroundColor: brightness === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
                               borderRadius: 3,
-                              alignItems: "center",
                             }}
                           >
-                            <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: "600" }}>
-                              {val}
+                            <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "600" }}>
+                              {val === 70 ? "强" : val === 130 ? "弱" : val}
                             </Text>
                           </TouchableOpacity>
                         ))}
@@ -273,7 +272,7 @@ export default function RepairResultScreen() {
                     <View>
                       <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
                         <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
-                          对比强弱
+                          对比度
                         </Text>
                         <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
                           {contrast}%
