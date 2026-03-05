@@ -47,34 +47,26 @@ export default function RepairResultScreen() {
       resizeMode: "cover",
     };
 
-    // 应用亮度和对比度滤镜
-    // 亮度范围：70-130，映射到 0.7-1.0（不超过opacity最大值1）
-    const normalizedBrightness = brightness / 100;
+    // 应用亮度滤镜
+    // 亮度范围：70-130
+    // 正确方向：70为暗，100为正常，130为亮
+    // 映射到 0.7-1.3的亮度倍数
+    const brightnessValue = (brightness - 100) / 100 + 1; // 70->0.7, 100->1.0, 130->1.3
     
     if (Platform.OS === "web") {
-      // 亮度值：70为暗，130为亮
+      // Web：直接使用brightness filter
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
     } else {
       // React Native：使用opacity模拟亮度
       // brightness 70 -> opacity 0.7 (暗)
       // brightness 100 -> opacity 1.0 (正常)
       // brightness 130 -> opacity 1.0 (正常，因为opacity最大值是1)
-      baseStyle.opacity = Math.min(1, normalizedBrightness);
+      baseStyle.opacity = Math.min(1, brightnessValue);
     }
 
-    // 对比度：使用tintColor模拟
-    // contrast 70 -> 添加白色滤镜（低对比）
-    // contrast 100 -> 正常
-    // contrast 130 -> 添加黑色滤镜（高对比）
-    if (contrast > 100) {
-      // 高对比：添加黑色滤镜
-      const intensity = Math.min(0.5, (contrast - 100) / 100 * 0.3);
-      baseStyle.tintColor = `rgba(0, 0, 0, ${intensity})`;
-    } else if (contrast < 100) {
-      // 低对比：添加白色滤镜
-      const intensity = Math.min(0.4, (100 - contrast) / 100 * 0.25);
-      baseStyle.tintColor = `rgba(255, 255, 255, ${intensity})`;
-    }
+    // 对比度：在React Native上不模拟，仅在web上应用
+    // 原因：tintColor在React Native上的行为不可预测，容易导致图像消失
+    // 对比度调整已在web上通过filter实现
 
     // 如果是老照片修复，不添加底色
     if (repairType === "enhance") {
@@ -265,8 +257,8 @@ export default function RepairResultScreen() {
                   className="rounded-lg p-3 flex-row items-center justify-between"
                   style={{
                     backgroundColor: selectedScale === scale.id ? COLORS.accent + "15" : COLORS.background,
-                    borderWidth: 1,
-                    borderColor: selectedScale === scale.id ? COLORS.accent : COLORS.border,
+                    borderWidth: selectedScale === scale.id ? 2 : 0,
+                    borderColor: selectedScale === scale.id ? COLORS.accent : "transparent",
                   }}
                 >
                   <View>
@@ -277,15 +269,22 @@ export default function RepairResultScreen() {
                       {scale.desc}
                     </Text>
                   </View>
-                  {selectedScale === scale.id && (
-                    <Text style={{ fontSize: 18, color: COLORS.accent }}>✓</Text>
-                  )}
+                  <View
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      borderWidth: 2,
+                      borderColor: selectedScale === scale.id ? COLORS.accent : COLORS.border,
+                      backgroundColor: selectedScale === scale.id ? COLORS.accent : "transparent",
+                    }}
+                  />
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
-          {/* 修复信息 */}
+          {/* 快速下载 */}
           <View
             className="rounded-2xl p-6 mb-8"
             style={{
@@ -298,66 +297,40 @@ export default function RepairResultScreen() {
             }}
           >
             <Text style={{ color: COLORS.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-              修复详情
+              快速下载
+            </Text>
+            <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
+              选择倍数后点击下载
             </Text>
 
-            <View className="gap-3">
-              {[
-                { icon: "🔍", title: "清晰度提升", desc: "自动修复模糊和噪点" },
-                { icon: "🎨", title: "色彩还原", desc: "保留原始色彩信息" },
-                { icon: "⚡", title: "快速处理", desc: "30秒内完成修复" },
-              ].map((item, index) => (
-                <View key={index} className="flex-row items-start gap-3">
-                  <Text style={{ fontSize: 18 }}>{item.icon}</Text>
-                  <View className="flex-1">
-                    <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: "600", marginBottom: 2 }}>
-                      {item.title}
-                    </Text>
-                    <Text style={{ color: COLORS.muted, fontSize: 12 }}>
-                      {item.desc}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+            <View className="gap-2">
+              <TouchableOpacity
+                onPress={handleDownload}
+                activeOpacity={0.7}
+                className="rounded-lg py-3 items-center"
+                style={{
+                  backgroundColor: COLORS.success,
+                }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: "600" }}>
+                  💚 免费预览版
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleDownloadPaid}
+                activeOpacity={0.7}
+                className="rounded-lg py-3 items-center"
+                style={{
+                  backgroundColor: COLORS.accent,
+                }}
+              >
+                <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: "600" }}>
+                  ⭐ 付费高清版
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          {/* 下载按钮 */}
-          <View className="gap-3 mb-8">
-            <TouchableOpacity
-              onPress={handleDownload}
-              activeOpacity={0.7}
-              className="rounded-lg py-4 items-center"
-              style={{ backgroundColor: COLORS.primary }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: "600" }}>
-                📥 下载预览版
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleDownloadPaid}
-              activeOpacity={0.7}
-              className="rounded-lg py-4 items-center border"
-              style={{ borderColor: COLORS.primary }}
-            >
-              <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: "600" }}>
-                💎 下载高清版 (¥3.9)
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* 返回首页 */}
-          <TouchableOpacity
-            onPress={() => router.push("/" as any)}
-            activeOpacity={0.7}
-            className="rounded-lg py-3 items-center mb-6"
-            style={{ backgroundColor: COLORS.background }}
-          >
-            <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: "600" }}>
-              🏠 返回首页
-            </Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </ScreenContainer>

@@ -50,6 +50,30 @@ export default function PhotoResultScreen() {
     alert("付费下载功能将在后续实现");
   };
 
+  // 获取图片的显示效果
+  const getImageStyle = () => {
+    const baseStyle: any = {
+      width: "100%",
+      height: 400,
+      resizeMode: "cover",
+    };
+
+    // 应用亮度滤镜
+    // 亮度范围：70-130
+    // 正确方向：70为暗，100为正常，130为亮
+    const brightnessValue = (brightness - 100) / 100 + 1; // 70->0.7, 100->1.0, 130->1.3
+    
+    if (Platform.OS === "web") {
+      // Web：直接使用brightness filter
+      baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
+    } else {
+      // React Native：使用opacity模拟亮度
+      baseStyle.opacity = Math.min(1, brightnessValue);
+    }
+
+    return baseStyle;
+  };
+
   return (
     <ScreenContainer className="bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -94,14 +118,7 @@ export default function PhotoResultScreen() {
             <View style={{ position: 'relative', width: '100%', height: 400 }}>
               <Image
                 source={{ uri: image }}
-                style={{ 
-                  width: '100%', 
-                  height: 400, 
-                  resizeMode: 'cover',
-                  opacity: Math.min(1, brightness / 100),
-                  tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.5, (contrast - 100) / 100 * 0.3) + ')' : 
-                             contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.4, (100 - contrast) / 100 * 0.25) + ')' : undefined,
-                }}
+                style={getImageStyle()}
               />
               {/* 色彩调整面板 - 覆盖在图片上方 */}
               <View 
@@ -291,106 +308,51 @@ export default function PhotoResultScreen() {
               {PRESET_SIZES.map((size, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setSelectedSize(index)}
+                  onPress={handleDownload}
                   activeOpacity={0.7}
                   className="rounded-lg p-3 flex-row items-center justify-between"
                   style={{
-                    backgroundColor: selectedSize === index ? COLORS.accent + '15' : COLORS.background,
-                    borderWidth: 1,
-                    borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
+                    backgroundColor: selectedSize === index ? COLORS.accent + "15" : COLORS.background,
+                    borderWidth: selectedSize === index ? 2 : 0,
+                    borderColor: selectedSize === index ? COLORS.accent : "transparent",
                   }}
                 >
                   <View>
-                    <Text 
-                      style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600', marginBottom: 2 }}
-                    >
+                    <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600', marginBottom: 2 }}>
                       {size.name}
                     </Text>
-                    <Text 
-                      style={{ color: COLORS.muted, fontSize: 12 }}
-                    >
+                    <Text style={{ color: COLORS.muted, fontSize: 12 }}>
                       {size.specs}
                     </Text>
                   </View>
-                  {selectedSize === index && (
-                    <Text style={{ fontSize: 18, color: COLORS.accent }}>✓</Text>
-                  )}
+                  <View
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      borderWidth: 2,
+                      borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
+                      backgroundColor: selectedSize === index ? COLORS.accent : "transparent",
+                    }}
+                  />
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
-          {/* 底部操作 */}
-          <View className="gap-3 mb-8">
-            <TouchableOpacity
-              onPress={handleDownload}
-              activeOpacity={0.7}
-              className="rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 2,
-                borderColor: COLORS.accent,
-              }}
-            >
-              <Text 
-                style={{ color: COLORS.accent, fontSize: 16, fontWeight: '600' }}
-              >
-                📥 下载预览版(免费)
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleDownloadPaid}
-              activeOpacity={0.7}
-              className="rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.success,
-              }}
-            >
-              <Text 
-                style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}
-              >
-                💾 下载高清版 ¥5.6
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* 底部导航 */}
-          <View className="flex-row gap-3 mb-8">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              activeOpacity={0.7}
-              className="flex-1 rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 1,
-                borderColor: COLORS.border,
-              }}
-            >
-              <Text 
-                style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
-              >
-                上一步
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push("/" as any)}
-              activeOpacity={0.7}
-              className="flex-1 rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 1,
-                borderColor: COLORS.border,
-              }}
-            >
-              <Text 
-                style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
-              >
-                返回首页
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* 付费下载 */}
+          <TouchableOpacity
+            onPress={handleDownloadPaid}
+            activeOpacity={0.7}
+            className="rounded-lg py-4 px-4 mb-8 items-center"
+            style={{
+              backgroundColor: COLORS.accent,
+            }}
+          >
+            <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
+              ⭐ 付费下载高清版
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </ScreenContainer>
