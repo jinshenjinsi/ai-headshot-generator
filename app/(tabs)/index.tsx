@@ -54,15 +54,30 @@ export default function HomeScreen() {
               }}
             />
             
-            {/* 品牌名称 - 优化设计 */}
-            <View style={{ alignItems: 'center', gap: 2 }}>
-              <Text 
-                className="text-5xl font-bold text-center"
-                style={{ color: COLORS.primary, letterSpacing: 2 }}
-              >
-                元一图灵
-              </Text>
-              <View style={{ height: 2, width: 60, backgroundColor: COLORS.accent, borderRadius: 1 }} />
+            {/* 品牌名称 - 艺术化设计 */}
+            <View style={{ alignItems: 'center', gap: 3 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 1 }}>
+                <Text 
+                  className="text-5xl font-bold"
+                  style={{ 
+                    color: COLORS.accent,
+                    letterSpacing: 1,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  元一
+                </Text>
+                <Text 
+                  className="text-5xl font-bold"
+                  style={{ 
+                    color: COLORS.primary,
+                    letterSpacing: 1,
+                  }}
+                >
+                  图灵
+                </Text>
+              </View>
+              <View style={{ height: 3, width: 80, backgroundColor: COLORS.accent, borderRadius: 2 }} />
             </View>
             
             <Text 

@@ -234,7 +234,7 @@ export default function StyleResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      对比度
+                      对比强弱
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {contrast}%
@@ -288,21 +288,6 @@ export default function StyleResultScreen() {
             </Text>
 
             <View className="gap-3">
-              <TouchableOpacity
-                onPress={handleDownload}
-                disabled={isDownloading}
-                activeOpacity={0.7}
-                className="rounded-lg py-3 items-center"
-                style={{
-                  backgroundColor: COLORS.success,
-                  opacity: isDownloading ? 0.6 : 1,
-                }}
-              >
-                <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                  {isDownloading ? "下载中..." : "💚 下载标准版"}
-                </Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 onPress={handleDownloadPaid}
                 disabled={isDownloading}
