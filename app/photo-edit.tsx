@@ -39,9 +39,9 @@ export default function PhotoEditScreen() {
     const contrastValue = contrast / 100;
     
     return {
-      opacity: Math.min(1, brightnessValue),
-      tintColor: contrastValue > 1 ? 'rgba(0,0,0,' + Math.min(0.5, (contrastValue - 1) * 0.3) + ')' : 
-                 contrastValue < 1 ? 'rgba(255,255,255,' + Math.min(0.3, (1 - contrastValue) * 0.2) + ')' : undefined,
+      opacity: brightnessValue,
+      tintColor: contrastValue > 1 ? 'rgba(0,0,0,' + Math.min(0.7, (contrastValue - 1) * 0.6) + ')' : 
+                 contrastValue < 1 ? 'rgba(255,255,255,' + Math.min(0.6, (1 - contrastValue) * 0.5) + ')' : undefined,
     };
   };
 

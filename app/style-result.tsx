@@ -211,9 +211,9 @@ export default function StyleResultScreen() {
                 width: '100%', 
                 height: 400, 
                 resizeMode: 'cover',
-                opacity: Math.min(1, brightness / 100),
-                tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.5, (contrast - 100) / 100 * 0.3) + ')' : 
-                           contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.3, (100 - contrast) / 100 * 0.2) + ')' : undefined,
+                opacity: brightness / 100,
+                tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
+                           contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
               }}
             />
             {showAdjustments && (
@@ -331,58 +331,7 @@ export default function StyleResultScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* 其他风格预览 */}
-          <View 
-            className="rounded-2xl p-6 mb-8"
-            style={{
-              backgroundColor: COLORS.white,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
-          >
-            <Text 
-              style={{ color: COLORS.primary, fontSize: 18, fontWeight: '700', marginBottom: 4 }}
-            >
-              尝试其他风格
-            </Text>
-            <Text 
-              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
-            >
-              同一张照片,10种风格任意转换
-            </Text>
-
-            <View className="flex-row flex-wrap gap-2">
-              {["professional", "oil", "watercolor", "sketch", "cartoon", "anime", "minimal", "retro", "neon", "art"].map((s) => (
-                <TouchableOpacity
-                  key={s}
-                  onPress={() => {
-                    router.push({
-                      pathname: "/style-edit",
-                      params: { image: params.image, style: s },
-                    } as any);
-                  }}
-                  activeOpacity={0.7}
-                  className="rounded-lg px-3 py-2"
-                  style={{
-                    backgroundColor: s === style ? COLORS.accent : COLORS.border,
-                  }}
-                >
-                  <Text 
-                    style={{ 
-                      color: s === style ? COLORS.white : COLORS.text, 
-                      fontSize: 12, 
-                      fontWeight: '600' 
-                    }}
-                  >
-                    {STYLE_NAMES[s]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+          {/* 其他风格功能已删除 */}
 
           {/* 导出格式 */}
           <View 
