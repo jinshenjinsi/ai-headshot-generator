@@ -61,7 +61,7 @@ export default function StyleUploadScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
-      pathname: "/style-select",
+      pathname: "/style-choose",
       params: { image: selectedImage },
     } as any);
   };
