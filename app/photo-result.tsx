@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
@@ -97,7 +97,9 @@ export default function PhotoResultScreen() {
                 width: '100%', 
                 height: 400, 
                 resizeMode: 'cover',
-                opacity: 1,
+                opacity: brightness / 100,
+                tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
+                           contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
               }}
             />
             {showAdjustments && (
@@ -107,52 +109,71 @@ export default function PhotoResultScreen() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
                   paddingVertical: 12,
-                  paddingHorizontal: 16,
+                  paddingHorizontal: 12,
+                  gap: 12,
                 }}
               >
-                <View style={{ marginBottom: 12 }}>
-                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
-                    亮度: {brightness}%
-                  </Text>
-                  <View 
-                    style={{
-                      height: 4,
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <View 
-                      style={{
-                        height: '100%',
-                        width: `${brightness}%`,
-                        backgroundColor: COLORS.accent,
-                      }}
-                    />
+                {/* 亮度调整 */}
+                <View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                      亮度
+                    </Text>
+                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                      {brightness}%
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    {[70, 85, 100, 115, 130].map((val) => (
+                      <TouchableOpacity
+                        key={val}
+                        onPress={() => setBrightness(val)}
+                        style={{
+                          flex: 1,
+                          paddingVertical: 6,
+                          backgroundColor: brightness === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
+                          borderRadius: 4,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
+                          {val}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
                 </View>
 
+                {/* 对比度调整 */}
                 <View>
-                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
-                    对比度: {contrast}%
-                  </Text>
-                  <View 
-                    style={{
-                      height: 4,
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <View 
-                      style={{
-                        height: '100%',
-                        width: `${contrast}%`,
-                        backgroundColor: COLORS.accent,
-                      }}
-                    />
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                      对比度
+                    </Text>
+                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                      {contrast}%
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    {[70, 85, 100, 115, 130].map((val) => (
+                      <TouchableOpacity
+                        key={val}
+                        onPress={() => setContrast(val)}
+                        style={{
+                          flex: 1,
+                          paddingVertical: 6,
+                          backgroundColor: contrast === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
+                          borderRadius: 4,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
+                          {val}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
                 </View>
               </View>
