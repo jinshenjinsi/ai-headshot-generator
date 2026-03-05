@@ -1,4 +1,5 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Pressable } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform } from "react-native";
+import { useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
@@ -29,6 +30,19 @@ export default function StyleEditScreen() {
   const contrastRef = useRef(null);
   const saturationRef = useRef(null);
   const sharpnessRef = useRef(null);
+
+  // 计算滤镜效果
+  const getImageStyle = () => {
+    const brightnessValue = brightness / 100;
+    const contrastValue = contrast / 100;
+    const saturationValue = saturation / 100;
+    
+    return {
+      opacity: Math.min(1, brightnessValue),
+      tintColor: contrastValue > 1 ? 'rgba(0,0,0,' + Math.min(0.5, (contrastValue - 1) * 0.3) + ')' : 
+                 contrastValue < 1 ? 'rgba(255,255,255,' + Math.min(0.3, (1 - contrastValue) * 0.2) + ')' : undefined,
+    };
+  };
 
   const handleSliderPress = (value: number, setter: (v: number) => void, ref: any) => {
     if (Platform.OS !== "web") {
@@ -197,6 +211,7 @@ export default function StyleEditScreen() {
                 width: '100%', 
                 height: 400,
                 resizeMode: 'cover',
+                ...getImageStyle(),
               }}
             />
           </View>

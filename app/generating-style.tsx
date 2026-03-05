@@ -210,7 +210,7 @@ export default function GeneratingStyleScreen() {
       setStatusMessage("完成!");
 
       setTimeout(() => {
-        router.push({
+        router.replace({
           pathname: "/style-result",
           params: {
             image: result.imageUrl,
