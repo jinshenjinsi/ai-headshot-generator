@@ -18,6 +18,7 @@ const COLORS = {
 export default function RepairUploadScreen() {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [repairType, setRepairType] = useState<'upscale' | 'restore'>('upscale');
 
   const handlePickImage = async () => {
     if (Platform.OS !== "web") {
@@ -62,7 +63,7 @@ export default function RepairUploadScreen() {
     }
     router.push({
       pathname: "/repair-generating",
-      params: { image: selectedImage, scale: "2x" },
+      params: { image: selectedImage, scale: "2x", repairType },
     } as any);
   };
 
@@ -91,7 +92,7 @@ export default function RepairUploadScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 14 }}
             >
-              上传低分辨率照片,让AI帮您修复清晰
+              选择修复方式,让AI帮您修复照片
             </Text>
           </View>
 
@@ -132,6 +133,65 @@ export default function RepairUploadScreen() {
             )}
           </View>
 
+          {/* 修复类型选择 */}
+          <View 
+            className="rounded-2xl p-6 mb-8"
+            style={{
+              backgroundColor: COLORS.white,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 2,
+            }}
+          >
+            <Text 
+              style={{ color: COLORS.primary, fontSize: 18, fontWeight: '700', marginBottom: 4 }}
+            >
+              选择修复类型
+            </Text>
+            <Text 
+              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
+            >
+              选择适合您照片的修复方式
+            </Text>
+
+            <View className="gap-3">
+              {[
+                { id: 'upscale', name: '📈 超分辨率', desc: '提升分辨率和清晰度' },
+                { id: 'restore', name: '✨ 老照片修复', desc: '修复褪色、划痕、噪点' },
+              ].map((type) => (
+                <TouchableOpacity
+                  key={type.id}
+                  onPress={() => setRepairType(type.id as 'upscale' | 'restore')}
+                  activeOpacity={0.7}
+                  className="rounded-lg p-4 flex-row items-center justify-between"
+                  style={{
+                    backgroundColor: repairType === type.id ? COLORS.accent + '15' : COLORS.background,
+                    borderWidth: 1,
+                    borderColor: repairType === type.id ? COLORS.accent : COLORS.border,
+                  }}
+                >
+                  <View>
+                    <Text 
+                      style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600', marginBottom: 2 }}
+                    >
+                      {type.name}
+                    </Text>
+                    <Text 
+                      style={{ color: COLORS.muted, fontSize: 12 }}
+                    >
+                      {type.desc}
+                    </Text>
+                  </View>
+                  {repairType === type.id && (
+                    <Text style={{ fontSize: 18, color: COLORS.accent }}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           {/* 提示信息 */}
           <View 
             className="rounded-xl p-4 mb-8"
@@ -145,10 +205,11 @@ export default function RepairUploadScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, lineHeight: 18 }}
             >
-              • 支持2倍、4倍超分辨率{"\n"}
-              • 自动修复模糊、噪点{"\n"}
-              • 保留原始色彩和细节{"\n"}
-              • 最大支持 8000×8000 像素
+              {repairType === 'upscale' ? (
+                <>支持2倍、4倍超分辨率{"\n"}提升低分辨率照片清晰度{"\n"}保留原始色彩和细节{"\n"}最大支持 8000×8000 像素</>
+              ) : (
+                <>修复褪色和色彩偏差{"\n"}去除划痕和污渍{"\n"}降低噪点和颗粒感{"\n"}恢复照片原始质感</>
+              )}
             </Text>
           </View>
 

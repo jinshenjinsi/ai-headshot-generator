@@ -20,6 +20,7 @@ export default function PhotoEditScreen() {
   const image = params.image as string;
   const type = params.type as string;
   const country = params.country as string;
+  const background = params.background as string || "white";
 
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
@@ -45,7 +46,7 @@ export default function PhotoEditScreen() {
       params: { 
         image, 
         type, 
-        background: "white",
+        background,
       },
     } as any);
   };

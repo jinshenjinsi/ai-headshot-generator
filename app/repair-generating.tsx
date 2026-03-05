@@ -56,10 +56,11 @@ async function blobUrlToBase64(blobUrl: string): Promise<string> {
 
 export default function RepairGeneratingScreen() {
   const router = useRouter();
-  const colors = useColors();
   const params = useLocalSearchParams();
   const image = params.image as string;
   const scale = params.scale as string || "2x";
+  const repairType = (params.repairType as 'upscale' | 'restore') || 'upscale';
+  const colors = useColors();
 
   const [progress, setProgress] = useState(0);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
@@ -164,16 +165,30 @@ export default function RepairGeneratingScreen() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       setProgress(70);
-      const scaleLabel = scale === "4x" ? "4倍" : "2倍";
-      setStatusMessage(`正在进行${scaleLabel}超分辨率处理...`);
-
-      const prompt = `修复和增强照片质量。要求:
+      let statusMsg = '';
+      let prompt = '';
+      
+      if (repairType === 'upscale') {
+        const scaleLabel = scale === "4x" ? "4倍" : "2倍";
+        statusMsg = `正在进行${scaleLabel}超分辨率处理...`;
+        prompt = `修复和增强照片质量。要求:
 - 使用${scaleLabel}超分辨率技术
 - 自动修复图片缺陷(噪点、模糊等)
 - 增强色彩和细节
 - 提高清晰度和锐度
 - 保持原始内容的真实性
 - 输出高质量、高分辨率图片`;
+      } else {
+        statusMsg = '正在修复老照片...';
+        prompt = `修复和恢复老照片。要求:
+- 修复褪色和色彩偏差
+- 去除划痕、污渍和损伤
+- 降低噪点和颗粒感
+- 恢复照片原始质感和细节
+- 保留历史感和真实性
+- 输出高质量、清晰的修复照片`;
+      }
+      setStatusMessage(statusMsg);
 
       const result = await generateMutation.mutateAsync({
         imageUrl: uploadResult.url,
@@ -195,7 +210,8 @@ export default function RepairGeneratingScreen() {
       setStatusMessage("完成!");
 
       setTimeout(() => {
-        router.push({
+        // 使用replace而不是push，以便回退时不会回到这个100%完成页面
+        router.replace({
           pathname: "/repair-result",
           params: {
             image: result.imageUrl,

@@ -175,17 +175,19 @@ export default function PhotoGeneratingScreen() {
       };
       setStatusMessage(`正在生成${typeLabel[type] || type}证照...`);
 
+      const bgColorLabel = background === 'white' ? '白色' : background === 'blue' ? '蓝色' : background === 'red' ? '红色' : '灰色';
       const prompt = `生成一张高质量的${typeLabel[type] || type}证照照片。要求:
-- 背景颜色: ${background === 'white' ? '白色' : background === 'blue' ? '蓝色' : background === 'red' ? '红色' : '灰色'}
+- 背景颜色: ${bgColorLabel}
 - 参考输入图片的人物特征
 - 正式、专业、清晰
 - 符合${typeLabel[type] || type}的标准要求
 - 高分辨率、高质量`;
 
-      let bgColor: 'white' | 'black' | 'neutral' | 'gray' | 'office' | undefined = 'neutral';
+      let bgColor: 'white' | 'black' | 'neutral' | 'gray' | 'office' | undefined = 'white';
       if (background === 'white') bgColor = 'white';
       else if (background === 'gray') bgColor = 'gray';
-      else if (background === 'blue' || background === 'red') bgColor = 'neutral';
+      else if (background === 'blue') bgColor = 'office';
+      else if (background === 'red') bgColor = 'black';
 
       const result = await generateMutation.mutateAsync({
         imageUrl: uploadResult.url,
@@ -207,7 +209,8 @@ export default function PhotoGeneratingScreen() {
       setStatusMessage("完成!");
 
       setTimeout(() => {
-        router.push({
+        // 使用replace而不是push，以便回退时不会回到这个100%完成页面
+        router.replace({
           pathname: "/photo-result",
           params: {
             image: result.imageUrl,
