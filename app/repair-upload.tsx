@@ -19,6 +19,7 @@ export default function RepairUploadScreen() {
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [repairType, setRepairType] = useState<'upscale' | 'restore'>('upscale');
+  const [scale, setScale] = useState<'2x' | '4x'>('2x');
 
   const handlePickImage = async () => {
     if (Platform.OS !== "web") {
@@ -63,7 +64,7 @@ export default function RepairUploadScreen() {
     }
     router.push({
       pathname: "/repair-generating",
-      params: { image: selectedImage, scale: "2x", repairType },
+      params: { image: selectedImage, scale, repairType },
     } as any);
   };
 
@@ -190,6 +191,47 @@ export default function RepairUploadScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            {/* 超分倍数选择 */}
+            {repairType === 'upscale' && (
+              <View className="mt-6 pt-6 border-t" style={{ borderTopColor: COLORS.border }}>
+                <Text 
+                  style={{ color: COLORS.primary, fontSize: 16, fontWeight: '700', marginBottom: 4 }}
+                >
+                  选择超分倍数
+                </Text>
+                <Text 
+                  style={{ color: COLORS.muted, fontSize: 12, marginBottom: 4 }}
+                >
+                  选择合适的放大倍数
+                </Text>
+                <View className="gap-2 flex-row">
+                  {['2x', '4x'].map((s) => (
+                    <TouchableOpacity
+                      key={s}
+                      onPress={() => setScale(s as '2x' | '4x')}
+                      activeOpacity={0.7}
+                      className="flex-1 rounded-lg p-3 items-center"
+                      style={{
+                        backgroundColor: scale === s ? COLORS.accent : COLORS.background,
+                        borderWidth: 1,
+                        borderColor: scale === s ? COLORS.accent : COLORS.border,
+                      }}
+                    >
+                      <Text 
+                        style={{ 
+                          color: scale === s ? COLORS.white : COLORS.text, 
+                          fontSize: 14, 
+                          fontWeight: '600' 
+                        }}
+                      >
+                        {s}放大
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
 
           {/* 提示信息 */}

@@ -236,17 +236,18 @@ export default function StyleResultScreen() {
                       {brightness}%
                     </Text>
                   </View>
-                  <Pressable
+                  <TouchableOpacity
                     onPress={(e) => {
                       const locationX = (e.nativeEvent as any).locationX || 0;
                       const trackWidth = 280;
                       const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
                       setBrightness(percentage);
                     }}
+                    activeOpacity={0.8}
                     style={{
-                      height: 24,
+                      height: 32,
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 12,
+                      borderRadius: 16,
                       justifyContent: 'center',
                       paddingHorizontal: 2,
                     }}
@@ -256,10 +257,10 @@ export default function StyleResultScreen() {
                         height: '100%',
                         width: `${(brightness / 200) * 100}%`,
                         backgroundColor: COLORS.accent,
-                        borderRadius: 10,
+                        borderRadius: 14,
                       }}
                     />
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
 
                 {/* 对比度调整 */}
@@ -272,17 +273,18 @@ export default function StyleResultScreen() {
                       {contrast}%
                     </Text>
                   </View>
-                  <Pressable
+                  <TouchableOpacity
                     onPress={(e) => {
                       const locationX = (e.nativeEvent as any).locationX || 0;
                       const trackWidth = 280;
                       const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
                       setContrast(percentage);
                     }}
+                    activeOpacity={0.8}
                     style={{
-                      height: 24,
+                      height: 32,
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 12,
+                      borderRadius: 16,
                       justifyContent: 'center',
                       paddingHorizontal: 2,
                     }}
@@ -292,10 +294,10 @@ export default function StyleResultScreen() {
                         height: '100%',
                         width: `${(contrast / 200) * 100}%`,
                         backgroundColor: COLORS.accent,
-                        borderRadius: 10,
+                        borderRadius: 14,
                       }}
                     />
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
               </View>
             )}
