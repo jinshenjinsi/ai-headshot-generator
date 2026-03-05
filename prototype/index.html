@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI专业头像 - 界面原型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #1a365d 0%, #2d5a8c 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(26, 54, 93, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* 页面 */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+
+        /* 功能卡片 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(26, 54, 93, 0.15);
+            border-color: #d4af37;
+        }
+
+        .feature-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h2 {
+            font-size: 24px;
+            color: #1a365d;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a365d 0%, #2d5a8c 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(26, 54, 93, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(26, 54, 93, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1a365d;
+            border: 2px solid #1a365d;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #1a365d;
+            color: white;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-gold:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+
+        /* 页面标题 */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        /* 表单区域 */
+        .form-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-section h2 {
+            font-size: 20px;
+            color: #1a365d;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f4f8;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        /* 选项网格 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .option-item {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option-item:hover {
+            border-color: #d4af37;
+            background: #fffbf0;
+        }
+
+        .option-item.selected {
+            border-color: #d4af37;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff8e7 100%);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .option-item .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .option-item .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* 国家列表 */
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .country-item {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .country-item:hover {
+            border-color: #d4af37;
+            background: #fffbf0;
+        }
+
+        .country-item.selected {
+            border-color: #d4af37;
+            background: linear-gradient(135deg, #fffbf0 0%, #fff8e7 100%);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 预览区域 */
+        .preview-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 400px;
+            height: 500px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #718096;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .preview-image.has-image {
+            border: none;
+            background: #f0f4f8;
+        }
+
+        /* 底部操作栏 */
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .breadcrumb a {
+            color: #1a365d;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #cbd5e0;
+        }
+
+        /* 尺寸输入 */
+        .size-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .size-input-group .form-group {
+            margin-bottom: 0;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .country-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <div class="logo">AI专业头像</div>
+        <ul class="nav-links">
+            <li><a onclick="showPage('home')">首页</a></li>
+            <li><a onclick="showPage('history')">历史记录</a></li>
+            <li><a onclick="showPage('account')">个人中心</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <!-- 首页 -->
+        <div id="home" class="page active">
+            <div class="hero">
+                <h1>AI专业头像生成器</h1>
+                <p>一张照片,10种风格,专业级效果</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- 证照生成 -->
+                <div class="feature-card" onclick="showPage('photo-upload')">
+                    <div class="feature-icon">📸</div>
+                    <h2>证照生成</h2>
+                    <p>一张正面照,快速生成标准证件照。支持护照、签证、工作证等多种用途。</p>
+                    <button class="btn-primary">开始生成</button>
+                </div>
+
+                <!-- 美照生成 -->
+                <div class="feature-card" onclick="showPage('style-upload')">
+                    <div class="feature-icon">✨</div>
+                    <h2>美照生成</h2>
+                    <p>10种专业风格转换,让你的头像更出众。卡通、油画、水彩等任意选择。</p>
+                    <button class="btn-primary">开始生成</button>
+                </div>
+
+                <!-- 照片修复 -->
+                <div class="feature-card" onclick="showPage('repair-upload')">
+                    <div class="feature-icon">🔧</div>
+                    <h2>照片修复</h2>
+                    <p>低分辨率照片也能变清晰。2倍、4倍超分,让老照片焕然一新。</p>
+                    <button class="btn-primary">开始修复</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 上传页 -->
+        <div id="photo-upload" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>上传照片</span>
+            </div>
+
+            <div class="page-header">
+                <h1>证照生成</h1>
+                <p>上传一张正面人物照,我们为您生成标准证件照</p>
+            </div>
+
+            <div class="form-section">
+                <h2>上传照片</h2>
+                <div class="form-group">
+                    <label>请上传一张清晰的正面人物照</label>
+                    <div class="preview-image" id="preview-photo">
+                        <div>点击或拖拽上传照片</div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%; margin-top: 15px; margin-bottom: 15px;" onclick="openCamera()">📷 调用摄像头拍照</button>
+                    <input type="file" accept="image/*" style="margin-top: 15px;">
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-primary" onclick="showPage('photo-type')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 证照类型选择 -->
+        <div id="photo-type" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>选择类型</span>
+            </div>
+
+            <div class="page-header">
+                <h1>选择证照类型</h1>
+                <p>选择您需要的证照类型</p>
+            </div>
+
+            <div class="form-section">
+                <h2>有特定要求的证照</h2>
+                <div class="options-grid">
+                    <div class="option-item" onclick="selectPhotoType('passport', this)">
+                        <div class="icon">🛂</div>
+                        <div class="label">护照照</div>
+                    </div>
+                    <div class="option-item" onclick="selectPhotoType('visa', this)">
+                        <div class="icon">✈️</div>
+                        <div class="label">签证照</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>其他证照</h2>
+                <div class="options-grid">
+                    <div class="option-item" onclick="selectPhotoType('work', this)">
+                        <div class="icon">💼</div>
+                        <div class="label">工作证</div>
+                    </div>
+                    <div class="option-item" onclick="selectPhotoType('resume', this)">
+                        <div class="icon">📄</div>
+                        <div class="label">简历照</div>
+                    </div>
+                    <div class="option-item" onclick="selectPhotoType('student', this)">
+                        <div class="icon">🎓</div>
+                        <div class="label">学生证</div>
+                    </div>
+                    <div class="option-item" onclick="selectPhotoType('social', this)">
+                        <div class="icon">🌐</div>
+                        <div class="label">社交头像</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('photo-upload')">上一步</button>
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 国家选择(护照) -->
+        <div id="passport-country" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>选择国家</span>
+            </div>
+
+            <div class="page-header">
+                <h1>选择护照国家</h1>
+                <p>选择您的护照所属国家,我们将自动配置标准尺寸和背景</p>
+            </div>
+
+            <div class="form-section">
+                <h2>热门国家</h2>
+                <div class="country-grid">
+                    <div class="country-item selected" onclick="selectCountry('china', this)">🇨🇳 中国</div>
+                    <div class="country-item" onclick="selectCountry('usa', this)">🇺🇸 美国</div>
+                    <div class="country-item" onclick="selectCountry('japan', this)">🇯🇵 日本</div>
+                    <div class="country-item" onclick="selectCountry('uk', this)">🇬🇧 英国</div>
+                    <div class="country-item" onclick="selectCountry('canada', this)">🇨🇦 加拿大</div>
+                    <div class="country-item" onclick="selectCountry('australia', this)">🇦🇺 澳大利亚</div>
+                    <div class="country-item" onclick="selectCountry('singapore', this)">🇸🇬 新加坡</div>
+                    <div class="country-item" onclick="selectCountry('korea', this)">🇰🇷 韩国</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>其他国家</h2>
+                <div class="country-grid">
+                    <div class="country-item" onclick="selectCountry('france', this)">🇫🇷 法国</div>
+                    <div class="country-item" onclick="selectCountry('germany', this)">🇩🇪 德国</div>
+                    <div class="country-item" onclick="selectCountry('italy', this)">🇮🇹 意大利</div>
+                    <div class="country-item" onclick="selectCountry('spain', this)">🇪🇸 西班牙</div>
+                    <div class="country-item" onclick="selectCountry('netherlands', this)">🇳🇱 荷兰</div>
+                    <div class="country-item" onclick="selectCountry('sweden', this)">🇸🇪 瑞典</div>
+                    <div class="country-item" onclick="selectCountry('switzerland', this)">🇨🇭 瑞士</div>
+                    <div class="country-item" onclick="selectCountry('taiwan', this)">🇹🇼 台湾</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div style="background: #f0f4f8; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="font-size: 12px; color: #718096;"><strong>已选择:</strong> <span id="selected-country">中国护照</span></p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;"><strong>配置:</strong> 35×45mm | 白色背景</p>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('photo-type')">上一步</button>
+                    <button class="btn-primary" onclick="showPage('edit')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 国家选择(签证) -->
+        <div id="visa-country" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>选择国家</span>
+            </div>
+
+            <div class="page-header">
+                <h1>选择签证国家</h1>
+                <p>选择您要申请签证的国家,我们将自动配置标准尺寸和背景</p>
+            </div>
+
+            <div class="form-section">
+                <h2>热门国家</h2>
+                <div class="country-grid">
+                    <div class="country-item selected" onclick="selectCountry('usa-visa', this)">🇺🇸 美国</div>
+                    <div class="country-item" onclick="selectCountry('japan-visa', this)">🇯🇵 日本</div>
+                    <div class="country-item" onclick="selectCountry('uk-visa', this)">🇬🇧 英国</div>
+                    <div class="country-item" onclick="selectCountry('canada-visa', this)">🇨🇦 加拿大</div>
+                    <div class="country-item" onclick="selectCountry('australia-visa', this)">🇦🇺 澳大利亚</div>
+                    <div class="country-item" onclick="selectCountry('eu-visa', this)">🇪🇺 欧盟</div>
+                    <div class="country-item" onclick="selectCountry('singapore-visa', this)">🇸🇬 新加坡</div>
+                    <div class="country-item" onclick="selectCountry('korea-visa', this)">🇰🇷 韩国</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>其他国家</h2>
+                <div class="country-grid">
+                    <div class="country-item" onclick="selectCountry('india-visa', this)">🇮🇳 印度</div>
+                    <div class="country-item" onclick="selectCountry('thailand-visa', this)">🇹🇭 泰国</div>
+                    <div class="country-item" onclick="selectCountry('vietnam-visa', this)">🇻🇳 越南</div>
+                    <div class="country-item" onclick="selectCountry('malaysia-visa', this)">🇲🇾 马来西亚</div>
+                    <div class="country-item" onclick="selectCountry('philippines-visa', this)">🇵🇭 菲律宾</div>
+                    <div class="country-item" onclick="selectCountry('indonesia-visa', this)">🇮🇩 印度尼西亚</div>
+                    <div class="country-item" onclick="selectCountry('newzealand-visa', this)">🇳🇿 新西兰</div>
+                    <div class="country-item" onclick="selectCountry('france-visa', this)">🇫🇷 法国</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div style="background: #f0f4f8; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="font-size: 12px; color: #718096;"><strong>已选择:</strong> <span id="selected-visa-country">美国签证</span></p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;"><strong>配置:</strong> 50×50mm | 白色背景</p>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('photo-type')">上一步</button>
+                    <button class="btn-primary" onclick="showPage('edit')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 背景选择(其他证照) -->
+        <div id="other-config" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>配置参数</span>
+            </div>
+
+            <div class="page-header">
+                <h1>证照配置</h1>
+                <p id="config-title">选择背景颜色</p>
+            </div>
+
+            <div class="form-section">
+                <h2>背景颜色</h2>
+                <div class="options-grid">
+                    <div class="option-item selected" onclick="selectBackground('white', this)">
+                        <div class="icon" style="background: white; width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 8px; border: 2px solid #e2e8f0;"></div>
+                        <div class="label">白色</div>
+                    </div>
+                    <div class="option-item" onclick="selectBackground('blue', this)">
+                        <div class="icon" style="background: #2d5a8c; width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 8px;"></div>
+                        <div class="label">蓝色</div>
+                    </div>
+                    <div class="option-item" onclick="selectBackground('red', this)">
+                        <div class="icon" style="background: #e53e3e; width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 8px;"></div>
+                        <div class="label">红色</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div style="background: #f0f4f8; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="font-size: 12px; color: #718096;"><strong>证照类型:</strong> <span id="selected-type">工作证</span></p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;"><strong>默认尺寸:</strong> 25×35mm (可在结果页修改)</p>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('photo-type')">上一步</button>
+                    <button class="btn-primary" onclick="showPage('edit')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 编辑页 -->
+        <div id="photo-edit" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>编辑调整</span>
+            </div>
+
+            <div class="page-header">
+                <h1>编辑调整</h1>
+                <p>调整亮度、对比度等参数,获得最佳效果</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <div class="preview-section">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">预览效果</h3>
+                    <div class="preview-image has-image">
+                        [证照预览]
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-bottom: 0;">
+                    <h2>图片调整</h2>
+                    <div class="form-group">
+                        <label>亮度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                        <div style="font-size: 12px; color: #718096; margin-top: 5px;">100%</div>
+                    </div>
+                    <div class="form-group">
+                        <label>对比度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                        <div style="font-size: 12px; color: #718096; margin-top: 5px;">100%</div>
+                    </div>
+                    <div class="form-group">
+                        <label>饱和度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                        <div style="font-size: 12px; color: #718096; margin-top: 5px;">100%</div>
+                    </div>
+                    <div class="form-group">
+                        <label>锐度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                        <div style="font-size: 12px; color: #718096; margin-top: 5px;">100%</div>
+                    </div>
+                    <button class="btn-secondary" style="width: 100%; margin-top: 15px;">重置</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="goBackFromEdit()">上一步</button>
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证照生成 - 结果页 -->
+        <div id="photo-result" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>证照生成</span>
+                <span>></span>
+                <span>生成完成</span>
+            </div>
+
+            <div class="page-header">
+                <h1>证照生成完成</h1>
+                <p>您的证照已生成,可以下载或修改尺寸</p>
+            </div>
+
+            <div class="preview-section">
+                <h3 style="margin-bottom: 20px; color: #1a365d;">生成结果</h3>
+                <div class="preview-image has-image" style="height: 600px;">
+                    [最终证照预览]
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f0f4f8; border-radius: 10px; text-align: left;">
+                    <p style="font-size: 14px; color: #2d3748;"><strong>证照信息:</strong></p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;">用途: 工作证 | 背景: 白色 | 尺寸: 25×35mm</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>修改尺寸</h2>
+                <div class="form-group">
+                    <label>您可以自定义输出尺寸(单位:mm)</label>
+                    <div class="size-input-group">
+                        <div class="form-group">
+                            <label>宽度(mm)</label>
+                            <input type="number" value="25" min="10" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label>高度(mm)</label>
+                            <input type="number" value="35" min="10" max="200">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-secondary" style="width: 100%; margin-top: 15px;">应用新尺寸</button>
+            </div>
+
+            <div class="form-section">
+                <h2>快速下载</h2>
+                <div class="options-grid">
+                    <div class="option-item selected">
+                        <div class="label">当前尺寸<br><span style="font-size: 12px; color: #a0aec0;">25×35mm</span></div>
+                    </div>
+                    <div class="option-item">
+                        <div class="label">1寸<br><span style="font-size: 12px; color: #a0aec0;">25×35mm</span></div>
+                    </div>
+                    <div class="option-item">
+                        <div class="label">2寸<br><span style="font-size: 12px; color: #a0aec0;">35×53mm</span></div>
+                    </div>
+                    <div class="option-item">
+                        <div class="label">护照<br><span style="font-size: 12px; color: #a0aec0;">35×45mm</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="goBackFromPhotoResult()">上一步</button>
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-gold">立即下载</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 美照生成 - 上传页 -->
+        <div id="style-upload" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>美照生成</span>
+                <span>></span>
+                <span>上传照片</span>
+            </div>
+
+            <div class="page-header">
+                <h1>美照生成</h1>
+                <p>上传照片,选择风格,一键转换</p>
+            </div>
+
+            <div class="form-section">
+                <h2>上传照片</h2>
+                <div class="form-group">
+                    <label>请上传您想要转换风格的照片</label>
+                    <div class="preview-image" id="preview-style">
+                        <div>点击或拖拽上传照片</div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%; margin-top: 15px; margin-bottom: 15px;" onclick="openCamera()">📷 调用摄像头拍照</button>
+                    <input type="file" accept="image/*" style="margin-top: 15px;">
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-primary" onclick="showPage('style-select')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 美照生成 - 风格选择页 -->
+        <div id="style-select" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>美照生成</span>
+                <span>></span>
+                <span>选择风格</span>
+            </div>
+
+            <div class="page-header">
+                <h1>选择风格</h1>
+                <p>10种专业风格,让您的头像更出众</p>
+            </div>
+
+            <div class="form-section">
+                <h2>风格选择</h2>
+                <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+                    <div class="option-item selected">
+                        <div class="icon">👔</div>
+                        <div class="label">专业</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🎨</div>
+                        <div class="label">油画</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🌈</div>
+                        <div class="label">水彩</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">✏️</div>
+                        <div class="label">素描</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🎭</div>
+                        <div class="label">卡通</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🎬</div>
+                        <div class="label">动漫</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">⚫</div>
+                        <div class="label">极简</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🕰️</div>
+                        <div class="label">复古</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">⚡</div>
+                        <div class="label">霓虹</div>
+                    </div>
+                    <div class="option-item">
+                        <div class="icon">🎪</div>
+                        <div class="label">艺术</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('style-upload')">上一步</button>
+                    <button class="btn-primary" onclick="showPage('style-result')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 美照生成 - 结果页 -->
+        <div id="style-result" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>美照生成</span>
+                <span>></span>
+                <span>生成完成</span>
+            </div>
+
+            <div class="page-header">
+                <h1>美照生成完成</h1>
+                <p>您的美照已生成,可以下载或继续编辑</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <div class="preview-section">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">生成结果</h3>
+                    <div class="preview-image has-image">
+                        [美照预览]
+                    </div>
+                </div>
+
+                <div class="form-section" style="margin-bottom: 0;">
+                    <h2>高级编辑</h2>
+                    <div class="form-group">
+                        <label>亮度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>对比度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>饱和度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label>锐度</label>
+                        <input type="range" min="0" max="200" value="100" style="width: 100%; cursor: pointer;">
+                    </div>
+                    <button class="btn-secondary" style="width: 100%; margin-top: 15px;">重置</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="goBackFromStyleResult()">上一步</button>
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-gold">立即下载</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 照片修复 - 上传页 -->
+        <div id="repair-upload" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>照片修复</span>
+                <span>></span>
+                <span>上传照片</span>
+            </div>
+
+            <div class="page-header">
+                <h1>照片修复</h1>
+                <p>上传低分辨率照片,一键提升清晰度</p>
+            </div>
+
+            <div class="form-section">
+                <h2>上传照片</h2>
+                <div class="form-group">
+                    <label>请上传需要修复的照片</label>
+                    <div class="preview-image" id="preview-repair">
+                        <div>点击或拖拽上传照片</div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%; margin-top: 15px; margin-bottom: 15px;" onclick="openCamera()">📷 调用摄像头拍照</button>
+                    <input type="file" accept="image/*" style="margin-top: 15px;">
+                </div>
+
+                <div class="form-group">
+                    <label>超分倍数</label>
+                    <div class="options-grid">
+                        <div class="option-item selected">
+                            <div class="label">2倍<br><span style="font-size: 12px; color: #a0aec0;">¥0.5</span></div>
+                        </div>
+                        <div class="option-item">
+                            <div class="label">4倍<br><span style="font-size: 12px; color: #a0aec0;">¥1.0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-primary" onclick="showPage('repair-result')">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 照片修复 - 结果页 -->
+        <div id="repair-result" class="page">
+            <div class="breadcrumb">
+                <a onclick="showPage('home')">首页</a>
+                <span>></span>
+                <span>照片修复</span>
+                <span>></span>
+                <span>修复完成</span>
+            </div>
+
+            <div class="page-header">
+                <h1>照片修复完成</h1>
+                <p>您的照片已修复,清晰度显著提升</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <div class="preview-section">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">修复前</h3>
+                    <div class="preview-image has-image">
+                        [原始照片]
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3 style="margin-bottom: 15px; color: #1a365d;">修复后</h3>
+                    <div class="preview-image has-image">
+                        [修复后照片]
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>调色工具</h2>
+                <div class="form-group">
+                    <label>亮度</label>
+                    <input type="range" min="-100" max="100" value="0" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>对比度</label>
+                    <input type="range" min="-100" max="100" value="0" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>饱和度</label>
+                    <input type="range" min="-100" max="100" value="0" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label>锐度</label>
+                    <input type="range" min="-100" max="100" value="0" style="width: 100%;">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="goBackFromRepairResult()">上一步</button>
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-gold">立即下载</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录页 -->
+        <div id="history" class="page">
+            <div class="page-header">
+                <h1>历史记录</h1>
+                <p>您生成过的所有头像和修复的照片</p>
+            </div>
+
+            <div class="form-section">
+                <h2>最近生成</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;">
+                    <div style="background: #f0f4f8; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer;">
+                        <div style="height: 150px; background: white; border-radius: 8px; margin-bottom: 10px;"></div>
+                        <p style="font-size: 12px; color: #718096;">证照生成<br>2小时前</p>
+                    </div>
+                    <div style="background: #f0f4f8; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer;">
+                        <div style="height: 150px; background: white; border-radius: 8px; margin-bottom: 10px;"></div>
+                        <p style="font-size: 12px; color: #718096;">美照生成<br>1天前</p>
+                    </div>
+                    <div style="background: #f0f4f8; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer;">
+                        <div style="height: 150px; background: white; border-radius: 8px; margin-bottom: 10px;"></div>
+                        <p style="font-size: 12px; color: #718096;">照片修复<br>3天前</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人中心页 -->
+        <div id="account" class="page">
+            <div class="page-header">
+                <h1>个人中心</h1>
+                <p>管理您的账户和订阅</p>
+            </div>
+
+            <div class="form-section">
+                <h2>账户信息</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <p style="font-size: 12px; color: #718096; margin-bottom: 5px;">用户名</p>
+                        <p style="font-size: 16px; color: #2d3748; font-weight: 600;">张三</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 12px; color: #718096; margin-bottom: 5px;">邮箱</p>
+                        <p style="font-size: 16px; color: #2d3748; font-weight: 600;">user@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>订阅计划</h2>
+                <div style="background: linear-gradient(135deg, #fffbf0 0%, #fff8e7 100%); padding: 20px; border-radius: 10px; border: 2px solid #d4af37; margin-bottom: 20px;">
+                    <p style="font-size: 14px; color: #2d3748; font-weight: 600;">当前计划: <span style="color: #d4af37;">高级版</span></p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;">有效期至: 2026-06-05</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center;">
+                        <p style="font-size: 14px; color: #2d3748; font-weight: 600;">免费版</p>
+                        <p style="font-size: 12px; color: #718096; margin: 10px 0;">1张/天</p>
+                        <button class="btn-secondary" style="width: 100%; margin-top: 10px;">当前计划</button>
+                    </div>
+                    <div style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center;">
+                        <p style="font-size: 14px; color: #2d3748; font-weight: 600;">基础版</p>
+                        <p style="font-size: 12px; color: #718096; margin: 10px 0;">¥9.9/月</p>
+                        <button class="btn-secondary" style="width: 100%; margin-top: 10px;">升级</button>
+                    </div>
+                    <div style="border: 2px solid #d4af37; border-radius: 10px; padding: 20px; text-align: center; background: #fffbf0;">
+                        <p style="font-size: 14px; color: #1a365d; font-weight: 600;">高级版</p>
+                        <p style="font-size: 12px; color: #718096; margin: 10px 0;">¥19.9/月</p>
+                        <button class="btn-primary" style="width: 100%; margin-top: 10px;">当前计划</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="action-bar">
+                    <button class="btn-secondary" onclick="showPage('home')">返回首页</button>
+                    <button class="btn-secondary">退出登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPhotoType = null;
+        let selectedCountry = null;
+        let selectedBackground = null;
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function selectPhotoType(type, element) {
+            selectedPhotoType = type;
+            const siblings = element.parentElement.querySelectorAll('.option-item');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // 直接进入下一步
+            setTimeout(() => {
+                if (type === 'passport') {
+                    showPage('passport-country');
+                } else if (type === 'visa') {
+                    showPage('visa-country');
+                } else {
+                    showPage('other-config');
+                }
+            }, 300);
+        }
+
+        function selectCountry(country, element) {
+            selectedCountry = country;
+            const siblings = element.parentElement.querySelectorAll('.country-item');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // 更新显示
+            const countryNames = {
+                'china': '中国护照 (35×45mm)',
+                'usa': '美国护照 (50×50mm)',
+                'japan': '日本护照 (45×45mm)',
+                'uk': '英国护照 (35×45mm)',
+                'canada': '加拿大护照 (35×45mm)',
+                'australia': '澳大利亚护照 (35×45mm)',
+                'singapore': '新加坡护照 (35×45mm)',
+                'korea': '韩国护照 (35×45mm)',
+                'taiwan': '台湾护照 (35×45mm)',
+                'usa-visa': '美国签证 (50×50mm)',
+                'japan-visa': '日本签证 (45×45mm)',
+                'uk-visa': '英国签证 (35×45mm)',
+                'canada-visa': '加拿大签证 (35×45mm)',
+                'australia-visa': '澳大利亚签证 (35×45mm)',
+                'eu-visa': '欧盟签证 (48×33mm)',
+                'singapore-visa': '新加坡签证 (35×45mm)',
+                'korea-visa': '韩国签证 (35×45mm)',
+                'india-visa': '印度签证 (50.8×50.8mm)',
+                'thailand-visa': '泰国签证 (35×45mm)',
+                'vietnam-visa': '越南签证 (40×60mm)',
+                'malaysia-visa': '马来西亚签证 (35×45mm)',
+                'philippines-visa': '菲律宾签证 (35×45mm)',
+                'indonesia-visa': '印度尼西亚签证 (35×45mm)',
+                'newzealand-visa': '新西兰签证 (35×45mm)',
+                'france-visa': '法国签证 (35×45mm)'
+            };
+
+            const displayElement = country.includes('visa') ? 
+                document.getElementById('selected-visa-country') : 
+                document.getElementById('selected-country');
+            if (displayElement) {
+                displayElement.textContent = countryNames[country] || country;
+            }
+        }
+
+        function selectBackground(color, element) {
+            selectedBackground = color;
+            const siblings = element.parentElement.querySelectorAll('.option-item');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function selectTypeAndBackground(type, element) {
+            selectedPhotoType = type;
+            const siblings = element.parentElement.querySelectorAll('.option-item');
+            siblings.forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const typeNames = {
+                'work': '工作证',
+                'resume': '简历照',
+                'student': '学生证',
+                'social': '社交头像'
+            };
+            document.getElementById('selected-type').textContent = typeNames[type] || type;
+        }
+
+        function goBackFromEdit() {
+            if (selectedPhotoType === 'passport') {
+                showPage('passport-country');
+            } else if (selectedPhotoType === 'visa') {
+                showPage('visa-country');
+            } else {
+                showPage('other-config');
+            }
+        }
+
+        function goBackFromPhotoResult() {
+            showPage('photo-edit');
+        }
+
+        function goBackFromStyleResult() {
+            showPage('style-select');
+        }
+
+        function goBackFromRepairResult() {
+            showPage('repair-upload');
+        }
+
+        function openCamera() {
+            alert('Prototype demo: This button will call the device camera in the actual app.');
+        }
+
+        // 为选项卡添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionItems = document.querySelectorAll('.option-item');
+            optionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.option-item').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
