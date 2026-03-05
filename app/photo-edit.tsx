@@ -41,15 +41,11 @@ export default function PhotoEditScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
-      pathname: "/photo-result",
+      pathname: "/photo-generating",
       params: { 
         image, 
         type, 
-        country,
-        brightness,
-        contrast,
-        saturation,
-        sharpness,
+        background: "white",
       },
     } as any);
   };

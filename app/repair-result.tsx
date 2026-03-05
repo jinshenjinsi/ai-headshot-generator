@@ -42,12 +42,17 @@ export default function RepairResultScreen() {
         <View className="flex-1 py-6 px-4">
           {/* 返回按钮 */}
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              // 回到上传页面而不是生成页面
+              router.replace({
+                pathname: "/repair-upload",
+              } as any);
+            }}
             className="mb-6"
             activeOpacity={0.7}
           >
             <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
-              ← 返回
+              ← 上一步
             </Text>
           </TouchableOpacity>
 
@@ -246,7 +251,12 @@ export default function RepairResultScreen() {
           {/* 底部导航 */}
           <View className="flex-row gap-3 mb-8">
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => {
+                // 回到上传页面
+                router.replace({
+                  pathname: "/repair-upload",
+                } as any);
+              }}
               activeOpacity={0.7}
               className="flex-1 rounded-xl py-4 items-center"
               style={{
@@ -258,7 +268,7 @@ export default function RepairResultScreen() {
               <Text 
                 style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
               >
-                上一步
+                重新修复
               </Text>
             </TouchableOpacity>
 

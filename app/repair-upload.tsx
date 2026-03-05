@@ -61,8 +61,8 @@ export default function RepairUploadScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
-      pathname: "/repair-result",
-      params: { image: selectedImage },
+      pathname: "/repair-generating",
+      params: { image: selectedImage, scale: "2x" },
     } as any);
   };
 

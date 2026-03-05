@@ -148,7 +148,11 @@ export default function StyleResultScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    router.back();
+    // 回到编辑页面而不是生成页面
+    router.replace({
+      pathname: "/style-edit",
+      params: { image: params.image, style },
+    } as any);
   };
 
   return (
@@ -157,12 +161,18 @@ export default function StyleResultScreen() {
         <View className="flex-1 py-6 px-4">
           {/* 返回按钮 */}
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              // 回到编辑页面而不是生成页面
+              router.replace({
+                pathname: "/style-edit",
+                params: { image: params.image, style },
+              } as any);
+            }}
             className="mb-6"
             activeOpacity={0.7}
           >
             <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
-              ← 返回
+              ← 上一步
             </Text>
           </TouchableOpacity>
 
