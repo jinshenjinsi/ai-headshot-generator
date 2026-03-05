@@ -39,6 +39,9 @@ export default function StyleResultScreen() {
   const [selectedFormat, setSelectedFormat] = useState("png");
   const [downloading, setDownloading] = useState(false);
   const originalImage = params.originalImage as string;
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [showAdjustments, setShowAdjustments] = useState(false);
 
   const handleDownload = async () => {
     if (!image || downloading) return;
@@ -204,8 +207,70 @@ export default function StyleResultScreen() {
           >
             <Image
               source={{ uri: image }}
-              style={{ width: '100%', height: 400, resizeMode: 'cover' }}
+              style={{ 
+                width: '100%', 
+                height: 400, 
+                resizeMode: 'cover',
+                opacity: 1,
+              }}
             />
+            {showAdjustments && (
+              <View 
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                }}
+              >
+                <View style={{ marginBottom: 12 }}>
+                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
+                    亮度: {brightness}%
+                  </Text>
+                  <View 
+                    style={{
+                      height: 4,
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <View 
+                      style={{
+                        height: '100%',
+                        width: `${brightness}%`,
+                        backgroundColor: COLORS.accent,
+                      }}
+                    />
+                  </View>
+                </View>
+
+                <View>
+                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
+                    对比度: {contrast}%
+                  </Text>
+                  <View 
+                    style={{
+                      height: 4,
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <View 
+                      style={{
+                        height: '100%',
+                        width: `${contrast}%`,
+                        backgroundColor: COLORS.accent,
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
             <View className="p-4" style={{ backgroundColor: COLORS.background }}>
               <Text 
                 style={{ color: COLORS.text, fontSize: 12, fontWeight: '600', marginBottom: 4 }}
@@ -219,6 +284,20 @@ export default function StyleResultScreen() {
               </Text>
             </View>
           </View>
+
+          {/* 色彩调整 */}
+          <TouchableOpacity
+            onPress={() => setShowAdjustments(!showAdjustments)}
+            activeOpacity={0.7}
+            className="rounded-lg py-3 px-4 mb-6 items-center flex-row justify-center gap-2"
+            style={{
+              backgroundColor: showAdjustments ? COLORS.accent : COLORS.primary,
+            }}
+          >
+            <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>
+              {showAdjustments ? '✓ 色彩调整中' : '🎨 色彩调整'}
+            </Text>
+          </TouchableOpacity>
 
           {/* 其他风格预览 */}
           <View 
