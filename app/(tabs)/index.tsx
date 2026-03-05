@@ -48,7 +48,7 @@ export default function HomeScreen() {
               className="text-5xl font-bold text-center"
               style={{ color: COLORS.primary }}
             >
-              AI专业头像
+              元一图灵
             </Text>
             <Text 
               className="text-base text-center"

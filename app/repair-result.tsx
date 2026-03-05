@@ -49,11 +49,15 @@ export default function RepairResultScreen() {
     };
 
     // 应用亮度和对比度滤镜
+    // 亮度范围：70-130（对应 0.7-1.3）
+    const normalizedBrightness = brightness / 100;
+    
     if (Platform.OS === "web") {
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
     } else {
       // React Native 不直接支持 filter，但可以通过 opacity 和其他属性模拟
-      baseStyle.opacity = brightness / 100;
+      // 亮度值范围：70-130，映射到opacity 0.7-1.0（opacity最大1）
+      baseStyle.opacity = Math.min(1, normalizedBrightness);
     }
 
     // 如果是老照片修复，不添加底色
@@ -120,101 +124,91 @@ export default function RepairResultScreen() {
               <View style={{ width: 1, backgroundColor: COLORS.border }} />
 
               {/* 修复后照片 */}
-              <View className="flex-1 items-center relative">
+              <View className="flex-1 items-center">
                 <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   修复后 ({selectedScale})
                 </Text>
-                <View
-                  style={{
-                    width: "100%",
-                    height: 200,
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Image source={{ uri: image }} style={getImageStyle()} />
-
-                  {/* 色彩调整面板 */}
-                  {showAdjustments && (
-                    <View
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                        paddingVertical: 12,
-                        paddingHorizontal: 12,
-                        gap: 12,
-                      }}
-                    >
-                      {/* 亮度调整 */}
-                      <View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-                          <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>
-                            亮度
-                          </Text>
-                          <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
-                            {brightness}%
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: "row", gap: 4 }}>
-                          {[70, 85, 100, 115, 130].map((val) => (
-                            <TouchableOpacity
-                              key={val}
-                              onPress={() => setBrightness(val)}
-                              style={{
-                                flex: 1,
-                                paddingVertical: 6,
-                                backgroundColor: brightness === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
-                                borderRadius: 4,
-                                alignItems: "center",
-                              }}
-                            >
-                              <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "600" }}>
-                                {val}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      </View>
-
-                      {/* 对比度调整 */}
-                      <View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-                          <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>
-                            对比度
-                          </Text>
-                          <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
-                            {contrast}%
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: "row", gap: 4 }}>
-                          {[70, 85, 100, 115, 130].map((val) => (
-                            <TouchableOpacity
-                              key={val}
-                              onPress={() => setContrast(val)}
-                              style={{
-                                flex: 1,
-                                paddingVertical: 6,
-                                backgroundColor: contrast === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
-                                borderRadius: 4,
-                                alignItems: "center",
-                              }}
-                            >
-                              <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "600" }}>
-                                {val}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      </View>
-                    </View>
-                  )}
-                </View>
+                <Image source={{ uri: image }} style={getImageStyle()} />
               </View>
             </View>
           </View>
+
+          {/* 色彩调整面板 - 移到图片下方 */}
+          {showAdjustments && (
+            <View
+              className="rounded-2xl p-4 mb-8"
+              style={{
+                backgroundColor: COLORS.white,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
+              }}
+            >
+              {/* 亮度调整 */}
+              <View style={{ marginBottom: 12 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
+                    亮度
+                  </Text>
+                  <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
+                    {brightness}%
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                  {[70, 85, 100, 115, 130].map((val) => (
+                    <TouchableOpacity
+                      key={val}
+                      onPress={() => setBrightness(val)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 6,
+                        backgroundColor: brightness === val ? COLORS.accent : COLORS.border,
+                        borderRadius: 4,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: COLORS.primary, fontSize: 10, fontWeight: "600" }}>
+                        {val}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* 对比度调整 */}
+              <View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
+                    对比度
+                  </Text>
+                  <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
+                    {contrast}%
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                  {[70, 85, 100, 115, 130].map((val) => (
+                    <TouchableOpacity
+                      key={val}
+                      onPress={() => setContrast(val)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 6,
+                        backgroundColor: contrast === val ? COLORS.accent : COLORS.border,
+                        borderRadius: 4,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: COLORS.primary, fontSize: 10, fontWeight: "600" }}>
+                        {val}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* 色彩调整按钮 */}
           <TouchableOpacity

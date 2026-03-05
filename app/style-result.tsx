@@ -211,7 +211,7 @@ export default function StyleResultScreen() {
                 width: '100%', 
                 height: 400, 
                 resizeMode: 'cover',
-                opacity: brightness / 100,
+                opacity: Math.min(1, brightness / 100),
                 tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
                            contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
               }}
