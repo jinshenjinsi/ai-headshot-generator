@@ -39,8 +39,10 @@ export default function StyleEditScreen() {
     
     if (Platform.OS === "web") {
       // Web：直接使用brightness filter
+      // 饱和度：0-200，100为正常
+      // 锐度：0-200，100为正常
       return {
-        filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+        filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${100 + (sharpness - 100) * 0.3}%)`,
       };
     } else {
       // React Native：使用opacity模拟亮度
@@ -77,10 +79,6 @@ export default function StyleEditScreen() {
       params: { 
         image, 
         style,
-        brightness,
-        contrast,
-        saturation,
-        sharpness,
       },
     } as any);
   };

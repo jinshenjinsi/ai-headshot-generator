@@ -386,7 +386,7 @@ export default function PhotoResultScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
             >
-              选择尺寸后点击下载免费预览版
+              必选：选择一个尺寸
             </Text>
             <View className="gap-2">
               {PRESET_SIZES.map((size, index) => (
@@ -434,20 +434,7 @@ export default function PhotoResultScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity
-              onPress={handleDownload}
-              disabled={isDownloading}
-              activeOpacity={0.7}
-              className="rounded-lg py-3 items-center mt-4"
-              style={{
-                backgroundColor: COLORS.success,
-                opacity: isDownloading ? 0.6 : 1,
-              }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                {isDownloading ? "下载中..." : "💚 下载标准版"}
-              </Text>
-            </TouchableOpacity>
+
           </View>
 
           {/* 付费下载 */}

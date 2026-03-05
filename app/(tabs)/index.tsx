@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image } from "react-native";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
@@ -43,16 +43,31 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <View className="flex-1 gap-8 py-8 px-6 pb-12">
           {/* 品牌头部 */}
-          <View className="items-center gap-3 mt-4">
-            <Text 
-              className="text-5xl font-bold text-center"
-              style={{ color: COLORS.primary }}
-            >
-              元一图灵
-            </Text>
+          <View className="items-center gap-4 mt-4">
+            {/* 应用图标 */}
+            <Image
+              source={require("@/assets/images/icon.png")}
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 24,
+              }}
+            />
+            
+            {/* 品牌名称 - 优化设计 */}
+            <View style={{ alignItems: 'center', gap: 2 }}>
+              <Text 
+                className="text-5xl font-bold text-center"
+                style={{ color: COLORS.primary, letterSpacing: 2 }}
+              >
+                元一图灵
+              </Text>
+              <View style={{ height: 2, width: 60, backgroundColor: COLORS.accent, borderRadius: 1 }} />
+            </View>
+            
             <Text 
               className="text-base text-center"
-              style={{ color: COLORS.lightText }}
+              style={{ color: COLORS.lightText, lineHeight: 22 }}
             >
               一张照片，10种风格{"\n"}专业证件照一键生成
             </Text>

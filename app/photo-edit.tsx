@@ -41,8 +41,10 @@ export default function PhotoEditScreen() {
     
     if (Platform.OS === "web") {
       // Web：直接使用brightness filter
+      // 饱和度：0-200，100为正常
+      // 锐度：0-200，100为正常
       return {
-        filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+        filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${100 + (sharpness - 100) * 0.3}%)`,
       };
     } else {
       // React Native：使用opacity模拟亮度
@@ -80,6 +82,10 @@ export default function PhotoEditScreen() {
         image, 
         type, 
         background,
+        brightness,
+        contrast,
+        saturation,
+        sharpness,
       },
     } as any);
   };
@@ -99,9 +105,9 @@ export default function PhotoEditScreen() {
         </Text>
       </View>
       
-      {/* 快速调整按钮 */}
+      {/* 快速调整按钮 - 温和的选择 */}
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-        {[0, 50, 100, 150, 200].map((val) => (
+        {[80, 90, 100, 110, 120].map((val) => (
           <TouchableOpacity
             key={val}
             onPress={() => handleSliderPress(val, setter, ref)}
@@ -116,7 +122,7 @@ export default function PhotoEditScreen() {
             }}
           >
             <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
-              {val === 0 ? '暗' : val === 50 ? '偏暗' : val === 100 ? '正常' : val === 150 ? '偏亮' : '亮'}
+              {val === 80 ? '暗' : val === 90 ? '-' : val === 100 ? '正常' : val === 110 ? '+' : '亮'}
             </Text>
           </TouchableOpacity>
         ))}
