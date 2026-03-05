@@ -24,7 +24,6 @@ export default function RepairResultScreen() {
   const [selectedScale, setSelectedScale] = useState("2x");
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
-  const [showAdjustments, setShowAdjustments] = useState(false);
 
   const handleDownload = () => {
     if (Platform.OS !== "web") {
@@ -123,106 +122,100 @@ export default function RepairResultScreen() {
               {/* 分割线 */}
               <View style={{ width: 1, backgroundColor: COLORS.border }} />
 
-              {/* 修复后照片 */}
+              {/* 修复后照片 - 包含色彩调整面板 */}
               <View className="flex-1 items-center">
                 <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   修复后 ({selectedScale})
                 </Text>
-                <Image source={{ uri: image }} style={getImageStyle()} />
+                <View
+                  style={{
+                    width: "100%",
+                    height: 200,
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Image source={{ uri: image }} style={getImageStyle()} />
+
+                  {/* 色彩调整面板 - 覆盖在图片上方 */}
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      backgroundColor: "rgba(0, 0, 0, 0.85)",
+                      paddingVertical: 10,
+                      paddingHorizontal: 10,
+                      gap: 8,
+                    }}
+                  >
+                    {/* 亮度调整 */}
+                    <View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                        <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                          亮度
+                        </Text>
+                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                          {brightness}%
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row", gap: 3 }}>
+                        {[70, 85, 100, 115, 130].map((val) => (
+                          <TouchableOpacity
+                            key={val}
+                            onPress={() => setBrightness(val)}
+                            style={{
+                              flex: 1,
+                              paddingVertical: 5,
+                              backgroundColor: brightness === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
+                              borderRadius: 3,
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: "600" }}>
+                              {val}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* 对比度调整 */}
+                    <View>
+                      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                        <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                          对比度
+                        </Text>
+                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                          {contrast}%
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: "row", gap: 3 }}>
+                        {[70, 85, 100, 115, 130].map((val) => (
+                          <TouchableOpacity
+                            key={val}
+                            onPress={() => setContrast(val)}
+                            style={{
+                              flex: 1,
+                              paddingVertical: 5,
+                              backgroundColor: contrast === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
+                              borderRadius: 3,
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: "600" }}>
+                              {val}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
-
-          {/* 色彩调整面板 - 移到图片下方 */}
-          {showAdjustments && (
-            <View
-              className="rounded-2xl p-4 mb-8"
-              style={{
-                backgroundColor: COLORS.white,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 8,
-                elevation: 2,
-              }}
-            >
-              {/* 亮度调整 */}
-              <View style={{ marginBottom: 12 }}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
-                    亮度
-                  </Text>
-                  <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
-                    {brightness}%
-                  </Text>
-                </View>
-                <View style={{ flexDirection: "row", gap: 4 }}>
-                  {[70, 85, 100, 115, 130].map((val) => (
-                    <TouchableOpacity
-                      key={val}
-                      onPress={() => setBrightness(val)}
-                      style={{
-                        flex: 1,
-                        paddingVertical: 6,
-                        backgroundColor: brightness === val ? COLORS.accent : COLORS.border,
-                        borderRadius: 4,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ color: COLORS.primary, fontSize: 10, fontWeight: "600" }}>
-                        {val}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              {/* 对比度调整 */}
-              <View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
-                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
-                    对比度
-                  </Text>
-                  <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600" }}>
-                    {contrast}%
-                  </Text>
-                </View>
-                <View style={{ flexDirection: "row", gap: 4 }}>
-                  {[70, 85, 100, 115, 130].map((val) => (
-                    <TouchableOpacity
-                      key={val}
-                      onPress={() => setContrast(val)}
-                      style={{
-                        flex: 1,
-                        paddingVertical: 6,
-                        backgroundColor: contrast === val ? COLORS.accent : COLORS.border,
-                        borderRadius: 4,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ color: COLORS.primary, fontSize: 10, fontWeight: "600" }}>
-                        {val}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </View>
-          )}
-
-          {/* 色彩调整按钮 */}
-          <TouchableOpacity
-            onPress={() => setShowAdjustments(!showAdjustments)}
-            activeOpacity={0.7}
-            className="rounded-lg py-3 px-4 mb-6 items-center flex-row justify-center gap-2"
-            style={{
-              backgroundColor: showAdjustments ? COLORS.accent : COLORS.primary,
-            }}
-          >
-            <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: "600" }}>
-              {showAdjustments ? "✓ 色彩调整中" : "🎨 色彩调整"}
-            </Text>
-          </TouchableOpacity>
 
           {/* 修复倍数选择 */}
           <View
@@ -312,73 +305,42 @@ export default function RepairResultScreen() {
             </View>
           </View>
 
-          {/* 底部操作 */}
+          {/* 下载按钮 */}
           <View className="gap-3 mb-8">
             <TouchableOpacity
               onPress={handleDownload}
               activeOpacity={0.7}
-              className="rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 2,
-                borderColor: COLORS.accent,
-              }}
+              className="rounded-lg py-4 items-center"
+              style={{ backgroundColor: COLORS.primary }}
             >
-              <Text style={{ color: COLORS.accent, fontSize: 16, fontWeight: "600" }}>
-                📥 下载预览版(免费)
+              <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: "600" }}>
+                📥 下载预览版
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleDownloadPaid}
               activeOpacity={0.7}
-              className="rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.success,
-              }}
+              className="rounded-lg py-4 items-center border"
+              style={{ borderColor: COLORS.primary }}
             >
-              <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: "600" }}>
-                💾 下载高清版 ¥2.9
+              <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: "600" }}>
+                💎 下载高清版 (¥3.9)
               </Text>
             </TouchableOpacity>
           </View>
 
-          {/* 底部导航 */}
-          <View className="flex-row gap-3 mb-8">
-            <TouchableOpacity
-              onPress={() => {
-                router.replace({
-                  pathname: "/repair-upload",
-                } as any);
-              }}
-              activeOpacity={0.7}
-              className="flex-1 rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 1,
-                borderColor: COLORS.border,
-              }}
-            >
-              <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: "600" }}>
-                重新修复
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push("/" as any)}
-              activeOpacity={0.7}
-              className="flex-1 rounded-xl py-4 items-center"
-              style={{
-                backgroundColor: COLORS.white,
-                borderWidth: 1,
-                borderColor: COLORS.border,
-              }}
-            >
-              <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: "600" }}>
-                返回首页
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* 返回首页 */}
+          <TouchableOpacity
+            onPress={() => router.push("/" as any)}
+            activeOpacity={0.7}
+            className="rounded-lg py-3 items-center mb-6"
+            style={{ backgroundColor: COLORS.background }}
+          >
+            <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: "600" }}>
+              🏠 返回首页
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </ScreenContainer>

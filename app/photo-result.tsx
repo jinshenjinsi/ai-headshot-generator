@@ -91,54 +91,55 @@ export default function PhotoResultScreen() {
               elevation: 2,
             }}
           >
-            <Image
-              source={{ uri: image }}
-              style={{ 
-                width: '100%', 
-                height: 400, 
-                resizeMode: 'cover',
-                opacity: Math.min(1, brightness / 100),
-                tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
-                           contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
-              }}
-            />
-            {showAdjustments && (
+            <View style={{ position: 'relative', width: '100%', height: 400 }}>
+              <Image
+                source={{ uri: image }}
+                style={{ 
+                  width: '100%', 
+                  height: 400, 
+                  resizeMode: 'cover',
+                  opacity: Math.min(1, brightness / 100),
+                  tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
+                             contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
+                }}
+              />
+              {/* 色彩调整面板 - 覆盖在图片上方 */}
               <View 
                 style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  paddingVertical: 12,
-                  paddingHorizontal: 12,
-                  gap: 12,
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                  gap: 8,
                 }}
               >
                 {/* 亮度调整 */}
                 <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
                       亮度
                     </Text>
-                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                    <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {brightness}%
                     </Text>
                   </View>
-                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                  <View style={{ flexDirection: 'row', gap: 3 }}>
                     {[70, 85, 100, 115, 130].map((val) => (
                       <TouchableOpacity
                         key={val}
                         onPress={() => setBrightness(val)}
                         style={{
                           flex: 1,
-                          paddingVertical: 6,
+                          paddingVertical: 5,
                           backgroundColor: brightness === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
-                          borderRadius: 4,
+                          borderRadius: 3,
                           alignItems: 'center',
                         }}
                       >
-                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
+                        <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: '600' }}>
                           {val}
                         </Text>
                       </TouchableOpacity>
@@ -148,28 +149,28 @@ export default function PhotoResultScreen() {
 
                 {/* 对比度调整 */}
                 <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
                       对比度
                     </Text>
-                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                    <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {contrast}%
                     </Text>
                   </View>
-                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                  <View style={{ flexDirection: 'row', gap: 3 }}>
                     {[70, 85, 100, 115, 130].map((val) => (
                       <TouchableOpacity
                         key={val}
                         onPress={() => setContrast(val)}
                         style={{
                           flex: 1,
-                          paddingVertical: 6,
+                          paddingVertical: 5,
                           backgroundColor: contrast === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
-                          borderRadius: 4,
+                          borderRadius: 3,
                           alignItems: 'center',
                         }}
                       >
-                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
+                        <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: '600' }}>
                           {val}
                         </Text>
                       </TouchableOpacity>
@@ -177,7 +178,7 @@ export default function PhotoResultScreen() {
                   </View>
                 </View>
               </View>
-            )}
+            </View>
             <View className="p-4" style={{ backgroundColor: COLORS.background }}>
               <Text 
                 style={{ color: COLORS.text, fontSize: 12, fontWeight: '600', marginBottom: 4 }}
@@ -192,19 +193,7 @@ export default function PhotoResultScreen() {
             </View>
           </View>
 
-          {/* 色彩调整 */}
-          <TouchableOpacity
-            onPress={() => setShowAdjustments(!showAdjustments)}
-            activeOpacity={0.7}
-            className="rounded-lg py-3 px-4 mb-6 items-center flex-row justify-center gap-2"
-            style={{
-              backgroundColor: showAdjustments ? COLORS.accent : COLORS.primary,
-            }}
-          >
-            <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>
-              {showAdjustments ? '✓ 色彩调整中' : '🎨 色彩调整'}
-            </Text>
-          </TouchableOpacity>
+          {/* 色彩调整按钮已移除 - 直接在图片上显示调整面板 */}
 
           {/* 修改尺寸 */}
           <View 
