@@ -33,21 +33,29 @@ export default function StyleEditScreen() {
 
   // 计算滤镜效果
   const getImageStyle = () => {
-    const brightnessValue = brightness / 100;
-    const contrastValue = contrast / 100;
+    // 亮度范围：0-200
+    // 正确方向：0为暗，100为正常，200为亮
+    const brightnessValue = (brightness - 100) / 100 + 1; // 0->0, 100->1.0, 200->2.0
     
-    return {
-      opacity: brightnessValue,
-      tintColor: contrastValue > 1 ? 'rgba(0,0,0,' + Math.min(0.7, (contrastValue - 1) * 0.6) + ')' : 
-                 contrastValue < 1 ? 'rgba(255,255,255,' + Math.min(0.6, (1 - contrastValue) * 0.5) + ')' : undefined,
-    };
+    if (Platform.OS === "web") {
+      // Web：直接使用brightness filter
+      return {
+        filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+      };
+    } else {
+      // React Native：使用opacity模拟亮度
+      return {
+        opacity: Math.min(1, brightnessValue),
+      };
+    }
   };
 
   const handleSliderPress = (value: number, setter: (v: number) => void, ref: any) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setter(value);
+    // 限制范围在0-200
+    setter(Math.max(0, Math.min(200, value)));
   };
 
   const handleReset = () => {

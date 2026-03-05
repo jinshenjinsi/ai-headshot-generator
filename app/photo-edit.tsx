@@ -35,21 +35,29 @@ export default function PhotoEditScreen() {
 
   // 计算滤镜效果
   const getImageStyle = () => {
-    const brightnessValue = brightness / 100;
-    const contrastValue = contrast / 100;
+    // 亮度范围：0-200
+    // 正确方向：0为暗，100为正常，200为亮
+    const brightnessValue = (brightness - 100) / 100 + 1; // 0->0, 100->1.0, 200->2.0
     
-    return {
-      opacity: brightnessValue,
-      tintColor: contrastValue > 1 ? 'rgba(0,0,0,' + Math.min(0.7, (contrastValue - 1) * 0.6) + ')' : 
-                 contrastValue < 1 ? 'rgba(255,255,255,' + Math.min(0.6, (1 - contrastValue) * 0.5) + ')' : undefined,
-    };
+    if (Platform.OS === "web") {
+      // Web：直接使用brightness filter
+      return {
+        filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+      };
+    } else {
+      // React Native：使用opacity模拟亮度
+      return {
+        opacity: Math.min(1, brightnessValue),
+      };
+    }
   };
 
   const handleSliderPress = (value: number, setter: (v: number) => void, ref: any) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setter(value);
+    // 限制范围在0-200
+    setter(Math.max(0, Math.min(200, value)));
   };
 
   const handleReset = () => {
@@ -89,6 +97,29 @@ export default function PhotoEditScreen() {
         >
           {value}%
         </Text>
+      </View>
+      
+      {/* 快速调整按钮 */}
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+        {[0, 50, 100, 150, 200].map((val) => (
+          <TouchableOpacity
+            key={val}
+            onPress={() => handleSliderPress(val, setter, ref)}
+            style={{
+              flex: 1,
+              paddingVertical: 6,
+              backgroundColor: value === val ? COLORS.accent : COLORS.background,
+              borderWidth: 1,
+              borderColor: value === val ? COLORS.accent : COLORS.border,
+              borderRadius: 6,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
+              {val === 0 ? '暗' : val === 50 ? '偏暗' : val === 100 ? '正常' : val === 150 ? '偏亮' : '亮'}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
       
       {/* 滑条轨道 */}
@@ -135,30 +166,7 @@ export default function PhotoEditScreen() {
         </Text>
       </Pressable>
 
-      {/* 快速调整按钮 */}
-      <View className="flex-row gap-2 mt-2">
-        <TouchableOpacity
-          onPress={() => handleSliderPress(Math.max(0, value - 10), setter, ref)}
-          className="flex-1 py-2 rounded-lg items-center"
-          style={{ backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border }}
-        >
-          <Text style={{ color: COLORS.text, fontSize: 12, fontWeight: '600' }}>-</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleSliderPress(100, setter, ref)}
-          className="flex-1 py-2 rounded-lg items-center"
-          style={{ backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border }}
-        >
-          <Text style={{ color: COLORS.text, fontSize: 12, fontWeight: '600' }}>重置</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleSliderPress(Math.min(200, value + 10), setter, ref)}
-          className="flex-1 py-2 rounded-lg items-center"
-          style={{ backgroundColor: COLORS.background, borderWidth: 1, borderColor: COLORS.border }}
-        >
-          <Text style={{ color: COLORS.text, fontSize: 12, fontWeight: '600' }}>+</Text>
-        </TouchableOpacity>
-      </View>
+
     </View>
   );
 
