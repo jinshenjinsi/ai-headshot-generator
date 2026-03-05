@@ -40,7 +40,7 @@ export default function StyleEditScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
-      pathname: "/style-result",
+      pathname: "/generating-style",
       params: { 
         image, 
         style,

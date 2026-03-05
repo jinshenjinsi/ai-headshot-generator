@@ -1,6 +1,8 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system/legacy";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 
@@ -35,19 +37,118 @@ export default function StyleResultScreen() {
   const style = params.style as string;
 
   const [selectedFormat, setSelectedFormat] = useState("png");
+  const [downloading, setDownloading] = useState(false);
+  const originalImage = params.originalImage as string;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    if (!image || downloading) return;
+
     if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    alert("下载功能将在后续实现");
+
+    setDownloading(true);
+    try {
+      if (Platform.OS === "web") {
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = `style-preview-${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        
+        Alert.alert("下载成功", "预览版已保存");
+      } else {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("需要权限", "请允许访问相册以保存图片");
+          setDownloading(false);
+          return;
+        }
+
+        const fileUri = FileSystem.documentDirectory + `style-preview-${Date.now()}.jpg`;
+        await FileSystem.downloadAsync(image, fileUri);
+        await MediaLibrary.saveToLibraryAsync(fileUri);
+        
+        Alert.alert("下载成功", "预览版已保存到相册");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      Alert.alert("下载失败", "保存图片时出现问题,请稍后重试");
+    } finally {
+      setDownloading(false);
+    }
   };
 
-  const handleDownloadPaid = () => {
+  const handleDownloadPaid = async () => {
+    if (!originalImage || downloading) return;
+
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+
+    Alert.alert(
+      "付费下载",
+      "下载高清无水印版需要支付 ¥3.9\n\n支付功能即将开放,敬请期待!",
+      [
+        { text: "取消", style: "cancel" },
+        {
+          text: "确认支付",
+          onPress: async () => {
+            setDownloading(true);
+            try {
+              if (Platform.OS === "web") {
+                const response = await fetch(originalImage);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement("a");
+                link.href = blobUrl;
+                link.download = `style-hd-${Date.now()}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                
+                Alert.alert("下载成功", "高清无水印版已保存");
+              } else {
+                const { status } = await MediaLibrary.requestPermissionsAsync();
+                if (status !== "granted") {
+                  Alert.alert("需要权限", "请允许访问相册以保存图片");
+                  setDownloading(false);
+                  return;
+                }
+
+                const fileUri = FileSystem.documentDirectory + `style-hd-${Date.now()}.jpg`;
+                await FileSystem.downloadAsync(originalImage, fileUri);
+                await MediaLibrary.saveToLibraryAsync(fileUri);
+                
+                Alert.alert("下载成功", "高清无水印版已保存到相册");
+              }
+            } catch (error) {
+              console.error("Download HD error:", error);
+              Alert.alert("下载失败", "保存图片时出现问题,请稍后重试");
+            } finally {
+              setDownloading(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleRegenerate = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    alert("付费下载功能将在后续实现");
+    router.back();
   };
 
   return (
@@ -214,26 +315,30 @@ export default function StyleResultScreen() {
             <TouchableOpacity
               onPress={handleDownload}
               activeOpacity={0.7}
+              disabled={downloading}
               className="rounded-xl py-4 items-center"
               style={{
                 backgroundColor: COLORS.white,
                 borderWidth: 2,
                 borderColor: COLORS.accent,
+                opacity: downloading ? 0.6 : 1,
               }}
             >
               <Text 
                 style={{ color: COLORS.accent, fontSize: 16, fontWeight: '600' }}
               >
-                📥 下载预览版(免费)
+                {downloading ? "下载中..." : "📥 下载预览版(免费)"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleDownloadPaid}
               activeOpacity={0.7}
+              disabled={downloading}
               className="rounded-xl py-4 items-center"
               style={{
                 backgroundColor: COLORS.success,
+                opacity: downloading ? 0.6 : 1,
               }}
             >
               <Text 
