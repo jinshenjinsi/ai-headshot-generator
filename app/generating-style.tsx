@@ -7,16 +7,16 @@ import * as FileSystem from "expo-file-system/legacy";
 import { ScrollView, Text, View, Platform, Animated, Easing, Alert } from "react-native";
 
 const STYLE_PROMPTS: Record<string, string> = {
-  professional: "Professional corporate headshot photo. Character: this person with their exact face. Setting: modern office background. Attire: business suit. Lighting: bright professional lighting. Expression: confident and authoritative. Camera: 85mm lens, f/2.8, sharp focus on face. Style: corporate executive portrait, formal and powerful.",
-  oil: "Oil painting style portrait. Character: this person with their exact face. Style: impressionist oil painting with visible brushstrokes, warm color palette, artistic and elegant.",
-  watercolor: "Watercolor style portrait. Character: this person with their exact face. Style: soft watercolor painting, dreamy and ethereal, pastel colors, artistic and romantic.",
-  sketch: "Pencil sketch style portrait. Character: this person with their exact face. Style: detailed pencil sketch, classic and elegant, fine line work, artistic rendering.",
-  cartoon: "Cartoon style portrait. Character: this person with their exact face. Style: cute cartoon illustration, vibrant colors, playful and friendly, animated style.",
-  anime: "Anime style portrait. Character: this person with their exact face. Style: Japanese anime art style, expressive eyes, detailed hair, vibrant colors, 2D animation style.",
-  minimal: "Minimalist style portrait. Character: this person with their exact face. Style: minimalist art, simple geometric shapes, limited color palette, modern and clean.",
-  retro: "Retro vintage style portrait. Character: this person with their exact face. Style: 1970s retro aesthetic, warm vintage colors, nostalgic and artistic.",
-  neon: "Neon cyberpunk style portrait. Character: this person with their exact face. Style: neon glow effect, cyberpunk aesthetic, vibrant neon colors, futuristic.",
-  art: "Fine art style portrait. Character: this person with their exact face. Style: contemporary fine art, mixed media, creative and unique, gallery-worthy.",
+  professional: "参考输入图片的风格和特征,生成一张专业的商务头像照片。要求:高清、清晰、正式气质、专业质量、适合商务场景使用",
+  oil: "油画风格头像,笔触明显,艺术感强,参考输入图片的人物特征",
+  watercolor: "水彩风格头像,柔和色调,艺术气息,参考输入图片的人物特征",
+  sketch: "素描风格头像,线条流畅,黑白风格,参考输入图片的人物特征",
+  cartoon: "卡通风格头像,色彩鲜艳,可爱风格,参考输入图片的人物特征",
+  anime: "二次元动漫风格头像,大眼睛,可爱表情,参考输入图片的人物特征",
+  minimal: "极简风格头像,简洁干净,现代感,参考输入图片的人物特征",
+  retro: "复古风格头像,怀旧色调,文艺气息,参考输入图片的人物特征",
+  neon: "霓虹灯风格头像,炫彩色彩,科技感,参考输入图片的人物特征",
+  art: "艺术风格头像,创意独特,画廊级别,参考输入图片的人物特征",
 };
 
 const PHOTOGRAPHY_TIPS = [
@@ -174,7 +174,19 @@ export default function GeneratingStyleScreen() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       setProgress(70);
-      setStatusMessage(`正在生成${style}风格美照...`);
+      const styleLabel: Record<string, string> = {
+        professional: "专业商务",
+        oil: "油画",
+        watercolor: "水彩",
+        sketch: "素描",
+        cartoon: "卡通",
+        anime: "动漫",
+        minimal: "极简",
+        retro: "复古",
+        neon: "霓虹",
+        art: "艺术",
+      };
+      setStatusMessage(`正在生成${styleLabel[style] || style}风格美照...`);
 
       const prompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.professional;
 

@@ -176,7 +176,7 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const { generateIdeogramCharacter } = await import("./ideogram-service");
+        const { generateHeadshotWithBailian } = await import("./bailian-service");
         const { addWatermarkToOriginal, uploadToS3 } = await import("./watermark-service");
         
         try {
@@ -210,16 +210,14 @@ export const appRouter = router({
           
           const prompt = `${input.prompt} Additional details: ${randomLighting}, ${randomAngle}, ${randomDetail}.`;
           
-          const result = await generateIdeogramCharacter({
-            characterImageUrl: input.imageUrl,
+          const result = await generateHeadshotWithBailian({
+            imageUrl: input.imageUrl,
+            style: "professional",
             prompt: prompt,
-            renderingSpeed: "Quality",
-            styleType: "Realistic",
-            aspectRatio: "1:1",
           });
 
           if (!result.success) {
-            throw new Error(result.error || "Failed to generate headshot with ideogram-character");
+            throw new Error(result.error || "Failed to generate headshot with Bailian API");
           }
 
           console.log("Adding watermark to original image...");

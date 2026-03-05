@@ -168,3 +168,12 @@
 - [x] 创建生成页面generating-style.tsx
 - [x] 测试完整的美照生成流程
 - [x] 保存检查点
+
+
+## API切换任务 - 2026-03-05
+
+### Ideogram → Bailian万象
+- [x] 修改后端路由使用Bailian API
+- [x] 更新generating-style.tsx的API调用
+- [x] 测试Bailian API集成
+- [ ] 保存检查点
