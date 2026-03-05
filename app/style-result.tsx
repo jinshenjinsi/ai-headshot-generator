@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Pressable, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as MediaLibrary from "expo-media-library";
@@ -221,53 +221,81 @@ export default function StyleResultScreen() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                  paddingVertical: 12,
+                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                  paddingVertical: 16,
                   paddingHorizontal: 16,
                 }}
               >
-                <View style={{ marginBottom: 12 }}>
-                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
-                    亮度: {brightness}%
-                  </Text>
-                  <View 
+                {/* 亮度调整 */}
+                <View style={{ marginBottom: 16 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                      亮度
+                    </Text>
+                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                      {brightness}%
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={(e) => {
+                      const locationX = (e.nativeEvent as any).locationX || 0;
+                      const trackWidth = 280;
+                      const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
+                      setBrightness(percentage);
+                    }}
                     style={{
-                      height: 4,
+                      height: 24,
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 2,
-                      overflow: 'hidden',
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      paddingHorizontal: 2,
                     }}
                   >
                     <View 
                       style={{
                         height: '100%',
-                        width: `${brightness}%`,
+                        width: `${(brightness / 200) * 100}%`,
                         backgroundColor: COLORS.accent,
+                        borderRadius: 10,
                       }}
                     />
-                  </View>
+                  </Pressable>
                 </View>
 
+                {/* 对比度调整 */}
                 <View>
-                  <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600', marginBottom: 8 }}>
-                    对比度: {contrast}%
-                  </Text>
-                  <View 
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>
+                      对比度
+                    </Text>
+                    <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: '600' }}>
+                      {contrast}%
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={(e) => {
+                      const locationX = (e.nativeEvent as any).locationX || 0;
+                      const trackWidth = 280;
+                      const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
+                      setContrast(percentage);
+                    }}
                     style={{
-                      height: 4,
+                      height: 24,
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      borderRadius: 2,
-                      overflow: 'hidden',
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      paddingHorizontal: 2,
                     }}
                   >
                     <View 
                       style={{
                         height: '100%',
-                        width: `${contrast}%`,
+                        width: `${(contrast / 200) * 100}%`,
                         backgroundColor: COLORS.accent,
+                        borderRadius: 10,
                       }}
                     />
-                  </View>
+                  </Pressable>
                 </View>
               </View>
             )}
@@ -329,7 +357,7 @@ export default function StyleResultScreen() {
                   onPress={() => {
                     router.push({
                       pathname: "/style-edit",
-                      params: { image, style: s },
+                      params: { image: params.image, style: s },
                     } as any);
                   }}
                   activeOpacity={0.7}

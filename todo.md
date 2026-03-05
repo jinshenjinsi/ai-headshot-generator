@@ -243,9 +243,30 @@
 ## 色彩调整功能 - 2026-03-05
 
 ### 结果页面调整功能
-- [ ] 为photo-result.tsx添加亮度和对比度滑条
-- [ ] 为style-result.tsx添加亮度和对比度滑条
-- [ ] 为repair-result.tsx添加亮度和对比度滑条
-- [ ] 使用半透明滑条覆盖在图片上方
+- [x] 为photo-result.tsx添加亮度和对比度滑条
+- [x] 为style-result.tsx添加亮度和对比度滑条
+- [x] 为repair-result.tsx添加亮度和对比度滑条
+- [x] 使用半透明滑条覆盖在图片上方
 - [ ] 测试所有调整功能
+- [ ] 保存检查点
+
+## 严重问题修复 - 2026-03-05 (第三轮)
+
+### 编辑页面调整条不活动
+- [ ] 修复photo-edit.tsx的滑条交互功能
+- [ ] 修复style-edit.tsx的滑条交互功能
+- [ ] 修复repair-generating.tsx的滑条交互功能
+
+### 结果页面色彩调整不可用
+- [ ] 修复photo-result.tsx的色彩调整无法使用问题
+- [ ] 修复style-result.tsx的色彩调整无法使用问题
+- [ ] 修复repair-result.tsx的色彩调整无法使用问题
+
+### 其他风格回退原图问题
+- [ ] 修复style-result.tsx的“其他风格”导航，正确传递原图
+- [ ] 修复generating-style.tsx的自动跳转逻辑，避免100%卡住
+- [ ] 修复style-edit.tsx的导航，正确处理原图参数
+
+### 测试和交付
+- [ ] 测试所有修复
 - [ ] 保存检查点
