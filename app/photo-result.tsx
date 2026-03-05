@@ -22,6 +22,36 @@ const PRESET_SIZES = [
   { name: "2寸", width: 35, height: 53, specs: "35×53mm" },
 ];
 
+// 各国家的证照尺寸标准
+const COUNTRY_SPECS: { [key: string]: string } = {
+  // 护照国家
+  china: "35×45mm",
+  usa: "50×50mm",
+  japan: "45×45mm",
+  uk: "35×45mm",
+  canada: "35×45mm",
+  australia: "35×45mm",
+  singapore: "35×45mm",
+  korea: "35×45mm",
+  france: "35×45mm",
+  germany: "35×45mm",
+  italy: "35×45mm",
+  spain: "35×45mm",
+  netherlands: "35×45mm",
+  sweden: "35×45mm",
+  switzerland: "35×45mm",
+  taiwan: "35×45mm",
+  // 签证国家
+  eu: "48×33mm",
+  india: "50.8×50.8mm",
+  thailand: "35×45mm",
+  vietnam: "40×60mm",
+  malaysia: "35×45mm",
+  philippines: "35×45mm",
+  indonesia: "35×45mm",
+  newzealand: "35×45mm",
+};
+
 export default function PhotoResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -283,7 +313,7 @@ export default function PhotoResultScreen() {
               <Text 
                 style={{ color: COLORS.muted, fontSize: 11 }}
               >
-                用途: {type === 'passport' ? '护照照' : type === 'visa' ? '签证照' : '其他'} | 背景: 白色 | 尺寸: 25×35mm
+                用途: {type === 'passport' ? '护照照' : type === 'visa' ? '签证照' : '其他'} | 背景: 白色 | 尺寸: {COUNTRY_SPECS[country] || '25×35mm'}
               </Text>
             </View>
           </View>
