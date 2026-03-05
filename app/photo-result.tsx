@@ -216,7 +216,7 @@ export default function PhotoResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      亮度
+                      亮度 -- 暗、亮
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {brightness}%
@@ -235,7 +235,7 @@ export default function PhotoResultScreen() {
                         }}
                       >
                         <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
-                          {val === 70 ? '强' : val === 130 ? '弱' : val}
+                          {val === 70 ? '暗' : val === 130 ? '亮' : val}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -246,7 +246,7 @@ export default function PhotoResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      对比度
+                      对比度 -- 弱、强
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {contrast}%
@@ -265,8 +265,8 @@ export default function PhotoResultScreen() {
                           alignItems: 'center',
                         }}
                       >
-                        <Text style={{ color: COLORS.white, fontSize: 9, fontWeight: '600' }}>
-                          {val}
+                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
+                          {val === 70 ? '弱' : val === 130 ? '强' : val}
                         </Text>
                       </TouchableOpacity>
                     ))}
