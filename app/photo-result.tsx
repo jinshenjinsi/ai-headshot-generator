@@ -99,8 +99,8 @@ export default function PhotoResultScreen() {
                   height: 400, 
                   resizeMode: 'cover',
                   opacity: Math.min(1, brightness / 100),
-                  tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.7, (contrast - 100) / 100 * 0.6) + ')' : 
-                             contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.6, (100 - contrast) / 100 * 0.5) + ')' : undefined,
+                  tintColor: contrast > 100 ? 'rgba(0,0,0,' + Math.min(0.5, (contrast - 100) / 100 * 0.3) + ')' : 
+                             contrast < 100 ? 'rgba(255,255,255,' + Math.min(0.4, (100 - contrast) / 100 * 0.25) + ')' : undefined,
                 }}
               />
               {/* 色彩调整面板 - 覆盖在图片上方 */}
@@ -110,7 +110,7 @@ export default function PhotoResultScreen() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                   gap: 8,

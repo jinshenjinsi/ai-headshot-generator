@@ -48,15 +48,32 @@ export default function RepairResultScreen() {
     };
 
     // 应用亮度和对比度滤镜
-    // 亮度范围：70-130（对应 0.7-1.3）
+    // 亮度范围：70-130，映射到 0.7-1.0（不超过opacity最大值1）
     const normalizedBrightness = brightness / 100;
     
     if (Platform.OS === "web") {
+      // 亮度值：70为暗，130为亮
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
     } else {
-      // React Native 不直接支持 filter，但可以通过 opacity 和其他属性模拟
-      // 亮度值范围：70-130，映射到opacity 0.7-1.0（opacity最大1）
+      // React Native：使用opacity模拟亮度
+      // brightness 70 -> opacity 0.7 (暗)
+      // brightness 100 -> opacity 1.0 (正常)
+      // brightness 130 -> opacity 1.0 (正常，因为opacity最大值是1)
       baseStyle.opacity = Math.min(1, normalizedBrightness);
+    }
+
+    // 对比度：使用tintColor模拟
+    // contrast 70 -> 添加白色滤镜（低对比）
+    // contrast 100 -> 正常
+    // contrast 130 -> 添加黑色滤镜（高对比）
+    if (contrast > 100) {
+      // 高对比：添加黑色滤镜
+      const intensity = Math.min(0.5, (contrast - 100) / 100 * 0.3);
+      baseStyle.tintColor = `rgba(0, 0, 0, ${intensity})`;
+    } else if (contrast < 100) {
+      // 低对比：添加白色滤镜
+      const intensity = Math.min(0.4, (100 - contrast) / 100 * 0.25);
+      baseStyle.tintColor = `rgba(255, 255, 255, ${intensity})`;
     }
 
     // 如果是老照片修复，不添加底色
@@ -144,7 +161,7 @@ export default function RepairResultScreen() {
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      backgroundColor: "rgba(0, 0, 0, 0.85)",
+                      backgroundColor: "rgba(0, 0, 0, 0.6)",
                       paddingVertical: 10,
                       paddingHorizontal: 10,
                       gap: 8,
