@@ -16,10 +16,8 @@ const COLORS = {
 };
 
 const PRESET_SIZES = [
-  { name: "当前尺寸", width: 25, height: 35, specs: "25×35mm" },
   { name: "1寸", width: 25, height: 35, specs: "25×35mm" },
   { name: "2寸", width: 35, height: 53, specs: "35×53mm" },
-  { name: "护照", width: 35, height: 45, specs: "35×45mm" },
 ];
 
 export default function PhotoResultScreen() {
@@ -40,14 +38,16 @@ export default function PhotoResultScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    alert("下载功能将在后续实现");
+    const size = PRESET_SIZES[selectedSize];
+    alert(`下载 ${size.name} 尺寸 (${size.specs}) 的免费预览版`);
   };
 
   const handleDownloadPaid = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    alert("付费下载功能将在后续实现");
+    const size = PRESET_SIZES[selectedSize];
+    alert(`付费下载 ${size.name} 尺寸 (${size.specs}) 的高清版 - 1.99元`);
   };
 
   // 获取图片的显示效果
@@ -304,20 +304,30 @@ export default function PhotoResultScreen() {
             >
               快速下载
             </Text>
+            <Text 
+              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
+            >
+              选择尺寸后点击下载免费预览版
+            </Text>
             <View className="gap-2">
               {PRESET_SIZES.map((size, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={handleDownload}
+                  onPress={() => {
+                    setSelectedSize(index);
+                    if (Platform.OS !== "web") {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }
+                  }}
                   activeOpacity={0.7}
-                  className="rounded-lg p-3 flex-row items-center justify-between"
+                  className="rounded-lg p-4 flex-row items-center justify-between"
                   style={{
-                    backgroundColor: selectedSize === index ? COLORS.accent + "15" : COLORS.background,
-                    borderWidth: selectedSize === index ? 2 : 0,
-                    borderColor: selectedSize === index ? COLORS.accent : "transparent",
+                    backgroundColor: selectedSize === index ? COLORS.accent + "20" : COLORS.background,
+                    borderWidth: 2,
+                    borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
                   }}
                 >
-                  <View>
+                  <View className="flex-1">
                     <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600', marginBottom: 2 }}>
                       {size.name}
                     </Text>
@@ -327,17 +337,36 @@ export default function PhotoResultScreen() {
                   </View>
                   <View
                     style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 10,
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
                       borderWidth: 2,
                       borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
                       backgroundColor: selectedSize === index ? COLORS.accent : "transparent",
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: 12,
                     }}
-                  />
+                  >
+                    {selectedSize === index && (
+                      <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '700' }}>✓</Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
+            <TouchableOpacity
+              onPress={handleDownload}
+              activeOpacity={0.7}
+              className="rounded-lg py-3 items-center mt-4"
+              style={{
+                backgroundColor: COLORS.success,
+              }}
+            >
+              <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+                💚 下载免费预览版
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* 付费下载 */}
@@ -349,9 +378,14 @@ export default function PhotoResultScreen() {
               backgroundColor: COLORS.accent,
             }}
           >
-            <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
-              ⭐ 付费下载高清版
-            </Text>
+            <View style={{ alignItems: 'center', gap: 2 }}>
+              <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
+                ⭐ 付费下载高清版
+              </Text>
+              <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '500', opacity: 0.8 }}>
+                ￥1.99
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>

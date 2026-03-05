@@ -309,9 +309,14 @@ export default function StyleResultScreen() {
                   backgroundColor: COLORS.accent,
                 }}
               >
-                <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600' }}>
-                  ⭐ 付费高清版
-                </Text>
+                <View style={{ alignItems: 'center', gap: 2 }}>
+                  <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600' }}>
+                    ⭐ 付费下载高清版
+                  </Text>
+                  <Text style={{ color: COLORS.primary, fontSize: 11, fontWeight: '500', opacity: 0.8 }}>
+                    ￥1.99
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
