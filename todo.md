@@ -188,3 +188,18 @@
 - [x] 修改美照生成流程，整合风格选择
 - [x] 测试所有流程
 - [ ] 保存检查点
+
+
+## 问题修复 - 2026-03-05
+
+### 用途和类型重复问题
+- [x] 合并photo-purpose.tsx和photo-type.tsx
+- [x] 删除photo-purpose.tsx和style-select.tsx
+- [x] 更新photo-upload.tsx的导航
+
+### 结果页面按钮问题
+- [x] 修复photo-result.tsx添加回退和操作按钮
+- [x] 修复style-result.tsx的按钮显示
+- [x] 修复repair-result.tsx的按钮显示
+- [x] 测试所有结果页面
+- [ ] 保存检查点

@@ -61,7 +61,7 @@ export default function PhotoUploadScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
-      pathname: "/photo-purpose",
+      pathname: "/photo-type",
       params: { image: selectedImage },
     } as any);
   };
