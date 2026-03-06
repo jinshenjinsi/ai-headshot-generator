@@ -1,9 +1,10 @@
-import { ScrollView, Text, View, TouchableOpacity, Image, Platform } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Slider from "@react-native-community/slider";
+import { getPhotoAndStyleFreeCount, canUsePhotoAndStyleFree } from "@/lib/free-usage-service";
+import { View, Text, TouchableOpacity, Image, ScrollView, Platform } from "react-native";
 
 const COLORS = {
   primary: "#1A365D",
@@ -27,6 +28,18 @@ export default function PhotoEditScreen() {
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
   const [sharpness, setSharpness] = useState(100);
+  const [freeCount, setFreeCount] = useState(0);
+  const [canUseFree, setCanUseFree] = useState(false);
+
+  useEffect(() => {
+    const loadFreeStatus = async () => {
+      const count = await getPhotoAndStyleFreeCount();
+      const canUse = await canUsePhotoAndStyleFree();
+      setFreeCount(count);
+      setCanUseFree(canUse);
+    };
+    loadFreeStatus();
+  }, []);
 
   // 计算滤镜效果
   const getImageStyle = () => {
@@ -77,18 +90,7 @@ export default function PhotoEditScreen() {
     } as any);
   };
 
-  const getButtonLabel = (val: number, sliderType: string): string => {
-    if (sliderType === "brightness") {
-      return val === 80 ? "暗" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "亮";
-    } else if (sliderType === "contrast") {
-      return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
-    } else if (sliderType === "saturation") {
-      return val === 80 ? "淡" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "浓";
-    } else if (sliderType === "sharpness") {
-      return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
-    }
-    return "";
-  };
+
 
   const renderSlider = (
     label: string, 
@@ -99,99 +101,40 @@ export default function PhotoEditScreen() {
     return (
       <View className="mb-6">
         <View className="flex-row justify-between items-center mb-3">
-          <Text 
-            style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
-          >
+          <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}>
             {label}
           </Text>
-          <Text 
-            style={{ color: COLORS.accent, fontSize: 14, fontWeight: '700' }}
-          >
-            {Math.round(value)}%
+          <Text style={{ color: COLORS.muted, fontSize: 13 }}>
+            {value}
           </Text>
         </View>
-        
-        {/* 快速调整按钮 */}
-        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-          {[80, 90, 100, 110, 120].map((val) => (
-            <TouchableOpacity
-              key={val}
-              onPress={() => handleSliderChange(val, setter)}
-              style={{
-                flex: 1,
-                paddingVertical: 6,
-                backgroundColor: Math.round(value) === val ? COLORS.accent : COLORS.background,
-                borderWidth: 1,
-                borderColor: Math.round(value) === val ? COLORS.accent : COLORS.border,
-                borderRadius: 6,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: Math.round(value) === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
-                {getButtonLabel(val, sliderType)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        
-        {/* 滑条 - 使用原生Slider组件 */}
-        <View style={{
-          height: 50,
-          justifyContent: 'center',
-          backgroundColor: COLORS.border,
-          borderRadius: 25,
-          paddingHorizontal: 4,
-        }}>
+
+        <View className="flex-row items-center gap-2 mb-2">
           <Slider
-            style={{ width: '100%', height: 50 }}
+            style={{ flex: 1, height: 40 }}
             minimumValue={0}
             maximumValue={200}
             value={value}
-            onValueChange={(val) => handleSliderChange(val, setter)}
+            onValueChange={(val) => handleSliderChange(Math.round(val), setter)}
             minimumTrackTintColor={COLORS.accent}
             maximumTrackTintColor={COLORS.border}
             thumbTintColor={COLORS.accent}
-            step={1}
           />
         </View>
+
+
       </View>
     );
   };
 
   return (
     <ScreenContainer className="bg-background">
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        <View className="flex-1 py-6 px-4">
-          {/* 返回按钮 */}
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="mb-6"
-            activeOpacity={0.7}
-          >
-            <Text style={{ color: COLORS.primary, fontSize: 16, fontWeight: '600' }}>
-              ← 返回
-            </Text>
-          </TouchableOpacity>
-
-          {/* 页面标题 */}
-          <View className="mb-8">
-            <Text 
-              style={{ color: COLORS.primary, fontSize: 28, fontWeight: '800', marginBottom: 8 }}
-            >
-              编辑调整
-            </Text>
-            <Text 
-              style={{ color: COLORS.muted, fontSize: 14 }}
-            >
-              调整亮度、对比度等参数,获得最佳效果
-            </Text>
-          </View>
-
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: 16 }}>
+        <View className="px-4 gap-4">
           {/* 图片预览 */}
           <View 
-            className="rounded-2xl mb-8 overflow-hidden"
+            className="rounded-2xl overflow-hidden"
             style={{
-              backgroundColor: COLORS.white,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.08,
@@ -252,6 +195,24 @@ export default function PhotoEditScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* 免费次数提示 */}
+          {canUseFree && (
+            <View 
+              className="rounded-xl p-4 mb-4"
+              style={{
+                backgroundColor: '#D4AF3720',
+                borderWidth: 1,
+                borderColor: COLORS.accent,
+              }}
+            >
+              <Text 
+                style={{ color: COLORS.accent, fontSize: 13, fontWeight: '600', textAlign: 'center' }}
+              >
+                ✨ 您还有 {freeCount} 次免费生成机会
+              </Text>
+            </View>
+          )}
+
           {/* 底部导航 */}
           <View className="flex-row gap-3">
             <TouchableOpacity
@@ -279,11 +240,18 @@ export default function PhotoEditScreen() {
                 backgroundColor: COLORS.primary,
               }}
             >
-              <Text 
-                style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}
-              >
-                下一步
-              </Text>
+              <View>
+                <Text 
+                  style={{ color: COLORS.white, fontSize: 14, fontWeight: '600', textAlign: 'center' }}
+                >
+                  生成
+                </Text>
+                <Text 
+                  style={{ color: COLORS.white, fontSize: 11, textAlign: 'center', marginTop: 2 }}
+                >
+                  {canUseFree ? `免费(${freeCount}次)` : '¥1.99'}
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>

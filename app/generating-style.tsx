@@ -5,6 +5,7 @@ import { useColors } from "@/hooks/use-colors";
 import { trpc } from "@/lib/trpc";
 import * as FileSystem from "expo-file-system/legacy";
 import { ScrollView, Text, View, Platform, Animated, Easing, Alert } from "react-native";
+import { usePhotoAndStyleFree } from "@/lib/free-usage-service";
 
 const STYLE_PROMPTS: Record<string, string> = {
   professional: "参考输入图片的风格和特征,生成一张专业的商务头像照片。要求:高清、清晰、正式气质、专业质量、适合商务场景使用",
@@ -208,6 +209,9 @@ export default function GeneratingStyleScreen() {
 
       setProgress(100);
       setStatusMessage("完成!");
+
+      // 扣除免费次数
+      await usePhotoAndStyleFree();
 
       setTimeout(() => {
         router.replace({

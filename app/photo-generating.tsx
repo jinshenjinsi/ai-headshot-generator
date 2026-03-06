@@ -5,6 +5,7 @@ import { useColors } from "@/hooks/use-colors";
 import { trpc } from "@/lib/trpc";
 import * as FileSystem from "expo-file-system/legacy";
 import { ScrollView, Text, View, Platform, Animated, Easing, Alert } from "react-native";
+import { usePhotoAndStyleFree } from "@/lib/free-usage-service";
 
 const PHOTOGRAPHY_TIPS = [
   {
@@ -208,6 +209,9 @@ export default function PhotoGeneratingScreen() {
 
       setProgress(100);
       setStatusMessage("完成!");
+
+      // 扣除免费次数
+      await usePhotoAndStyleFree();
 
       setTimeout(() => {
         // 使用replace而不是push，以便回退时不会回到这个100%完成页面

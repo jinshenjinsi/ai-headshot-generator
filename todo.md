@@ -325,3 +325,27 @@
 - [x] 修复repair-result.tsx的亮度计算，使用Math.min限制opacity最大1
 - [x] 修复photo-result.tsx的亮度计算
 - [x] 修复style-result.tsx的亮度计算
+
+
+## 收费策略实现修复 - 2026-03-06
+
+### 删除快捷键
+- [ ] 删除photo-edit.tsx中所有快捷键按钮（暗/-/正常/+/亮）
+- [ ] 删除style-edit.tsx中所有快捷键按钮
+- [ ] 删除repair-edit.tsx中所有快捷键按钮
+
+### 删除修复倍数选择
+- [ ] 删除repair-result.tsx中的修复倍数选择部分
+
+### 修复价格和标签
+- [ ] 删除repair-result.tsx中的"快速下载"标签
+- [ ] 修改repair-result.tsx中的价格为¥5.99元
+- [ ] 修改style-result.tsx中的价格为¥1.99元
+
+### 集成免费次数扣除
+- [ ] 在photo-generating.tsx中调用usePhotoAndStyleFree()
+- [ ] 在style-generating.tsx中调用usePhotoAndStyleFree()
+- [ ] 在repair-generating.tsx中调用useRepairFree()
+
+### 用户标识和计数
+- [ ] 实现设备ID或其他唯一标识来计算用户数

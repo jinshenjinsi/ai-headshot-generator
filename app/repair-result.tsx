@@ -313,63 +313,7 @@ export default function RepairResultScreen() {
             </View>
           </View>
 
-          {/* 修复倍数选择 */}
-          <View
-            className="rounded-2xl p-6 mb-8"
-            style={{
-              backgroundColor: COLORS.white,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
-          >
-            <Text style={{ color: COLORS.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-              选择修复倍数
-            </Text>
-            <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
-              更高倍数获得更清晰的效果
-            </Text>
 
-            <View className="gap-2">
-              {[
-                { id: "2x", name: "2倍超分", desc: "标准清晰度" },
-                { id: "4x", name: "4倍超分", desc: "超高清晰度" },
-              ].map((scale) => (
-                <TouchableOpacity
-                  key={scale.id}
-                  onPress={() => setSelectedScale(scale.id)}
-                  activeOpacity={0.7}
-                  className="rounded-lg p-3 flex-row items-center justify-between"
-                  style={{
-                    backgroundColor: selectedScale === scale.id ? COLORS.accent + "15" : COLORS.background,
-                    borderWidth: selectedScale === scale.id ? 2 : 0,
-                    borderColor: selectedScale === scale.id ? COLORS.accent : "transparent",
-                  }}
-                >
-                  <View>
-                    <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: "600", marginBottom: 2 }}>
-                      {scale.name}
-                    </Text>
-                    <Text style={{ color: COLORS.muted, fontSize: 12 }}>
-                      {scale.desc}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 10,
-                      borderWidth: 2,
-                      borderColor: selectedScale === scale.id ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedScale === scale.id ? COLORS.accent : "transparent",
-                    }}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
 
           {/* 固定尺寸 */}
           <View
@@ -383,9 +327,6 @@ export default function RepairResultScreen() {
               elevation: 2,
             }}
           >
-            <Text style={{ color: COLORS.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-              固定尺寸
-            </Text>
             <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
               推荐尺寸（可选）
             </Text>
@@ -443,10 +384,7 @@ export default function RepairResultScreen() {
             }}
           >
             <Text style={{ color: COLORS.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-              快速下载
-            </Text>
-            <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
-              选择倍数后点击下载
+              下载
             </Text>
 
             <View className="gap-2">
@@ -465,7 +403,7 @@ export default function RepairResultScreen() {
                     ⭐ 下载高清版
                   </Text>
                   <Text style={{ color: COLORS.primary, fontSize: 11, fontWeight: "500", opacity: 0.8 }}>
-                    ￥1.99
+                    ￥5.99
                   </Text>
                 </View>
               </TouchableOpacity>
