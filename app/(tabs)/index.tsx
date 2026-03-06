@@ -54,16 +54,15 @@ export default function HomeScreen() {
               }}
             />
             
-            {/* 品牌名称 */}
-            <Text 
-              className="text-2xl font-bold text-center"
-              style={{ 
-                color: COLORS.primary,
-                letterSpacing: 1,
+            {/* 品牌名称 - 文字logo */}
+            <Image
+              source={require("@/assets/images/yuanyi-text-logo.png")}
+              style={{
+                width: 280,
+                height: 140,
+                resizeMode: 'contain',
               }}
-            >
-              元一图灵
-            </Text>
+            />
             
             <Text 
               className="text-base text-center"
