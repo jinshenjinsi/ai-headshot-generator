@@ -198,7 +198,7 @@ export default function RepairResultScreen() {
             </Text>
           </View>
 
-          {/* 修复结果对比 */}
+          {/* 修复后照片 - 仅显示修复后的照片 */}
           <View
             className="rounded-2xl mb-8 overflow-hidden"
             style={{
@@ -210,98 +210,84 @@ export default function RepairResultScreen() {
               elevation: 2,
             }}
           >
-            <View className="flex-row">
-              {/* 原始照片 */}
-              <View className="flex-1 items-center justify-center">
-                <Text style={{ color: COLORS.muted, fontSize: 12, fontWeight: "600", padding: 8 }}>
-                  原始照片
-                </Text>
-                <Image source={{ uri: originalImage }} style={{ width: "100%", height: 200, resizeMode: "contain", alignSelf: "center" }} />
-              </View>
-
-              {/* 分割线 */}
-              <View style={{ width: 1, backgroundColor: COLORS.border }} />
-
-              {/* 修复后照片 - 包含色彩调整面板 */}
-              <Pressable 
-                onPress={() => setShowPreview(true)}
-                className="flex-1 items-center justify-center"
+            <Pressable 
+              onPress={() => setShowPreview(true)}
+              className="items-center justify-center p-6"
+            >
+              <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", marginBottom: 12 }}>
+                修复后 ({selectedScale})
+              </Text>
+              <View
+                style={{
+                  width: "100%",
+                  height: 250,
+                  position: "relative",
+                  overflow: "hidden",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
-                <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", padding: 8 }}>
-                  修复后 ({selectedScale})
-                </Text>
+                <Image source={{ uri: image }} style={getImageStyle()} />
+
+                {/* 色彩调整面板 - 覆盖在图片下方 */}
                 <View
                   style={{
-                    width: "100%",
-                    height: 200,
-                    position: "relative",
-                    overflow: "hidden",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                    paddingVertical: 10,
+                    paddingHorizontal: 10,
+                    gap: 8,
                   }}
                 >
-                    <Image source={{ uri: image }} style={getImageStyle()} />
-
-                  {/* 色彩调整面板 - 覆盖在图片上方 */}
-                  <View
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      backgroundColor: "rgba(0, 0, 0, 0.6)",
-                      paddingVertical: 10,
-                      paddingHorizontal: 10,
-                      gap: 8,
-                    }}
-                  >
-                    {/* 亮度调整 */}
-                    <View>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
-                        <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
-                          亮度
-                        </Text>
-                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
-                          {brightness}%
-                        </Text>
-                      </View>
-                      <Slider
-                        style={{ height: 30 }}
-                        minimumValue={70}
-                        maximumValue={130}
-                        step={5}
-                        value={brightness}
-                        onValueChange={setBrightness}
-                        minimumTrackTintColor={COLORS.accent}
-                        maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
-                      />
+                  {/* 亮度调整 */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                      <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                        亮度
+                      </Text>
+                      <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                        {brightness}%
+                      </Text>
                     </View>
+                    <Slider
+                      style={{ height: 30 }}
+                      minimumValue={70}
+                      maximumValue={130}
+                      step={5}
+                      value={brightness}
+                      onValueChange={setBrightness}
+                      minimumTrackTintColor={COLORS.accent}
+                      maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    />
+                  </View>
 
-                    {/* 对比度调整 */}
-                    <View>
-                      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
-                        <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
-                          对比度
-                        </Text>
-                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
-                          {contrast}%
-                        </Text>
-                      </View>
-                      <Slider
-                        style={{ height: 30 }}
-                        minimumValue={70}
-                        maximumValue={130}
-                        step={5}
-                        value={contrast}
-                        onValueChange={setContrast}
-                        minimumTrackTintColor={COLORS.accent}
-                        maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
-                      />
+                  {/* 对比度调整 */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                      <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                        对比度
+                      </Text>
+                      <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                        {contrast}%
+                      </Text>
                     </View>
+                    <Slider
+                      style={{ height: 30 }}
+                      minimumValue={70}
+                      maximumValue={130}
+                      step={5}
+                      value={contrast}
+                      onValueChange={setContrast}
+                      minimumTrackTintColor={COLORS.accent}
+                      maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    />
                   </View>
                 </View>
-              </Pressable>
-            </View>
+              </View>
+            </Pressable>
           </View>
 
 

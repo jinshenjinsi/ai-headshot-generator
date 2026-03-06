@@ -289,7 +289,7 @@ export default function StyleResultScreen() {
                   }}
                 >
                   <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                    {isDownloading ? "下载中..." : `下载${size.name}(${size.width}×${size.height}mm)`}
+                    {isDownloading ? "下载中..." : `${size.name}(${size.width}×${size.height}mm)`}
                   </Text>
                 </TouchableOpacity>
               ))}
