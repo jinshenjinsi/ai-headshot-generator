@@ -1,5 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform, useWindowDimensions } from "react-native";
-import { useEffect } from "react";
+import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform, useWindowDimensions, LayoutChangeEvent } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
@@ -22,12 +21,13 @@ export default function PhotoEditScreen() {
   const type = params.type as string;
   const country = params.country as string;
   const background = params.background as string || "white";
-  const { width: screenWidth } = useWindowDimensions();
 
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
   const [sharpness, setSharpness] = useState(100);
+  
+  const [sliderWidth, setSliderWidth] = useState(0);
 
   // 计算滤镜效果
   const getImageStyle = () => {
@@ -46,7 +46,8 @@ export default function PhotoEditScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    setter(Math.max(0, Math.min(200, value)));
+    const newValue = Math.max(0, Math.min(200, value));
+    setter(newValue);
   };
 
   const handleReset = () => {
@@ -91,9 +92,19 @@ export default function PhotoEditScreen() {
     return "";
   };
 
+  const handleSliderPress = (e: any, setter: (v: number) => void) => {
+    if (sliderWidth === 0) return;
+    
+    const locationX = e.nativeEvent.locationX;
+    // 计算百分比：locationX / sliderWidth = percentage / 100
+    // 我们需要 0-200 的值，所以：value = (locationX / sliderWidth) * 200
+    const newValue = Math.round((locationX / sliderWidth) * 200);
+    handleSliderChange(newValue, setter);
+  };
+
   const renderSlider = (label: string, value: number, setter: (v: number) => void, sliderType: string) => {
-    const sliderRef = useRef<View>(null);
-    // trackWidth用于计算点击位置，实际宽度由Pressable决定
+    // 计算填充百分比：value从0-200，所以填充百分比 = (value / 200) * 100
+    const fillPercentage = (value / 200) * 100;
 
     return (
       <View className="mb-6">
@@ -135,14 +146,10 @@ export default function PhotoEditScreen() {
         
         {/* 滑条轨道 */}
         <Pressable
-          ref={sliderRef}
-          onPress={(e) => {
-            const locationX = (e.nativeEvent as any).locationX || 0;
-            const pressableWidth = (e.currentTarget as any).offsetWidth || screenWidth - 40;
-            // 将点击位置转换为0-200的值
-            const newValue = Math.round((locationX / pressableWidth) * 200);
-            handleSliderChange(newValue, setter);
+          onLayout={(e: LayoutChangeEvent) => {
+            setSliderWidth(e.nativeEvent.layout.width);
           }}
+          onPress={(e) => handleSliderPress(e, setter)}
           style={{
             height: 50,
             backgroundColor: COLORS.border,
@@ -159,7 +166,7 @@ export default function PhotoEditScreen() {
               position: 'absolute',
               left: 4,
               top: 4,
-              width: `${(value / 200) * 100}%`,
+              width: `${fillPercentage}%`,
               height: 42,
               backgroundColor: COLORS.accent,
               borderRadius: 21,
@@ -169,7 +176,7 @@ export default function PhotoEditScreen() {
           {/* 数值显示 */}
           <Text 
             style={{ 
-              color: value > 100 ? COLORS.white : COLORS.text,
+              color: fillPercentage > 50 ? COLORS.white : COLORS.text,
               fontSize: 12,
               fontWeight: '600',
               textAlign: 'center',
