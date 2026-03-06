@@ -44,41 +44,26 @@ export default function HomeScreen() {
         <View className="flex-1 gap-8 py-8 px-6 pb-12">
           {/* 品牌头部 */}
           <View className="items-center gap-4 mt-4">
-            {/* 应用图标 */}
+            {/* 品牌图标 - 元一图灵 */}
             <Image
-              source={require("@/assets/images/react-logo.png")}
+              source={require("@/assets/images/yuanyi-icon.png")}
               style={{
-                width: 100,
-                height: 100,
-                borderRadius: 24,
+                width: 120,
+                height: 120,
+                borderRadius: 28,
               }}
             />
             
-            {/* 品牌名称 - 艺术化设计 */}
-            <View style={{ alignItems: 'center', gap: 3 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-                <Text 
-                  className="text-5xl font-bold"
-                  style={{ 
-                    color: COLORS.accent,
-                    letterSpacing: 1,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  元一
-                </Text>
-                <Text 
-                  className="text-5xl font-bold"
-                  style={{ 
-                    color: COLORS.primary,
-                    letterSpacing: 1,
-                  }}
-                >
-                  图灵
-                </Text>
-              </View>
-              <View style={{ height: 3, width: 80, backgroundColor: COLORS.accent, borderRadius: 2 }} />
-            </View>
+            {/* 品牌名称 */}
+            <Text 
+              className="text-2xl font-bold text-center"
+              style={{ 
+                color: COLORS.primary,
+                letterSpacing: 1,
+              }}
+            >
+              元一图灵
+            </Text>
             
             <Text 
               className="text-base text-center"
