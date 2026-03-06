@@ -56,7 +56,6 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { generateHeadshotWithBailian } = await import("./bailian-service");
-        const { addWatermarkToOriginal, uploadToS3 } = await import("./watermark-service");
         
         try {
           console.log("[Router] Starting Bailian generation...");
@@ -70,30 +69,12 @@ export const appRouter = router({
             throw new Error(result.error || "Failed to generate headshot with Bailian");
           }
 
-          console.log("[Router] Bailian generation successful, adding watermark...");
-          
-          const qrCodeUrl = "https://manus.im";
-          const { watermarked, original } = await addWatermarkToOriginal(
-            result.imageUrl!,
-            qrCodeUrl,
-            {
-              qrSize: 120,
-              opacity: 0.3,
-              padding: 20,
-            }
-          );
-
-          const timestamp = Date.now();
-          const watermarkedUrl = await uploadToS3(watermarked, `headshots/watermarked/${timestamp}.jpg`);
-          const originalUrl = await uploadToS3(original, `headshots/original/${timestamp}.jpg`);
-
-          console.log("[Router] Watermarked image URL:", watermarkedUrl);
-          console.log("[Router] Original image URL:", originalUrl);
+          console.log("[Router] Bailian generation successful");
 
           return {
             success: true,
-            imageUrl: watermarkedUrl,
-            originalUrl: originalUrl,
+            imageUrl: result.imageUrl,
+            originalUrl: result.imageUrl,
           };
         } catch (error) {
           console.error("[Router] Bailian generation failed:", error);
@@ -177,7 +158,6 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         const { generateHeadshotWithBailian } = await import("./bailian-service");
-        const { addWatermarkToOriginal, uploadToS3 } = await import("./watermark-service");
         
         try {
           const lightingVariations = [
@@ -220,29 +200,12 @@ export const appRouter = router({
             throw new Error(result.error || "Failed to generate headshot with Bailian API");
           }
 
-          console.log("Adding watermark to original image...");
-          const qrCodeUrl = "https://manus.im";
-          const { watermarked, original } = await addWatermarkToOriginal(
-            result.imageUrl!,
-            qrCodeUrl,
-            {
-              qrSize: 120,
-              opacity: 0.3,
-              padding: 20,
-            }
-          );
-
-          const timestamp = Date.now();
-          const watermarkedUrl = await uploadToS3(watermarked, `headshots/watermarked/${timestamp}.jpg`);
-          const originalUrl = await uploadToS3(original, `headshots/original/${timestamp}.jpg`);
-
-          console.log("Watermarked image URL:", watermarkedUrl);
-          console.log("Original image URL:", originalUrl);
+          console.log("Generation successful");
 
           return {
             success: true,
-            imageUrl: watermarkedUrl,
-            originalUrl: originalUrl,
+            imageUrl: result.imageUrl,
+            originalUrl: result.imageUrl,
           };
         } catch (error) {
           console.error("Ideogram-character generation failed:", error);
