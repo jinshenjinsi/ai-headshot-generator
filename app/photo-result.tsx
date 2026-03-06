@@ -68,6 +68,7 @@ export default function PhotoResultScreen() {
   const [contrast, setContrast] = useState(100);
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isPaidVersion, setIsPaidVersion] = useState(false);
 
   const handleDownload = async (width?: number, height?: number) => {
     if (Platform.OS !== "web") {
@@ -133,7 +134,9 @@ export default function PhotoResultScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    setIsDownloading(true);
+    // 设置为付费版本，分享按钮将被禁用
+    setIsPaidVersion(true);
+    setIsDownloading(true)
     try {
       // 使用自定义尺寸或国家默认尺寸
       const finalWidth = parseInt(customWidth) || 35;
@@ -457,7 +460,7 @@ export default function PhotoResultScreen() {
 
           </View>
 
-          {/* 一键分享 - 四种方式 */}
+          {/* 一键分享 - 四种方式（仅免费版本可用） */}
           <View className="gap-2 mb-4">
             {/* 邮件 */}
             <TouchableOpacity
@@ -470,11 +473,12 @@ export default function PhotoResultScreen() {
                   "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。"
                 );
               }}
+              disabled={isPaidVersion}
               activeOpacity={0.7}
               className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#0A66C2" }}
+              style={{ backgroundColor: "#0A66C2", opacity: isPaidVersion ? 0.5 : 1 }}
             >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>📧 邮件</Text>
+              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>📧 邮件{isPaidVersion ? ' (需付费)' : ''}</Text>
             </TouchableOpacity>
 
             {/* 信息 */}
@@ -485,11 +489,12 @@ export default function PhotoResultScreen() {
                 }
                 shareToSMS("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎 不需要去照相馆，在家就能一键生成专业证件照。");
               }}
+              disabled={isPaidVersion}
               activeOpacity={0.7}
               className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#34C759" }}
+              style={{ backgroundColor: "#34C759", opacity: isPaidVersion ? 0.5 : 1 }}
             >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💬 信息</Text>
+              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💬 信息{isPaidVersion ? ' (需付费)' : ''}</Text>
             </TouchableOpacity>
 
             {/* 微信 */}
@@ -500,11 +505,12 @@ export default function PhotoResultScreen() {
                 }
                 shareToWeChat("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎");
               }}
+              disabled={isPaidVersion}
               activeOpacity={0.7}
               className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#09B83E" }}
+              style={{ backgroundColor: "#09B83E", opacity: isPaidVersion ? 0.5 : 1 }}
             >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💚 微信</Text>
+              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💚 微信{isPaidVersion ? ' (需付费)' : ''}</Text>
             </TouchableOpacity>
 
             {/* 蓝牙 */}
@@ -515,11 +521,12 @@ export default function PhotoResultScreen() {
                 }
                 shareViaBluetooth("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎");
               }}
+              disabled={isPaidVersion}
               activeOpacity={0.7}
               className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#007AFF" }}
+              style={{ backgroundColor: "#007AFF", opacity: isPaidVersion ? 0.5 : 1 }}
             >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>🔵 蓝牙</Text>
+              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>🔵 蓝牙{isPaidVersion ? ' (需付费)' : ''}</Text>
             </TouchableOpacity>
           </View>
 

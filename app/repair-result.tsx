@@ -33,6 +33,7 @@ export default function RepairResultScreen() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [isPaidVersion, setIsPaidVersion] = useState(false);
 
   const QUICK_SIZES = [
     { width: 50, height: 75, name: "5寸" },
@@ -93,6 +94,8 @@ export default function RepairResultScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
+    // 设置为付费版本，分享按钮将被禁用
+    setIsPaidVersion(true);
     setIsDownloading(true);
     try {
       // 获取图片的base64数据
@@ -379,14 +382,15 @@ export default function RepairResultScreen() {
                   }
                   shareToEmail(
                     "元一图灵-照片修复",
-                    "📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎\n\n旧照片修复、模糊照片修复、照片超分，一键帮你搭救珍贵回忆。"
+                    "💷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎\n\n旧照片修复、模糊照片修复、照片超分，一键帮你撕救珍贵回忆。"
                   );
                 }}
+                disabled={isPaidVersion}
                 activeOpacity={0.7}
                 className="rounded-lg py-2 items-center"
-                style={{ backgroundColor: "#0A66C2" }}
+                style={{ backgroundColor: "#0A66C2", opacity: isPaidVersion ? 0.5 : 1 }}
               >
-                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>📧 邮件</Text>
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>📧 邮件{isPaidVersion ? ' (需付费)' : ''}</Text>
               </TouchableOpacity>
 
               {/* 信息 */}
@@ -397,11 +401,12 @@ export default function RepairResultScreen() {
                   }
                   shareToSMS("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎 旧照片修复、模糊照片修复、照片超分。");
                 }}
+                disabled={isPaidVersion}
                 activeOpacity={0.7}
                 className="rounded-lg py-2 items-center"
-                style={{ backgroundColor: "#34C759" }}
+                style={{ backgroundColor: "#34C759", opacity: isPaidVersion ? 0.5 : 1 }}
               >
-                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💬 信息</Text>
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💬 信息{isPaidVersion ? ' (需付费)' : ''}</Text>
               </TouchableOpacity>
 
               {/* 微信 */}
@@ -412,11 +417,12 @@ export default function RepairResultScreen() {
                   }
                   shareToWeChat("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎");
                 }}
+                disabled={isPaidVersion}
                 activeOpacity={0.7}
                 className="rounded-lg py-2 items-center"
-                style={{ backgroundColor: "#09B83E" }}
+                style={{ backgroundColor: "#09B83E", opacity: isPaidVersion ? 0.5 : 1 }}
               >
-                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💚 微信</Text>
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💚 微信{isPaidVersion ? ' (需付费)' : ''}</Text>
               </TouchableOpacity>
 
               {/* 蓝牙 */}
@@ -427,11 +433,12 @@ export default function RepairResultScreen() {
                   }
                   shareViaBluetooth("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎");
                 }}
+                disabled={isPaidVersion}
                 activeOpacity={0.7}
                 className="rounded-lg py-2 items-center"
-                style={{ backgroundColor: "#007AFF" }}
+                style={{ backgroundColor: "#007AFF", opacity: isPaidVersion ? 0.5 : 1 }}
               >
-                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>🔵 蓝牙</Text>
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>🔵 蓝牙{isPaidVersion ? ' (需付费)' : ''}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
