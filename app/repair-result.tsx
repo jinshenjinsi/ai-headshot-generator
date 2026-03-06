@@ -21,6 +21,7 @@ export default function RepairResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const image = params.image as string;
+  const originalImage = params.originalImage as string;
   const repairType = params.repairType as string;
 
   const [selectedScale, setSelectedScale] = useState("2x");
@@ -210,11 +211,11 @@ export default function RepairResultScreen() {
           >
             <View className="flex-row">
               {/* 原始照片 */}
-              <View className="flex-1 items-center">
+              <View className="flex-1 items-center justify-center">
                 <Text style={{ color: COLORS.muted, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   原始照片
                 </Text>
-                <Image source={{ uri: image }} style={{ width: "100%", height: 200, resizeMode: "cover" }} />
+                <Image source={{ uri: originalImage }} style={{ width: "100%", height: 200, resizeMode: "contain" }} />
               </View>
 
               {/* 分割线 */}
@@ -223,7 +224,7 @@ export default function RepairResultScreen() {
               {/* 修复后照片 - 包含色彩调整面板 */}
               <Pressable 
                 onPress={() => setShowPreview(true)}
-                className="flex-1 items-center"
+                className="flex-1 items-center justify-center"
               >
                 <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   修复后 ({selectedScale})
