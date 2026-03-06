@@ -54,15 +54,30 @@ export default function HomeScreen() {
               }}
             />
             
-            {/* 品牌名称 - 文字logo */}
-            <Image
-              source={require("@/assets/images/yuanyi-text-logo.png")}
-              style={{
-                width: 280,
-                height: 140,
-                resizeMode: 'contain',
-              }}
-            />
+            {/* 品牌名称 - 纯文字 */}
+            <View className="flex-row items-center justify-center gap-1">
+              <Text
+                style={{
+                  fontSize: 48,
+                  fontWeight: '800',
+                  color: COLORS.accent,
+                  fontStyle: 'italic',
+                  letterSpacing: 2,
+                }}
+              >
+                元一
+              </Text>
+              <Text
+                style={{
+                  fontSize: 48,
+                  fontWeight: '800',
+                  color: COLORS.primary,
+                  letterSpacing: 2,
+                }}
+              >
+                图灵
+              </Text>
+            </View>
             
             <Text 
               className="text-base text-center"
