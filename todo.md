@@ -373,4 +373,4 @@
 - [x] 检查photo-result.tsx和style-result.tsx中是否还有快捷键按钮需要替换为滑动条
 - [x] 修复repair-result.tsx中原始照片显示错误（显示的是修复后的照片）
 - [x] 调整repair-result.tsx中原始照片和修复后照片的对比布局（居中、大小一致）
-- [x] 将photo-result.tsx和style-result.tsx中的固定尺寸按钮改为简化版本
+- [x] 将photo-result.tsx中的固定尺寸按钮改为滑动条

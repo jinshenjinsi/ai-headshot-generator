@@ -215,7 +215,7 @@ export default function RepairResultScreen() {
                 <Text style={{ color: COLORS.muted, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   原始照片
                 </Text>
-                <Image source={{ uri: originalImage }} style={{ width: "100%", height: 200, resizeMode: "contain" }} />
+                <Image source={{ uri: originalImage }} style={{ width: "100%", height: 200, resizeMode: "contain", alignSelf: "center" }} />
               </View>
 
               {/* 分割线 */}
@@ -235,6 +235,8 @@ export default function RepairResultScreen() {
                     height: 200,
                     position: "relative",
                     overflow: "hidden",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
                     <Image source={{ uri: image }} style={getImageStyle()} />

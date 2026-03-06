@@ -432,10 +432,50 @@ export default function PhotoResultScreen() {
               固定尺寸
             </Text>
             <Text 
-              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
+              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 12 }}
             >
               推荐尺寸（可选）
             </Text>
+            
+            {/* 宽度滑动条 */}
+            <View className="mb-6">
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}>
+                  宽度: {customWidth}mm
+                </Text>
+              </View>
+              <Slider
+                style={{ height: 40 }}
+                minimumValue={20}
+                maximumValue={50}
+                step={1}
+                value={parseInt(customWidth)}
+                onValueChange={(value) => setCustomWidth(value.toString())}
+                minimumTrackTintColor={COLORS.primary}
+                maximumTrackTintColor={COLORS.border}
+              />
+            </View>
+            
+            {/* 高度滑动条 */}
+            <View className="mb-6">
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}>
+                  高度: {customHeight}mm
+                </Text>
+              </View>
+              <Slider
+                style={{ height: 40 }}
+                minimumValue={30}
+                maximumValue={70}
+                step={1}
+                value={parseInt(customHeight)}
+                onValueChange={(value) => setCustomHeight(value.toString())}
+                minimumTrackTintColor={COLORS.primary}
+                maximumTrackTintColor={COLORS.border}
+              />
+            </View>
+            
+            {/* 快速选择按钮 */}
             <View className="gap-2">
               {QUICK_SIZES.map((size, index) => (
                 <TouchableOpacity
@@ -444,18 +484,19 @@ export default function PhotoResultScreen() {
                     if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
-                    handleDownload(size.width, size.height);
+                    setCustomWidth(size.width.toString());
+                    setCustomHeight(size.height.toString());
                   }}
-                  disabled={isDownloading}
                   activeOpacity={0.7}
-                  className="rounded-lg py-3 items-center"
+                  className="rounded-lg py-2 items-center"
                   style={{
-                    backgroundColor: COLORS.primary,
-                    opacity: isDownloading ? 0.6 : 1,
+                    backgroundColor: COLORS.background,
+                    borderWidth: 1,
+                    borderColor: COLORS.border,
                   }}
                 >
-                  <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                    {isDownloading ? "下载中..." : `下载${size.name}(${size.specs})`}
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '600' }}>
+                    {size.name} ({size.specs})
                   </Text>
                 </TouchableOpacity>
               ))}
