@@ -110,7 +110,9 @@ export default function PhotoEditScreen() {
     
     // 计算值：locationX / sliderWidth = value / 200
     // 所以 value = (locationX / sliderWidth) * 200
-    const newValue = Math.round((locationX / sliderWidth) * 200);
+    // 确保value在0-200范围内
+    let newValue = Math.round((locationX / sliderWidth) * 200);
+    newValue = Math.max(0, Math.min(200, newValue));
     handleSliderChange(newValue, setter);
   };
 
@@ -123,6 +125,7 @@ export default function PhotoEditScreen() {
     setSliderWidth: (w: number) => void
   ) => {
     // 计算填充百分比：value从0-200，所以填充百分比 = (value / 200) * 100
+    // 注意：value越小越暗，value越大越亮，所以填充百分比就是 (value / 200) * 100
     const fillPercentage = (value / 200) * 100;
 
     return (
@@ -180,7 +183,7 @@ export default function PhotoEditScreen() {
             overflow: 'hidden',
           }}
         >
-          {/* 填充部分 - 从左到右 */}
+          {/* 填充部分 - 从左到右，数值小时填充少，数值大时填充多 */}
           <View 
             style={{ 
               position: 'absolute',
