@@ -1,10 +1,10 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
+import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Platform } from "react-native";
 
 const COLORS = {
   primary: "#1A365D",
@@ -15,20 +15,6 @@ const COLORS = {
   muted: "#718096",
   border: "#E2E8F0",
   success: "#10B981",
-};
-
-// 动态生成PRESET_SIZES，根据国家选择
-const getPresetSizes = (country: string) => {
-  const countrySpecs = COUNTRY_SPECS[country] || "25×35mm";
-  // 解析国家尺寸规格
-  const [widthStr, heightStr] = countrySpecs.split('×');
-  const width = parseInt(widthStr);
-  const height = parseInt(heightStr);
-  
-  return [
-    { name: "标准", width, height, specs: countrySpecs },
-    { name: "1.5倍", width: Math.round(width * 1.5), height: Math.round(height * 1.5), specs: `${Math.round(width * 1.5)}×${Math.round(height * 1.5)}mm` },
-  ];
 };
 
 // 各国家的证照尺寸标准
@@ -61,6 +47,12 @@ const COUNTRY_SPECS: { [key: string]: string } = {
   newzealand: "35×45mm",
 };
 
+// 固定的推荐尺寸（1寸和2寸）
+const QUICK_SIZES = [
+  { name: "1寸", width: 25, height: 35, specs: "25×35mm" },
+  { name: "2寸", width: 35, height: 53, specs: "35×53mm" },
+];
+
 export default function PhotoResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -68,30 +60,40 @@ export default function PhotoResultScreen() {
   const type = params.type as string;
   const country = params.country as string;
 
-  const PRESET_SIZES = getPresetSizes(country);
-  const [selectedSize, setSelectedSize] = useState(0);
-  const [customWidth, setCustomWidth] = useState("25");
-  const [customHeight, setCustomHeight] = useState("35");
+  const [customWidth, setCustomWidth] = useState("35");
+  const [customHeight, setCustomHeight] = useState("45");
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
-  const [showAdjustments, setShowAdjustments] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownload = async () => {
+  const handleDownload = async (width?: number, height?: number) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
     setIsDownloading(true);
     try {
-      const size = PRESET_SIZES[selectedSize];
+      // 使用传入的尺寸，或使用自定义尺寸，或使用国家默认尺寸
+      let finalWidth = width;
+      let finalHeight = height;
+      let sizeLabel = "原始";
+
+      if (!finalWidth || !finalHeight) {
+        // 使用自定义尺寸
+        finalWidth = parseInt(customWidth) || 35;
+        finalHeight = parseInt(customHeight) || 45;
+        sizeLabel = `${finalWidth}×${finalHeight}mm`;
+      } else {
+        sizeLabel = `${width}×${height}mm`;
+      }
+
       // 获取图片的base64数据
       const base64 = await FileSystem.readAsStringAsync(image, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
       // 创建临时文件
-      const fileName = `photo_${size.name}_${Date.now()}.png`;
+      const fileName = `photo_${sizeLabel}_${Date.now()}.png`;
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
       
       await FileSystem.writeAsStringAsync(fileUri, base64, {
@@ -103,7 +105,7 @@ export default function PhotoResultScreen() {
         const permission = await MediaLibrary.requestPermissionsAsync();
         if (permission.granted) {
           await MediaLibrary.createAssetAsync(fileUri);
-          Alert.alert("成功", `${size.name}尺寸图片已保存到相册`);
+          Alert.alert("成功", `${sizeLabel}尺寸图片已保存到相册`);
         } else {
           Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
         }
@@ -113,7 +115,7 @@ export default function PhotoResultScreen() {
         link.href = `data:image/png;base64,${base64}`;
         link.download = fileName;
         link.click();
-        Alert.alert("成功", `${size.name}尺寸图片已下载`);
+        Alert.alert("成功", `${sizeLabel}尺寸图片已下载`);
       }
     } catch (error) {
       Alert.alert("下载失败", "无法保存图片，请重试");
@@ -130,14 +132,18 @@ export default function PhotoResultScreen() {
     
     setIsDownloading(true);
     try {
-      const size = PRESET_SIZES[selectedSize];
+      // 使用自定义尺寸或国家默认尺寸
+      const finalWidth = parseInt(customWidth) || 35;
+      const finalHeight = parseInt(customHeight) || 45;
+      const sizeLabel = `${finalWidth}×${finalHeight}mm`;
+
       // 获取图片的base64数据
       const base64 = await FileSystem.readAsStringAsync(image, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
       // 创建临时文件
-      const fileName = `photo_hd_${size.name}_${Date.now()}.png`;
+      const fileName = `photo_hd_${sizeLabel}_${Date.now()}.png`;
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
       
       await FileSystem.writeAsStringAsync(fileUri, base64, {
@@ -149,7 +155,7 @@ export default function PhotoResultScreen() {
         const permission = await MediaLibrary.requestPermissionsAsync();
         if (permission.granted) {
           await MediaLibrary.createAssetAsync(fileUri);
-          Alert.alert("成功", `${size.name}尺寸高清图片已保存到相册（已付费）`);
+          Alert.alert("成功", `${sizeLabel}尺寸高清图片已保存到相册（已付费）`);
         } else {
           Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
         }
@@ -159,7 +165,7 @@ export default function PhotoResultScreen() {
         link.href = `data:image/png;base64,${base64}`;
         link.download = fileName;
         link.click();
-        Alert.alert("成功", `${size.name}尺寸高清图片已下载（已付费）`);
+        Alert.alert("成功", `${sizeLabel}尺寸高清图片已下载（已付费）`);
       }
     } catch (error) {
       Alert.alert("下载失败", "无法保存图片，请重试");
@@ -323,12 +329,10 @@ export default function PhotoResultScreen() {
               <Text 
                 style={{ color: COLORS.muted, fontSize: 11 }}
               >
-                用途: {type === 'passport' ? '护照照' : type === 'visa' ? '签证照' : '其他'} | 背景: 白色 | 尺寸: {COUNTRY_SPECS[country] || '25×35mm'}
+                用途: {type === 'passport' ? '护照照' : type === 'visa' ? '签证照' : '其他'} | 背景: 白色 | 尺寸: {COUNTRY_SPECS[country] || '35×45mm'}
               </Text>
             </View>
           </View>
-
-          {/* 色彩调整按钮已移除 - 直接在图片上显示调整面板 */}
 
           {/* 修改尺寸 */}
           <View 
@@ -350,7 +354,7 @@ export default function PhotoResultScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
             >
-              您可以自定义输出尺寸(单位:mm)
+              自定义输出尺寸(单位:mm)
             </Text>
 
             <View className="flex-row gap-3 mb-6">
@@ -360,16 +364,22 @@ export default function PhotoResultScreen() {
                 >
                   宽度(mm)
                 </Text>
-                <View 
-                  className="rounded-lg px-3 py-2 border"
-                  style={{ borderColor: COLORS.border }}
-                >
-                  <Text 
-                    style={{ color: COLORS.text, fontSize: 14 }}
-                  >
-                    {customWidth}
-                  </Text>
-                </View>
+                <TextInput
+                  value={customWidth}
+                  onChangeText={setCustomWidth}
+                  placeholder="35"
+                  keyboardType="numeric"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: COLORS.border,
+                    borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    fontSize: 14,
+                    color: COLORS.text,
+                  }}
+                  placeholderTextColor={COLORS.muted}
+                />
               </View>
               <View className="flex-1">
                 <Text 
@@ -377,30 +387,44 @@ export default function PhotoResultScreen() {
                 >
                   高度(mm)
                 </Text>
-                <View 
-                  className="rounded-lg px-3 py-2 border"
-                  style={{ borderColor: COLORS.border }}
-                >
-                  <Text 
-                    style={{ color: COLORS.text, fontSize: 14 }}
-                  >
-                    {customHeight}
-                  </Text>
-                </View>
+                <TextInput
+                  value={customHeight}
+                  onChangeText={setCustomHeight}
+                  placeholder="45"
+                  keyboardType="numeric"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: COLORS.border,
+                    borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    fontSize: 14,
+                    color: COLORS.text,
+                  }}
+                  placeholderTextColor={COLORS.muted}
+                />
               </View>
             </View>
 
             <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS !== "web") {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }
+                handleDownload();
+              }}
+              disabled={isDownloading}
               activeOpacity={0.7}
               className="rounded-lg py-3 items-center"
               style={{
-                backgroundColor: COLORS.border,
+                backgroundColor: COLORS.primary,
+                opacity: isDownloading ? 0.6 : 1,
               }}
             >
               <Text 
-                style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
+                style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}
               >
-                应用新尺寸
+                {isDownloading ? "下载中..." : "下载自定义尺寸"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -425,24 +449,26 @@ export default function PhotoResultScreen() {
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
             >
-              必选：选择一个尺寸
+              推荐尺寸（可选）
             </Text>
             <View className="gap-2">
-              {PRESET_SIZES.map((size, index) => (
+              {QUICK_SIZES.map((size, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    setSelectedSize(index);
                     if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
+                    handleDownload(size.width, size.height);
                   }}
+                  disabled={isDownloading}
                   activeOpacity={0.7}
                   className="rounded-lg p-4 flex-row items-center justify-between"
                   style={{
-                    backgroundColor: selectedSize === index ? COLORS.accent + "20" : COLORS.background,
-                    borderWidth: 2,
-                    borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
+                    backgroundColor: COLORS.background,
+                    borderWidth: 1,
+                    borderColor: COLORS.border,
+                    opacity: isDownloading ? 0.6 : 1,
                   }}
                 >
                   <View className="flex-1">
@@ -453,23 +479,9 @@ export default function PhotoResultScreen() {
                       {size.specs}
                     </Text>
                   </View>
-                  <View
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 12,
-                      borderWidth: 2,
-                      borderColor: selectedSize === index ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedSize === index ? COLORS.accent : "transparent",
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginLeft: 12,
-                    }}
-                  >
-                    {selectedSize === index && (
-                      <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '700' }}>✓</Text>
-                    )}
-                  </View>
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '600' }}>
+                    ↓
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
