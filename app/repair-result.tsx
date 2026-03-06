@@ -33,11 +33,12 @@ export default function RepairResultScreen() {
   const [showPreview, setShowPreview] = useState(false);
 
   const QUICK_SIZES = [
-    { width: 25, height: 35, name: "1寸" },
-    { width: 35, height: 53, name: "2寸" },
     { width: 50, height: 75, name: "5寸" },
     { width: 60, height: 90, name: "6寸" },
+    { width: 70, height: 105, name: "7寸" },
     { width: 100, height: 150, name: "10寸" },
+    { width: 120, height: 180, name: "12寸" },
+    { width: 160, height: 240, name: "16寸" },
   ];
 
   const handleDownload = async () => {

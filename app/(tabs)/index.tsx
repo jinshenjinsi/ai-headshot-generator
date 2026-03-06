@@ -1,3 +1,4 @@
+import React from "react";
 import { ScrollView, Text, View, TouchableOpacity, Platform, Image } from "react-native";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -14,13 +15,48 @@ const COLORS = {
   lightText: "#666666",
 };
 
+// 提示词库
+const PROMPTS = {
+  photo: [
+    "一张正面照，快速生成标准证件照。支持护照、签证、工作证等多种用途。",
+    "上传清晰的自拍照，AI智能裁剪和优化，生成符合各国标准的证件照。",
+    "无需去照相馆，在家就能生成专业证件照。支持多种背景色和尺寸。",
+    "一键生成证件照，自动调整光线、肤色和背景，让你看起来更专业。",
+    "支持多种证件类型，包括护照、签证、驾照、工作证等。快速便捷。",
+  ],
+  style: [
+    "10种专业风格转换：油画、水彩、素描、卡通、动漫、极简等。让你的头像更出众。",
+    "一张照片，十种变身。从商务风格到艺术风格，总有一款适合你。",
+    "AI艺术转换，让普通照片变成艺术作品。油画、水彩、素描、漫画等风格任选。",
+    "专业风格库，包含油画、水彩、素描、卡通、动漫、极简、黑白、复古等。",
+    "创意头像生成器，一键转换为你喜欢的艺术风格。适合社交媒体和专业用途。",
+  ],
+  repair: [
+    "低分辨率照片也能清晰一新。支持2倍和4倍超分辨率，让老照片焕然一新。",
+    "AI超分辨率技术，让模糊的老照片重获新生。支持多倍数放大。",
+    "智能修复老照片，去除噪点、提升清晰度。让珍贵回忆更清晰。",
+    "照片放大不失真，AI智能补全细节。支持2倍、4倍等多种超分倍数。",
+    "修复褪色老照片，提升清晰度和色彩。让家族回忆焕然一新。",
+  ],
+};
+
+// 获取随机提示词
+function getRandomPrompt(category: 'photo' | 'style' | 'repair'): string {
+  const prompts = PROMPTS[category];
+  return prompts[Math.floor(Math.random() * prompts.length)];
+}
+
 export default function HomeScreen() {
   const router = useRouter();
+  const [photoPrompt, setPhotoPrompt] = React.useState(() => getRandomPrompt('photo'));
+  const [stylePrompt, setStylePrompt] = React.useState(() => getRandomPrompt('style'));
+  const [repairPrompt, setRepairPrompt] = React.useState(() => getRandomPrompt('repair'));
 
   const handlePhotoGeneration = () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    setPhotoPrompt(getRandomPrompt('photo'));
     router.push("/photo-upload" as any);
   };
 
@@ -28,6 +64,7 @@ export default function HomeScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    setStylePrompt(getRandomPrompt('style'));
     router.push("/style-upload" as any);
   };
 
@@ -35,6 +72,7 @@ export default function HomeScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
+    setRepairPrompt(getRandomPrompt('repair'));
     router.push("/repair-upload" as any);
   };
 
@@ -116,7 +154,7 @@ export default function HomeScreen() {
                     className="text-sm leading-relaxed"
                     style={{ color: "rgba(255,255,255,0.85)" }}
                   >
-                    一张正面照，快速生成标准证件照。支持护照、签证、工作证等多种用途。
+                    {photoPrompt}
                   </Text>
                 </View>
                 <View className="mt-2 flex-row flex-wrap gap-2">
@@ -160,7 +198,7 @@ export default function HomeScreen() {
                     className="text-sm leading-relaxed"
                     style={{ color: COLORS.primary }}
                   >
-                    10种专业风格转换：油画、水彩、素描、卡通、动漫、极简等。让你的头像更出众。
+                    {stylePrompt}
                   </Text>
                 </View>
                 <View className="mt-2 flex-row flex-wrap gap-2">
@@ -204,7 +242,7 @@ export default function HomeScreen() {
                     className="text-sm leading-relaxed"
                     style={{ color: "rgba(255,255,255,0.85)" }}
                   >
-                    低分辨率照片也能清晰一新。支持2倍和4倍超分辨率，让老照片焕然一新。
+                    {repairPrompt}
                   </Text>
                 </View>
                 <View className="mt-2 flex-row flex-wrap gap-2">
