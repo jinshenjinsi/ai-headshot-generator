@@ -60,6 +60,7 @@ export default function PhotoGeneratingScreen() {
   const params = useLocalSearchParams();
   const image = params.image as string;
   const type = params.type as string;
+  const country = params.country as string;
   const background = params.background as string;
 
   const [progress, setProgress] = useState(0);
@@ -216,6 +217,7 @@ export default function PhotoGeneratingScreen() {
             image: result.imageUrl,
             originalImage: result.originalUrl || result.imageUrl,
             type,
+            country,
             background,
           },
         } as any);

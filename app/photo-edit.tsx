@@ -81,6 +81,7 @@ export default function PhotoEditScreen() {
       params: { 
         image, 
         type, 
+        country,
         background,
         brightness,
         contrast,
@@ -246,10 +247,10 @@ export default function PhotoEditScreen() {
               图片调整
             </Text>
 
-            {renderSlider("亮度调整", brightness, setBrightness, brightnessRef)}
-            {renderSlider("对比强弱", contrast, setContrast, contrastRef)}
-            {renderSlider("饱和度", saturation, setSaturation, saturationRef)}
-            {renderSlider("锐度强弱", sharpness, setSharpness, sharpnessRef)}
+            {renderSlider("亮度(暗-亮)", brightness, setBrightness, brightnessRef)}
+            {renderSlider("对比度(弱-强)", contrast, setContrast, contrastRef)}
+            {renderSlider("饱和度(淡-浓)", saturation, setSaturation, saturationRef)}
+            {renderSlider("锐度(弱-强)", sharpness, setSharpness, sharpnessRef)}
 
             {/* 重置按钮 */}
             <TouchableOpacity

@@ -17,10 +17,19 @@ const COLORS = {
   success: "#10B981",
 };
 
-const PRESET_SIZES = [
-  { name: "1寸", width: 25, height: 35, specs: "25×35mm" },
-  { name: "2寸", width: 35, height: 53, specs: "35×53mm" },
-];
+// 动态生成PRESET_SIZES，根据国家选择
+const getPresetSizes = (country: string) => {
+  const countrySpecs = COUNTRY_SPECS[country] || "25×35mm";
+  // 解析国家尺寸规格
+  const [widthStr, heightStr] = countrySpecs.split('×');
+  const width = parseInt(widthStr);
+  const height = parseInt(heightStr);
+  
+  return [
+    { name: "标准", width, height, specs: countrySpecs },
+    { name: "1.5倍", width: Math.round(width * 1.5), height: Math.round(height * 1.5), specs: `${Math.round(width * 1.5)}×${Math.round(height * 1.5)}mm` },
+  ];
+};
 
 // 各国家的证照尺寸标准
 const COUNTRY_SPECS: { [key: string]: string } = {
@@ -59,6 +68,7 @@ export default function PhotoResultScreen() {
   const type = params.type as string;
   const country = params.country as string;
 
+  const PRESET_SIZES = getPresetSizes(country);
   const [selectedSize, setSelectedSize] = useState(0);
   const [customWidth, setCustomWidth] = useState("25");
   const [customHeight, setCustomHeight] = useState("35");
@@ -246,7 +256,7 @@ export default function PhotoResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      亮度 -- 暗、亮
+                      亮度(暗-亮)
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {brightness}%
@@ -276,7 +286,7 @@ export default function PhotoResultScreen() {
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
-                      对比度 -- 弱、强
+                      对比度(弱-强)
                     </Text>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '600' }}>
                       {contrast}%
