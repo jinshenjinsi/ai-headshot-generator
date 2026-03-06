@@ -445,7 +445,7 @@ export default function PhotoResultScreen() {
             <Text 
               style={{ color: COLORS.primary, fontSize: 18, fontWeight: '700', marginBottom: 4 }}
             >
-              快速下载
+              固定尺寸
             </Text>
             <Text 
               style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
