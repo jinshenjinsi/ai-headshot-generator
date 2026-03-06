@@ -91,7 +91,20 @@ export default function PhotoEditScreen() {
     } as any);
   };
 
-  const renderSlider = (label: string, value: number, setter: (v: number) => void, ref: any) => (
+  const getButtonLabel = (val: number, type: string): string => {
+    if (type === "brightness") {
+      return val === 80 ? "暗" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "亮";
+    } else if (type === "contrast") {
+      return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
+    } else if (type === "saturation") {
+      return val === 80 ? "淡" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "浓";
+    } else if (type === "sharpness") {
+      return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
+    }
+    return "";
+  };
+
+  const renderSlider = (label: string, value: number, setter: (v: number) => void, ref: any, sliderType: string) => (
     <View className="mb-6">
       <View className="flex-row justify-between items-center mb-3">
         <Text 
@@ -123,7 +136,7 @@ export default function PhotoEditScreen() {
             }}
           >
             <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
-              {val === 80 ? '暗' : val === 90 ? '-' : val === 100 ? '正常' : val === 110 ? '+' : '亮'}
+              {getButtonLabel(val, sliderType)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -247,10 +260,10 @@ export default function PhotoEditScreen() {
               图片调整
             </Text>
 
-            {renderSlider("亮度(暗-亮)", brightness, setBrightness, brightnessRef)}
-            {renderSlider("对比度(弱-强)", contrast, setContrast, contrastRef)}
-            {renderSlider("饱和度(淡-浓)", saturation, setSaturation, saturationRef)}
-            {renderSlider("锐度(弱-强)", sharpness, setSharpness, sharpnessRef)}
+            {renderSlider("亮度", brightness, setBrightness, brightnessRef, "brightness")}
+            {renderSlider("对比度", contrast, setContrast, contrastRef, "contrast")}
+            {renderSlider("饱和度", saturation, setSaturation, saturationRef, "saturation")}
+            {renderSlider("锐度", sharpness, setSharpness, sharpnessRef, "sharpness")}
 
             {/* 重置按钮 */}
             <TouchableOpacity
