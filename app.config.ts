@@ -32,7 +32,7 @@ const env = {
   appSlug: "ai-headshot-generator",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663268502683/4uNatSn2uUNaV6m3TDJGic/icon-Ayki7BUMuDzARy27UVpYf3.png",
+  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310519663268502683/4uNatSn2uUNaV6m3TDJGic/yuanyi-logo-6nNNyHM79rM7mQPtaHVgkJ.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
