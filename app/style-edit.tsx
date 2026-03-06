@@ -26,37 +26,23 @@ export default function StyleEditScreen() {
   const [saturation, setSaturation] = useState(100);
   const [sharpness, setSharpness] = useState(100);
 
-  const brightnessRef = useRef(null);
-  const contrastRef = useRef(null);
-  const saturationRef = useRef(null);
-  const sharpnessRef = useRef(null);
-
   // 计算滤镜效果
   const getImageStyle = () => {
-    // 亮度范围：0-200
-    // 正确方向：0为暗，100为正常，200为亮
-    const brightnessValue = (brightness - 100) / 100 + 1; // 0->0, 100->1.0, 200->2.0
-    
     if (Platform.OS === "web") {
-      // Web：直接使用brightness filter
-      // 饱和度：0-200，100为正常
-      // 锐度：0-200，100为正常
       return {
         filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${100 + (sharpness - 100) * 0.3}%)`,
       };
     } else {
-      // React Native：使用opacity模拟亮度
       return {
-        opacity: Math.min(1, brightnessValue),
+        opacity: Math.min(1, brightness / 100),
       };
     }
   };
 
-  const handleSliderPress = (value: number, setter: (v: number) => void, ref: any) => {
+  const handleSliderChange = (value: number, setter: (v: number) => void) => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    // 限制范围在0-200
     setter(Math.max(0, Math.min(200, value)));
   };
 
@@ -83,20 +69,20 @@ export default function StyleEditScreen() {
     } as any);
   };
 
-  const getButtonLabel = (val: number, type: string): string => {
-    if (type === "brightness") {
+  const getButtonLabel = (val: number, sliderType: string): string => {
+    if (sliderType === "brightness") {
       return val === 80 ? "暗" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "亮";
-    } else if (type === "contrast") {
+    } else if (sliderType === "contrast") {
       return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
-    } else if (type === "saturation") {
+    } else if (sliderType === "saturation") {
       return val === 80 ? "淡" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "浓";
-    } else if (type === "sharpness") {
+    } else if (sliderType === "sharpness") {
       return val === 80 ? "弱" : val === 90 ? "-" : val === 100 ? "正常" : val === 110 ? "+" : "强";
     }
     return "";
   };
 
-  const renderSlider = (label: string, value: number, setter: (v: number) => void, ref: any, sliderType: string) => (
+  const renderSlider = (label: string, value: number, setter: (v: number) => void, sliderType: string) => (
     <View className="mb-6">
       <View className="flex-row justify-between items-center mb-3">
         <Text 
@@ -111,21 +97,44 @@ export default function StyleEditScreen() {
         </Text>
       </View>
       
-      {/* 滑条轨道 */}
+      {/* 快速调整按钮 */}
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+        {[80, 90, 100, 110, 120].map((val) => (
+          <TouchableOpacity
+            key={val}
+            onPress={() => handleSliderChange(val, setter)}
+            style={{
+              flex: 1,
+              paddingVertical: 6,
+              backgroundColor: value === val ? COLORS.accent : COLORS.background,
+              borderWidth: 1,
+              borderColor: value === val ? COLORS.accent : COLORS.border,
+              borderRadius: 6,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
+              {getButtonLabel(val, sliderType)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      
+      {/* 滑条轨道 - 使用Pressable处理点击 */}
       <Pressable
-        ref={ref}
         onPress={(e) => {
           const locationX = (e.nativeEvent as any).locationX || 0;
           const trackWidth = 280;
           const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
-          handleSliderPress(percentage, setter, ref);
+          handleSliderChange(percentage, setter);
         }}
         style={{
-          height: 40,
+          height: 50,
           backgroundColor: COLORS.border,
-          borderRadius: 20,
+          borderRadius: 25,
           justifyContent: 'center',
           paddingHorizontal: 4,
+          position: 'relative',
         }}
       >
         {/* 填充部分 */}
@@ -135,9 +144,9 @@ export default function StyleEditScreen() {
             left: 4,
             top: 4,
             width: `${(value / 200) * 100}%`,
-            height: 32,
+            height: 42,
             backgroundColor: COLORS.accent,
-            borderRadius: 16,
+            borderRadius: 21,
           }}
         />
         
@@ -154,22 +163,6 @@ export default function StyleEditScreen() {
           {value}%
         </Text>
       </Pressable>
-
-      {/* 快速调整按钮 */}
-      <View className="flex-row gap-2 mt-2">
-        {[80, 90, 100, 110, 120].map((val) => (
-          <TouchableOpacity
-            key={val}
-            onPress={() => handleSliderPress(val, setter, ref)}
-            className="flex-1 py-2 rounded-lg items-center"
-            style={{ backgroundColor: value === val ? COLORS.accent : COLORS.background, borderWidth: 1, borderColor: value === val ? COLORS.accent : COLORS.border }}
-          >
-            <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 12, fontWeight: '600' }}>
-              {getButtonLabel(val, sliderType)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
     </View>
   );
 
@@ -243,10 +236,10 @@ export default function StyleEditScreen() {
               图片调整
             </Text>
 
-            {renderSlider("亮度", brightness, setBrightness, brightnessRef, "brightness")}
-            {renderSlider("对比度", contrast, setContrast, contrastRef, "contrast")}
-            {renderSlider("饱和度", saturation, setSaturation, saturationRef, "saturation")}
-            {renderSlider("锐度", sharpness, setSharpness, sharpnessRef, "sharpness")}
+            {renderSlider("亮度", brightness, setBrightness, "brightness")}
+            {renderSlider("对比度", contrast, setContrast, "contrast")}
+            {renderSlider("饱和度", saturation, setSaturation, "saturation")}
+            {renderSlider("锐度", sharpness, setSharpness, "sharpness")}
 
             {/* 重置按钮 */}
             <TouchableOpacity

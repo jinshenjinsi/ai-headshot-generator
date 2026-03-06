@@ -242,7 +242,7 @@ export default function RepairResultScreen() {
                     <View>
                       <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
                         <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
-                          亮度 -- 暗、亮
+                          亮度
                         </Text>
                         <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
                           {brightness}%
