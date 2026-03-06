@@ -5,6 +5,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
+import Slider from "@react-native-community/slider";
 
 const COLORS = {
   primary: "#1A365D",
@@ -264,24 +265,16 @@ export default function RepairResultScreen() {
                           {brightness}%
                         </Text>
                       </View>
-                      <View style={{ flexDirection: "row", gap: 3 }}>
-                        {[70, 85, 100, 115, 130].map((val) => (
-                          <TouchableOpacity
-                            key={val}
-                            onPress={() => setBrightness(val)}
-                            style={{
-                              flex: 1,
-                              paddingVertical: 5,
-                              backgroundColor: brightness === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
-                              borderRadius: 3,
-                            }}
-                          >
-                            <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "600" }}>
-                              {val === 70 ? "暗" : val === 130 ? "亮" : val}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
+                      <Slider
+                        style={{ height: 30 }}
+                        minimumValue={70}
+                        maximumValue={130}
+                        step={5}
+                        value={brightness}
+                        onValueChange={setBrightness}
+                        minimumTrackTintColor={COLORS.accent}
+                        maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                      />
                     </View>
 
                     {/* 对比度调整 */}
@@ -294,25 +287,16 @@ export default function RepairResultScreen() {
                           {contrast}%
                         </Text>
                       </View>
-                      <View style={{ flexDirection: "row", gap: 3 }}>
-                        {[70, 85, 100, 115, 130].map((val) => (
-                          <TouchableOpacity
-                            key={val}
-                            onPress={() => setContrast(val)}
-                            style={{
-                              flex: 1,
-                              paddingVertical: 5,
-                              backgroundColor: contrast === val ? COLORS.accent : "rgba(255, 255, 255, 0.2)",
-                              borderRadius: 3,
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "600" }}>
-                              {val === 70 ? "弱" : val === 130 ? "强" : val}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
+                      <Slider
+                        style={{ height: 30 }}
+                        minimumValue={70}
+                        maximumValue={130}
+                        step={5}
+                        value={contrast}
+                        onValueChange={setContrast}
+                        minimumTrackTintColor={COLORS.accent}
+                        maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                      />
                     </View>
                   </View>
                 </View>
