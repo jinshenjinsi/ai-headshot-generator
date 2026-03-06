@@ -64,6 +64,7 @@ export default function PhotoResultScreen() {
   const [customHeight, setCustomHeight] = useState("45");
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async (width?: number, height?: number) => {
@@ -459,15 +460,16 @@ export default function PhotoResultScreen() {
                     if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
+                    setSelectedQuickSize(index);
                     handleDownload(size.width, size.height);
                   }}
                   disabled={isDownloading}
                   activeOpacity={0.7}
                   className="rounded-lg p-4 flex-row items-center justify-between"
                   style={{
-                    backgroundColor: COLORS.background,
-                    borderWidth: 1,
-                    borderColor: COLORS.border,
+                    backgroundColor: selectedQuickSize === index ? COLORS.accent + "20" : COLORS.background,
+                    borderWidth: 2,
+                    borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
                     opacity: isDownloading ? 0.6 : 1,
                   }}
                 >
@@ -479,9 +481,23 @@ export default function PhotoResultScreen() {
                       {size.specs}
                     </Text>
                   </View>
-                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: '600' }}>
-                    ↓
-                  </Text>
+                  <View
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 12,
+                      borderWidth: 2,
+                      borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
+                      backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: 12,
+                    }}
+                  >
+                    {selectedQuickSize === index && (
+                      <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '700' }}>✓</Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
