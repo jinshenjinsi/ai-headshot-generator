@@ -64,22 +64,13 @@ export default function RepairResultScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      // 保存到相册
-      if (Platform.OS !== "web") {
-        const permission = await MediaLibrary.requestPermissionsAsync();
-        if (permission.granted) {
-          await MediaLibrary.createAssetAsync(fileUri);
-          Alert.alert("成功", `图片已保存到相册（${selectedScale}倍）`);
-        } else {
-          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
-        }
+      // 保存到手机图库
+      const permission = await MediaLibrary.requestPermissionsAsync();
+      if (permission.granted) {
+        await MediaLibrary.createAssetAsync(fileUri);
+        Alert.alert("成功", `图片已保存到手机图库（${selectedScale}倍）`);
       } else {
-        // Web平台：直接下载
-        const link = document.createElement("a");
-        link.href = `data:image/png;base64,${base64}`;
-        link.download = fileName;
-        link.click();
-        Alert.alert("成功", `图片已下载（${selectedScale}倍）`);
+        Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
       }
     } catch (error) {
       Alert.alert("下载失败", "无法保存图片，请重试");
@@ -111,22 +102,13 @@ export default function RepairResultScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      // 保存到相册
-      if (Platform.OS !== "web") {
-        const permission = await MediaLibrary.requestPermissionsAsync();
-        if (permission.granted) {
-          await MediaLibrary.createAssetAsync(fileUri);
-          Alert.alert("成功", `高清图片已保存到相册（${selectedScale}倍，已付费）`);
-        } else {
-          Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
-        }
+      // 保存到手机图库
+      const permission = await MediaLibrary.requestPermissionsAsync();
+      if (permission.granted) {
+        await MediaLibrary.createAssetAsync(fileUri);
+        Alert.alert("成功", `高清图片已保存到手机图库（${selectedScale}倍，已付费）`);
       } else {
-        // Web平台：直接下载
-        const link = document.createElement("a");
-        link.href = `data:image/png;base64,${base64}`;
-        link.download = fileName;
-        link.click();
-        Alert.alert("成功", `高清图片已下载（${selectedScale}倍，已付费）`);
+        Alert.alert("权限不足", "无法访问相册，请在设置中授予权限");
       }
     } catch (error) {
       Alert.alert("下载失败", "无法保存图片，请重试");
