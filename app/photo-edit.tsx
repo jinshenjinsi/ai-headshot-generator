@@ -1,8 +1,9 @@
-import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform, LayoutChangeEvent } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Image, Platform } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
-import { useState, useRef } from "react";
+import { useState } from "react";
+import Slider from "@react-native-community/slider";
 
 const COLORS = {
   primary: "#1A365D",
@@ -26,12 +27,6 @@ export default function PhotoEditScreen() {
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
   const [sharpness, setSharpness] = useState(100);
-  
-  // 为每个滑条使用独立的宽度状态
-  const [brightnessWidth, setBrightnessWidth] = useState(0);
-  const [contrastWidth, setContrastWidth] = useState(0);
-  const [saturationWidth, setSaturationWidth] = useState(0);
-  const [sharpnessWidth, setSharpnessWidth] = useState(0);
 
   // 计算滤镜效果
   const getImageStyle = () => {
@@ -50,8 +45,7 @@ export default function PhotoEditScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    const newValue = Math.max(0, Math.min(200, value));
-    setter(newValue);
+    setter(value);
   };
 
   const handleReset = () => {
@@ -96,38 +90,12 @@ export default function PhotoEditScreen() {
     return "";
   };
 
-  const handleSliderPress = (e: any, setter: (v: number) => void, sliderWidth: number) => {
-    if (sliderWidth === 0) {
-      console.warn("Slider width not set");
-      return;
-    }
-    
-    const locationX = e.nativeEvent.locationX;
-    if (locationX === undefined || locationX === null) {
-      console.warn("Location X not available");
-      return;
-    }
-    
-    // 计算值：locationX / sliderWidth = value / 200
-    // 所以 value = (locationX / sliderWidth) * 200
-    // 确保value在0-200范围内
-    let newValue = Math.round((locationX / sliderWidth) * 200);
-    newValue = Math.max(0, Math.min(200, newValue));
-    handleSliderChange(newValue, setter);
-  };
-
   const renderSlider = (
     label: string, 
     value: number, 
     setter: (v: number) => void, 
-    sliderType: string,
-    sliderWidth: number,
-    setSliderWidth: (w: number) => void
+    sliderType: string
   ) => {
-    // 计算填充百分比：value从0-200，所以填充百分比 = (value / 200) * 100
-    // 注意：value越小越暗，value越大越亮，所以填充百分比就是 (value / 200) * 100
-    const fillPercentage = (value / 200) * 100;
-
     return (
       <View className="mb-6">
         <View className="flex-row justify-between items-center mb-3">
@@ -139,7 +107,7 @@ export default function PhotoEditScreen() {
           <Text 
             style={{ color: COLORS.accent, fontSize: 14, fontWeight: '700' }}
           >
-            {isNaN(value) ? "100" : value}%
+            {Math.round(value)}%
           </Text>
         </View>
         
@@ -152,63 +120,40 @@ export default function PhotoEditScreen() {
               style={{
                 flex: 1,
                 paddingVertical: 6,
-                backgroundColor: value === val ? COLORS.accent : COLORS.background,
+                backgroundColor: Math.round(value) === val ? COLORS.accent : COLORS.background,
                 borderWidth: 1,
-                borderColor: value === val ? COLORS.accent : COLORS.border,
+                borderColor: Math.round(value) === val ? COLORS.accent : COLORS.border,
                 borderRadius: 6,
                 alignItems: 'center',
               }}
             >
-              <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
+              <Text style={{ color: Math.round(value) === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
                 {getButtonLabel(val, sliderType)}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
         
-        {/* 滑条轨道 */}
-        <Pressable
-          onLayout={(e: LayoutChangeEvent) => {
-            const width = e.nativeEvent.layout.width;
-            setSliderWidth(width);
-          }}
-          onPress={(e) => handleSliderPress(e, setter, sliderWidth)}
-          style={{
-            height: 50,
-            backgroundColor: COLORS.border,
-            borderRadius: 25,
-            justifyContent: 'center',
-            paddingHorizontal: 4,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          {/* 填充部分 - 从左到右，数值小时填充少，数值大时填充多 */}
-          <View 
-            style={{ 
-              position: 'absolute',
-              left: 4,
-              top: 4,
-              width: `${fillPercentage}%`,
-              height: 42,
-              backgroundColor: COLORS.accent,
-              borderRadius: 21,
-            }}
+        {/* 滑条 - 使用原生Slider组件 */}
+        <View style={{
+          height: 50,
+          justifyContent: 'center',
+          backgroundColor: COLORS.border,
+          borderRadius: 25,
+          paddingHorizontal: 4,
+        }}>
+          <Slider
+            style={{ width: '100%', height: 50 }}
+            minimumValue={0}
+            maximumValue={200}
+            value={value}
+            onValueChange={(val) => handleSliderChange(val, setter)}
+            minimumTrackTintColor={COLORS.accent}
+            maximumTrackTintColor={COLORS.border}
+            thumbTintColor={COLORS.accent}
+            step={1}
           />
-          
-          {/* 数值显示 */}
-          <Text 
-            style={{ 
-              color: fillPercentage > 50 ? COLORS.white : COLORS.text,
-              fontSize: 12,
-              fontWeight: '600',
-              textAlign: 'center',
-              zIndex: 10,
-            }}
-          >
-            {isNaN(value) ? "100" : value}%
-          </Text>
-        </Pressable>
+        </View>
       </View>
     );
   };
@@ -283,10 +228,10 @@ export default function PhotoEditScreen() {
               图片调整
             </Text>
 
-            {renderSlider("亮度", brightness, setBrightness, "brightness", brightnessWidth, setBrightnessWidth)}
-            {renderSlider("对比度", contrast, setContrast, "contrast", contrastWidth, setContrastWidth)}
-            {renderSlider("饱和度", saturation, setSaturation, "saturation", saturationWidth, setSaturationWidth)}
-            {renderSlider("锐度", sharpness, setSharpness, "sharpness", sharpnessWidth, setSharpnessWidth)}
+            {renderSlider("亮度", brightness, setBrightness, "brightness")}
+            {renderSlider("对比度", contrast, setContrast, "contrast")}
+            {renderSlider("饱和度", saturation, setSaturation, "saturation")}
+            {renderSlider("锐度", sharpness, setSharpness, "sharpness")}
 
             {/* 重置按钮 */}
             <TouchableOpacity
