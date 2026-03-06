@@ -43,7 +43,7 @@ const config: ExpoConfig = {
   slug: env.appSlug,
   version: "1.0.2",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
+  icon: "./assets/images/react-logo.png",
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,

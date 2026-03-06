@@ -46,7 +46,7 @@ export default function HomeScreen() {
           <View className="items-center gap-4 mt-4">
             {/* 应用图标 */}
             <Image
-              source={require("@/assets/images/icon.png")}
+              source={require("@/assets/images/react-logo.png")}
               style={{
                 width: 100,
                 height: 100,

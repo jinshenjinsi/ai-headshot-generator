@@ -25,6 +25,15 @@ export default function StyleResultScreen() {
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
+
+  const QUICK_SIZES = [
+    { width: 25, height: 35, name: "1寸" },
+    { width: 35, height: 53, name: "2寸" },
+    { width: 50, height: 75, name: "5寸" },
+    { width: 60, height: 90, name: "6寸" },
+    { width: 100, height: 150, name: "10寸" },
+  ];
 
   const handleDownload = async () => {
     if (Platform.OS !== "web") {
@@ -260,6 +269,65 @@ export default function StyleResultScreen() {
                   </View>
                 </View>
               </View>
+            </View>
+          </View>
+
+          {/* 固定尺寸 */}
+          <View
+            className="rounded-2xl p-6 mb-8"
+            style={{
+              backgroundColor: COLORS.white,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 2,
+            }}
+          >
+            <Text style={{ color: COLORS.primary, fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
+              固定尺寸
+            </Text>
+            <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
+              推荐尺寸（可选）
+            </Text>
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {QUICK_SIZES.map((size, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setSelectedQuickSize(index)}
+                  activeOpacity={0.7}
+                  style={{
+                    flex: 1,
+                    minWidth: '30%',
+                    paddingVertical: 12,
+                    paddingHorizontal: 8,
+                    backgroundColor: selectedQuickSize === index ? COLORS.accent + "20" : COLORS.background,
+                    borderWidth: 1,
+                    borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      borderWidth: 2,
+                      borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
+                      backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
+                    }}
+                  />
+                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
+                    {size.name}
+                  </Text>
+                  <Text style={{ color: COLORS.muted, fontSize: 10 }}>
+                    {size.width}×{size.height}mm
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
