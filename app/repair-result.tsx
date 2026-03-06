@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert, Modal, Pressable } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert, Modal, Pressable, Linking } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
@@ -7,6 +7,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import Slider from "@react-native-community/slider";
 import { Share } from "react-native";
+import { shareToEmail, shareToSMS, shareToWeChat, shareViaBluetooth } from "@/lib/share-utils";
 
 const COLORS = {
   primary: "#1A365D",
@@ -370,24 +371,67 @@ export default function RepairResultScreen() {
             </Text>
 
             <View className="gap-2">
+              {/* 邮件 */}
               <TouchableOpacity
                 onPress={() => {
                   if (Platform.OS !== "web") {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }
-                  Share.share({
-                    message: "📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎\n\n旧照片修复、模糊照片修复、照片超分，一键帮你搭救珍贵回忆。\n\n下载体验：",
-                  });
+                  shareToEmail(
+                    "元一图灵-照片修复",
+                    "📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎\n\n旧照片修复、模糊照片修复、照片超分，一键帮你搭救珍贵回忆。"
+                  );
                 }}
                 activeOpacity={0.7}
-                className="rounded-lg py-3 items-center"
-                style={{
-                  backgroundColor: COLORS.success,
-                }}
+                className="rounded-lg py-2 items-center"
+                style={{ backgroundColor: "#0A66C2" }}
               >
-                <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: "600" }}>
-                  📄 一键分享
-                </Text>
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>📧 邮件</Text>
+              </TouchableOpacity>
+
+              {/* 信息 */}
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  shareToSMS("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎 旧照片修复、模糊照片修复、照片超分。");
+                }}
+                activeOpacity={0.7}
+                className="rounded-lg py-2 items-center"
+                style={{ backgroundColor: "#34C759" }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💬 信息</Text>
+              </TouchableOpacity>
+
+              {/* 微信 */}
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  shareToWeChat("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎");
+                }}
+                activeOpacity={0.7}
+                className="rounded-lg py-2 items-center"
+                style={{ backgroundColor: "#09B83E" }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>💚 微信</Text>
+              </TouchableOpacity>
+
+              {/* 蓝牙 */}
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  shareViaBluetooth("📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎");
+                }}
+                activeOpacity={0.7}
+                className="rounded-lg py-2 items-center"
+                style={{ backgroundColor: "#007AFF" }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: "600" }}>🔵 蓝牙</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
