@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert, Modal, Pressable } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
@@ -28,6 +28,7 @@ export default function RepairResultScreen() {
   const [contrast, setContrast] = useState(100);
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const QUICK_SIZES = [
     { width: 25, height: 35, name: "1寸" },
@@ -220,7 +221,10 @@ export default function RepairResultScreen() {
               <View style={{ width: 1, backgroundColor: COLORS.border }} />
 
               {/* 修复后照片 - 包含色彩调整面板 */}
-              <View className="flex-1 items-center">
+              <Pressable 
+                onPress={() => setShowPreview(true)}
+                className="flex-1 items-center"
+              >
                 <Text style={{ color: COLORS.accent, fontSize: 12, fontWeight: "600", padding: 8 }}>
                   修复后 ({selectedScale})
                 </Text>
@@ -309,7 +313,7 @@ export default function RepairResultScreen() {
                     </View>
                   </View>
                 </View>
-              </View>
+              </Pressable>
             </View>
           </View>
 
@@ -411,6 +415,36 @@ export default function RepairResultScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* 全屏预览模态框 */}
+      <Modal
+        visible={showPreview}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowPreview(false)}
+      >
+        <Pressable
+          onPress={() => setShowPreview(false)}
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Image
+            source={{ uri: image }}
+            style={{
+              width: '90%',
+              height: '80%',
+              resizeMode: 'contain',
+            }}
+          />
+          <Text style={{ color: COLORS.white, fontSize: 12, marginTop: 16, fontWeight: '600' }}>
+            点击关闭预览
+          </Text>
+        </Pressable>
+      </Modal>
     </ScreenContainer>
   );
 }

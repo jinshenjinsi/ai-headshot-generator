@@ -5,6 +5,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
+import Slider from "@react-native-community/slider";
 
 const COLORS = {
   primary: "#1A365D",
@@ -210,7 +211,7 @@ export default function StyleResultScreen() {
               >
                 {/* 亮度调整 */}
                 <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
                       亮度
                     </Text>
@@ -218,29 +219,21 @@ export default function StyleResultScreen() {
                       {brightness}%
                     </Text>
                   </View>
-                  <View style={{ flexDirection: 'row', gap: 3 }}>
-                    {[70, 85, 100, 115, 130].map((val) => (
-                      <TouchableOpacity
-                        key={val}
-                        onPress={() => setBrightness(val)}
-                        style={{
-                          flex: 1,
-                          paddingVertical: 5,
-                          backgroundColor: brightness === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
-                          borderRadius: 3,
-                        }}
-                      >
-                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
-                          {val === 70 ? '暗' : val === 130 ? '亮' : val}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Slider
+                    style={{ height: 30 }}
+                    minimumValue={70}
+                    maximumValue={130}
+                    value={brightness}
+                    onValueChange={(val) => setBrightness(Math.round(val))}
+                    minimumTrackTintColor={COLORS.accent}
+                    maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    thumbTintColor={COLORS.accent}
+                  />
                 </View>
 
                 {/* 对比度调整 */}
                 <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
                     <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: '600' }}>
                       对比度
                     </Text>
@@ -248,25 +241,16 @@ export default function StyleResultScreen() {
                       {contrast}%
                     </Text>
                   </View>
-                  <View style={{ flexDirection: 'row', gap: 3 }}>
-                    {[70, 85, 100, 115, 130].map((val) => (
-                      <TouchableOpacity
-                        key={val}
-                        onPress={() => setContrast(val)}
-                        style={{
-                          flex: 1,
-                          paddingVertical: 5,
-                          backgroundColor: contrast === val ? COLORS.accent : 'rgba(255, 255, 255, 0.2)',
-                          borderRadius: 3,
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: '600' }}>
-                          {val === 70 ? '弱' : val === 130 ? '强' : val}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Slider
+                    style={{ height: 30 }}
+                    minimumValue={70}
+                    maximumValue={130}
+                    value={contrast}
+                    onValueChange={(val) => setContrast(Math.round(val))}
+                    minimumTrackTintColor={COLORS.accent}
+                    maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    thumbTintColor={COLORS.accent}
+                  />
                 </View>
               </View>
             </View>

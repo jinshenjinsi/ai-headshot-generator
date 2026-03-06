@@ -3,7 +3,8 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getRepairFreeCount } from "@/lib/free-usage-service";
 
 const COLORS = {
   primary: "#1A365D",
@@ -20,6 +21,11 @@ export default function RepairUploadScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [repairType, setRepairType] = useState<'upscale' | 'restore'>('upscale');
   const [scale, setScale] = useState<'2x' | '4x'>('2x');
+  const [freeCount, setFreeCount] = useState(0);
+
+  useEffect(() => {
+    getRepairFreeCount().then(setFreeCount);
+  }, []);
 
   const handlePickImage = async () => {
     if (Platform.OS !== "web") {
@@ -233,6 +239,25 @@ export default function RepairUploadScreen() {
               </View>
             )}
           </View>
+
+          {/* 免费次数提醒 */}
+          {freeCount > 0 && (
+            <View 
+              className="rounded-xl p-4 mb-8"
+              style={{ backgroundColor: '#D4AF37' + '15', borderLeftWidth: 4, borderLeftColor: COLORS.accent }}
+            >
+              <Text 
+                style={{ color: COLORS.accent, fontSize: 14, fontWeight: '700', marginBottom: 2 }}
+              >
+                🎁 免费机会
+              </Text>
+              <Text 
+                style={{ color: COLORS.primary, fontSize: 12 }}
+              >
+                您还有 {freeCount} 次免费修复机会，立即使用吧！
+              </Text>
+            </View>
+          )}
 
           {/* 提示信息 */}
           <View 
