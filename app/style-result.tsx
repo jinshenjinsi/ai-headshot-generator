@@ -275,40 +275,21 @@ export default function StyleResultScreen() {
               推荐尺寸（可选）
             </Text>
 
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View className="gap-2">
               {QUICK_SIZES.map((size, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setSelectedQuickSize(index)}
+                  onPress={() => handleDownload()}
                   activeOpacity={0.7}
+                  disabled={isDownloading}
+                  className="rounded-lg py-3 items-center"
                   style={{
-                    flex: 1,
-                    minWidth: '30%',
-                    paddingVertical: 12,
-                    paddingHorizontal: 8,
-                    backgroundColor: selectedQuickSize === index ? COLORS.accent + "20" : COLORS.background,
-                    borderWidth: 1,
-                    borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
-                    borderRadius: 8,
-                    alignItems: 'center',
-                    gap: 4,
+                    backgroundColor: COLORS.primary,
+                    opacity: isDownloading ? 0.6 : 1,
                   }}
                 >
-                  <View
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 8,
-                      borderWidth: 2,
-                      borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
-                    }}
-                  />
-                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
-                    {size.name}
-                  </Text>
-                  <Text style={{ color: COLORS.muted, fontSize: 10 }}>
-                    {size.width}×{size.height}mm
+                  <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+                    {isDownloading ? "下载中..." : `下载${size.name}(${size.width}×${size.height}mm)`}
                   </Text>
                 </TouchableOpacity>
               ))}

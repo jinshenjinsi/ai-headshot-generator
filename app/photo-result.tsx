@@ -444,44 +444,19 @@ export default function PhotoResultScreen() {
                     if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     }
-                    setSelectedQuickSize(index);
                     handleDownload(size.width, size.height);
                   }}
                   disabled={isDownloading}
                   activeOpacity={0.7}
-                  className="rounded-lg p-4 flex-row items-center justify-between"
+                  className="rounded-lg py-3 items-center"
                   style={{
-                    backgroundColor: selectedQuickSize === index ? COLORS.accent + "20" : COLORS.background,
-                    borderWidth: 2,
-                    borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
+                    backgroundColor: COLORS.primary,
                     opacity: isDownloading ? 0.6 : 1,
                   }}
                 >
-                  <View className="flex-1">
-                    <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: '600', marginBottom: 2 }}>
-                      {size.name}
-                    </Text>
-                    <Text style={{ color: COLORS.muted, fontSize: 12 }}>
-                      {size.specs}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 12,
-                      borderWidth: 2,
-                      borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginLeft: 12,
-                    }}
-                  >
-                    {selectedQuickSize === index && (
-                      <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '700' }}>✓</Text>
-                    )}
-                  </View>
+                  <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+                    {isDownloading ? "下载中..." : `下载${size.name}(${size.specs})`}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>

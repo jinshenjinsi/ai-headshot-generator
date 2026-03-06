@@ -134,7 +134,7 @@ export default function RepairResultScreen() {
     const baseStyle: any = {
       width: "100%",
       height: 200,
-      resizeMode: "cover",
+      resizeMode: "contain",
     };
 
     // 应用亮度滤镜
@@ -237,7 +237,7 @@ export default function RepairResultScreen() {
                     overflow: "hidden",
                   }}
                 >
-                  <Image source={{ uri: image }} style={getImageStyle()} />
+                    <Image source={{ uri: image }} style={getImageStyle()} />
 
                   {/* 色彩调整面板 - 覆盖在图片上方 */}
                   <View
