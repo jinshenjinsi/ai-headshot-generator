@@ -121,7 +121,13 @@ export default function HomeScreen() {
               className="text-base text-center"
               style={{ color: COLORS.lightText, lineHeight: 22 }}
             >
-              一张照片，10种风格   专业证件照在家搞定
+              一张照片    多样风格
+            </Text>
+            <Text 
+              className="text-base text-center"
+              style={{ color: COLORS.lightText, lineHeight: 22 }}
+            >
+              专业证件照在家搞定
             </Text>
           </View>
 
@@ -152,21 +158,10 @@ export default function HomeScreen() {
                   </Text>
                   <Text 
                     className="text-sm leading-relaxed"
-                    style={{ color: "rgba(255,255,255,0.85)" }}
+                    style={{ color: COLORS.white, opacity: 0.9 }}
                   >
                     {photoPrompt}
                   </Text>
-                </View>
-                <View className="mt-2 flex-row flex-wrap gap-2">
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                    <Text className="text-xs" style={{ color: COLORS.white }}>护照</Text>
-                  </View>
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                    <Text className="text-xs" style={{ color: COLORS.white }}>签证</Text>
-                  </View>
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                    <Text className="text-xs" style={{ color: COLORS.white }}>工作证</Text>
-                  </View>
                 </View>
               </View>
             </TouchableOpacity>
@@ -196,21 +191,10 @@ export default function HomeScreen() {
                   </Text>
                   <Text 
                     className="text-sm leading-relaxed"
-                    style={{ color: COLORS.primary }}
+                    style={{ color: COLORS.primary, opacity: 0.85 }}
                   >
                     {stylePrompt}
                   </Text>
-                </View>
-                <View className="mt-2 flex-row flex-wrap gap-2">
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: COLORS.primary + "20" }}>
-                    <Text className="text-xs" style={{ color: COLORS.primary }}>油画</Text>
-                  </View>
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: COLORS.primary + "20" }}>
-                    <Text className="text-xs" style={{ color: COLORS.primary }}>水彩</Text>
-                  </View>
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: COLORS.primary + "20" }}>
-                    <Text className="text-xs" style={{ color: COLORS.primary }}>动漫</Text>
-                  </View>
                 </View>
               </View>
             </TouchableOpacity>
@@ -240,104 +224,34 @@ export default function HomeScreen() {
                   </Text>
                   <Text 
                     className="text-sm leading-relaxed"
-                    style={{ color: "rgba(255,255,255,0.85)" }}
+                    style={{ color: COLORS.white, opacity: 0.9 }}
                   >
                     {repairPrompt}
                   </Text>
-                </View>
-                <View className="mt-2 flex-row flex-wrap gap-2">
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                    <Text className="text-xs" style={{ color: COLORS.white }}>2倍超分</Text>
-                  </View>
-                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>
-                    <Text className="text-xs" style={{ color: COLORS.white }}>4倍超分</Text>
-                  </View>
                 </View>
               </View>
             </TouchableOpacity>
           </View>
 
-          {/* 功能说明 */}
-          <View className="gap-4 mt-4">
-            <Text 
-              className="text-lg font-bold"
-              style={{ color: COLORS.primary }}
-            >
-              为什么选择我们
-            </Text>
-            
-            <View className="gap-3">
-              <View className="flex-row gap-3">
-                <Text className="text-2xl">⚡</Text>
-                <View className="flex-1">
-                  <Text 
-                    className="font-semibold mb-1"
-                    style={{ color: COLORS.text }}
-                  >
-                    快速生成
-                  </Text>
-                  <Text 
-                    className="text-sm leading-relaxed"
-                    style={{ color: COLORS.lightText }}
-                  >
-                    AI驱动的智能处理，30秒内生成专业头像
-                  </Text>
-                </View>
-              </View>
-
-              <View className="flex-row gap-3">
-                <Text className="text-2xl">🎨</Text>
-                <View className="flex-1">
-                  <Text 
-                    className="font-semibold mb-1"
-                    style={{ color: COLORS.text }}
-                  >
-                    多种风格
-                  </Text>
-                  <Text 
-                    className="text-sm leading-relaxed"
-                    style={{ color: COLORS.lightText }}
-                  >
-                    从专业商务到创意艺术，10种风格任意转换
-                  </Text>
-                </View>
-              </View>
-
-              <View className="flex-row gap-3">
-                <Text className="text-2xl">💰</Text>
-                <View className="flex-1">
-                  <Text 
-                    className="font-semibold mb-1"
-                    style={{ color: COLORS.text }}
-                  >
-                    价格实惠
-                  </Text>
-                  <Text 
-                    className="text-sm leading-relaxed"
-                    style={{ color: COLORS.lightText }}
-                  >
-                    预览版免费，高清版仅需¥1.99
-                  </Text>
-                </View>
-              </View>
-
-              <View className="flex-row gap-3">
-                <Text className="text-2xl">🔒</Text>
-                <View className="flex-1">
-                  <Text 
-                    className="font-semibold mb-1"
-                    style={{ color: COLORS.text }}
-                  >
-                    隐私保护
-                  </Text>
-                  <Text 
-                    className="text-sm leading-relaxed"
-                    style={{ color: COLORS.lightText }}
-                  >
-                    您的照片仅用于生成，不会被保存或共享
-                  </Text>
-                </View>
-              </View>
+          {/* 底部特性说明 */}
+          <View className="gap-3 mt-8 p-4 rounded-xl" style={{ backgroundColor: COLORS.lightGray }}>
+            <View className="flex-row gap-2">
+              <Text style={{ fontSize: 18 }}>⚡</Text>
+              <Text style={{ flex: 1, color: COLORS.text, fontSize: 13, lineHeight: 18 }}>
+                一键生成，无需去照相馆
+              </Text>
+            </View>
+            <View className="flex-row gap-2">
+              <Text style={{ fontSize: 18 }}>🎨</Text>
+              <Text style={{ flex: 1, color: COLORS.text, fontSize: 13, lineHeight: 18 }}>
+                多种风格和尺寸可选
+              </Text>
+            </View>
+            <View className="flex-row gap-2">
+              <Text style={{ fontSize: 18 }}>🔒</Text>
+              <Text style={{ flex: 1, color: COLORS.text, fontSize: 13, lineHeight: 18 }}>
+                隐私保护，照片不上传服务器
+              </Text>
             </View>
           </View>
         </View>
