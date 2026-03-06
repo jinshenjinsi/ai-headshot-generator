@@ -374,3 +374,11 @@
 - [x] 修复repair-result.tsx中原始照片显示错误（显示的是修复后的照片）
 - [x] 调整repair-result.tsx中原始照片和修复后照片的对比布局（居中、大小一致）
 - [x] 将photo-result.tsx中的固定尺寸按钮改为滑动条
+
+
+## 布局和显示问题修复 - 2026-03-07
+
+- [x] 修复photo-result.tsx中修改尺寸部分的滑动条位置（应在"修改尺寸"标题下面）
+- [ ] 修复photo-result.tsx中生成完成页面的图片显示问题
+- [x] 修复repair-result.tsx中原始照片和修复后照片的显示和对齐
+- [x] 在repair-result.tsx中添加固定尺寸滑动条（1寸、2寸、5寸、6寸、10寸等）

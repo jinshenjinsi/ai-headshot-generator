@@ -322,7 +322,7 @@ export default function RepairResultScreen() {
 
 
 
-          {/* 固定尺寸 */}
+          {/* 推荐尺寸 */}
           <View
             className="rounded-2xl p-6 mb-8"
             style={{
@@ -334,45 +334,48 @@ export default function RepairResultScreen() {
               elevation: 2,
             }}
           >
-            <Text style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}>
+            <Text style={{ color: COLORS.primary, fontSize: 14, fontWeight: "600", marginBottom: 12 }}>
               推荐尺寸（可选）
             </Text>
 
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ gap: 8 }}>
               {QUICK_SIZES.map((size, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => setSelectedQuickSize(index)}
                   activeOpacity={0.7}
                   style={{
-                    flex: 1,
-                    minWidth: '30%',
                     paddingVertical: 12,
-                    paddingHorizontal: 8,
+                    paddingHorizontal: 12,
                     backgroundColor: selectedQuickSize === index ? COLORS.accent + "20" : COLORS.background,
                     borderWidth: 1,
                     borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
                     borderRadius: 8,
+                    flexDirection: 'row',
                     alignItems: 'center',
-                    gap: 4,
+                    justifyContent: 'space-between',
                   }}
                 >
-                  <View
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 8,
-                      borderWidth: 2,
-                      borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
-                      backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
-                    }}
-                  />
-                  <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
-                    {size.name}
-                  </Text>
-                  <Text style={{ color: COLORS.muted, fontSize: 10 }}>
-                    {size.width}×{size.height}mm
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: 8,
+                        borderWidth: 2,
+                        borderColor: selectedQuickSize === index ? COLORS.accent : COLORS.border,
+                        backgroundColor: selectedQuickSize === index ? COLORS.accent : "transparent",
+                      }}
+                    />
+                    <View>
+                      <Text style={{ color: COLORS.primary, fontSize: 12, fontWeight: "600" }}>
+                        {size.name}
+                      </Text>
+                      <Text style={{ color: COLORS.muted, fontSize: 10 }}>
+                        {size.width}×{size.height}mm
+                      </Text>
+                    </View>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>

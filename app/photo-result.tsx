@@ -337,60 +337,49 @@ export default function PhotoResultScreen() {
               修改尺寸
             </Text>
             <Text 
-              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 6 }}
+              style={{ color: COLORS.muted, fontSize: 12, marginBottom: 12 }}
             >
-              自定义输出尺寸(单位:mm)
+              自定义输出尺寸（单位mm）
             </Text>
-
-            <View className="flex-row gap-3 mb-6">
-              <View className="flex-1">
-                <Text 
-                  style={{ color: COLORS.text, fontSize: 12, fontWeight: '600', marginBottom: 4 }}
-                >
-                  宽度(mm)
+            
+            {/* 宽度滑动条 */}
+            <View className="mb-6">
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}>
+                  宽度: {customWidth}mm
                 </Text>
-                <TextInput
-                  value={customWidth}
-                  onChangeText={setCustomWidth}
-                  placeholder="35"
-                  keyboardType="numeric"
-                  style={{
-                    borderWidth: 1,
-                    borderColor: COLORS.border,
-                    borderRadius: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    fontSize: 14,
-                    color: COLORS.text,
-                  }}
-                  placeholderTextColor={COLORS.muted}
-                />
               </View>
-              <View className="flex-1">
-                <Text 
-                  style={{ color: COLORS.text, fontSize: 12, fontWeight: '600', marginBottom: 4 }}
-                >
-                  高度(mm)
-                </Text>
-                <TextInput
-                  value={customHeight}
-                  onChangeText={setCustomHeight}
-                  placeholder="45"
-                  keyboardType="numeric"
-                  style={{
-                    borderWidth: 1,
-                    borderColor: COLORS.border,
-                    borderRadius: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    fontSize: 14,
-                    color: COLORS.text,
-                  }}
-                  placeholderTextColor={COLORS.muted}
-                />
-              </View>
+              <Slider
+                style={{ height: 40 }}
+                minimumValue={20}
+                maximumValue={50}
+                step={1}
+                value={parseInt(customWidth)}
+                onValueChange={(value) => setCustomWidth(value.toString())}
+                minimumTrackTintColor={COLORS.primary}
+                maximumTrackTintColor={COLORS.border}
+              />
             </View>
-
+            
+            {/* 高度滑动条 */}
+            <View className="mb-6">
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}>
+                  高度: {customHeight}mm
+                </Text>
+              </View>
+              <Slider
+                style={{ height: 40 }}
+                minimumValue={30}
+                maximumValue={70}
+                step={1}
+                value={parseInt(customHeight)}
+                onValueChange={(value) => setCustomHeight(value.toString())}
+                minimumTrackTintColor={COLORS.primary}
+                maximumTrackTintColor={COLORS.border}
+              />
+            </View>
+            
             <TouchableOpacity
               onPress={() => {
                 if (Platform.OS !== "web") {
