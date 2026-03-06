@@ -4,7 +4,7 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
-import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Platform } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Platform, Share } from "react-native";
 import Slider from "@react-native-community/slider";
 
 const COLORS = {
@@ -455,6 +455,27 @@ export default function PhotoResultScreen() {
             </View>
 
           </View>
+
+          {/* 一键分享 */}
+          <TouchableOpacity
+            onPress={() => {
+              if (Platform.OS !== "web") {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+              Share.share({
+                message: "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。\n\n下载体验：",
+              });
+            }}
+            activeOpacity={0.7}
+            className="rounded-lg py-3 px-4 mb-4 items-center flex-row justify-center gap-2"
+            style={{
+              backgroundColor: COLORS.success,
+            }}
+          >
+            <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+              📄 一键分享
+            </Text>
+          </TouchableOpacity>
 
           {/* 付费下载 */}
           <TouchableOpacity

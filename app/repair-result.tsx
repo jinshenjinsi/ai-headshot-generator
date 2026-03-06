@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import Slider from "@react-native-community/slider";
+import { Share } from "react-native";
 
 const COLORS = {
   primary: "#1A365D",
@@ -369,6 +370,26 @@ export default function RepairResultScreen() {
             </Text>
 
             <View className="gap-2">
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  Share.share({
+                    message: "📷 我用「元一图灵」修复了一张旧照片，效果真的不错！😎\n\n旧照片修复、模糊照片修复、照片超分，一键帮你搭救珍贵回忆。\n\n下载体验：",
+                  });
+                }}
+                activeOpacity={0.7}
+                className="rounded-lg py-3 items-center"
+                style={{
+                  backgroundColor: COLORS.success,
+                }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: "600" }}>
+                  📄 一键分享
+                </Text>
+              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={handleDownloadPaid}
                 disabled={isDownloading}

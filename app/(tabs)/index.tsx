@@ -121,7 +121,7 @@ export default function HomeScreen() {
               className="text-base text-center"
               style={{ color: COLORS.lightText, lineHeight: 22 }}
             >
-              一张照片，10种风格{"\n"}专业证件照一键生成
+              一张照片，10种风格   专业证件照在家搞定
             </Text>
           </View>
 
@@ -311,7 +311,8 @@ export default function HomeScreen() {
                     style={{ color: COLORS.text }}
                   >
                     价格实惠
-                  </Text>                  <Text 
+                  </Text>
+                  <Text 
                     className="text-sm leading-relaxed"
                     style={{ color: COLORS.lightText }}
                   >

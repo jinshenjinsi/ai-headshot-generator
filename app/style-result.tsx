@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import Slider from "@react-native-community/slider";
+import { Share } from "react-native";
 
 const COLORS = {
   primary: "#1A365D",
@@ -320,6 +321,26 @@ export default function StyleResultScreen() {
             </Text>
 
             <View className="gap-3">
+              <TouchableOpacity
+                onPress={() => {
+                  if (Platform.OS !== "web") {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  Share.share({
+                    message: "✨ 我用「元一图灵」生成了一张专业美照，效果真的不错！😎\n\n创意头像生成器，一键转换为你喜欢的艺术风格。油画、水彩、素描、漫画等风格任选。\n\n下载体验：",
+                  });
+                }}
+                activeOpacity={0.7}
+                className="rounded-lg py-3 items-center"
+                style={{
+                  backgroundColor: COLORS.success,
+                }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+                  📄 一键分享
+                </Text>
+              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={handleDownloadPaid}
                 disabled={isDownloading}
