@@ -6,7 +6,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Platform, Share, Linking } from "react-native";
 import Slider from "@react-native-community/slider";
-import { shareToEmail, shareToSMS, shareToWeChat, shareViaBluetooth } from "@/lib/share-utils";
+import { showShareMenu } from "@/lib/share-utils";
 
 const COLORS = {
   primary: "#1A365D",
@@ -68,7 +68,7 @@ export default function PhotoResultScreen() {
   const [contrast, setContrast] = useState(100);
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isPaidVersion, setIsPaidVersion] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
 
   const handleDownload = async (width?: number, height?: number) => {
     if (Platform.OS !== "web") {
@@ -134,10 +134,9 @@ export default function PhotoResultScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     
-    // 设置为付费版本，分享按钮将被禁用
-    setIsPaidVersion(true);
-    setIsDownloading(true)
-    try {
+    // 设置为已付费，分享和下载都将可用
+    setIsPaid(true);
+    setIsDownloading(true);    try {
       // 使用自定义尺寸或国家默认尺寸
       const finalWidth = parseInt(customWidth) || 35;
       const finalHeight = parseInt(customHeight) || 45;
@@ -460,75 +459,29 @@ export default function PhotoResultScreen() {
 
           </View>
 
-          {/* 一键分享 - 四种方式（仅免费版本可用） */}
-          <View className="gap-2 mb-4">
-            {/* 邮件 */}
-            <TouchableOpacity
-              onPress={() => {
-                if (Platform.OS !== "web") {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
-                shareToEmail(
-                  "元一图灵-专业证件照",
-                  "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。"
-                );
-              }}
-              disabled={isPaidVersion}
-              activeOpacity={0.7}
-              className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#0A66C2", opacity: isPaidVersion ? 0.5 : 1 }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>📧 邮件{isPaidVersion ? ' (需付费)' : ''}</Text>
-            </TouchableOpacity>
-
-            {/* 信息 */}
-            <TouchableOpacity
-              onPress={() => {
-                if (Platform.OS !== "web") {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
-                shareToSMS("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎 不需要去照相馆，在家就能一键生成专业证件照。");
-              }}
-              disabled={isPaidVersion}
-              activeOpacity={0.7}
-              className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#34C759", opacity: isPaidVersion ? 0.5 : 1 }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💬 信息{isPaidVersion ? ' (需付费)' : ''}</Text>
-            </TouchableOpacity>
-
-            {/* 微信 */}
-            <TouchableOpacity
-              onPress={() => {
-                if (Platform.OS !== "web") {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
-                shareToWeChat("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎");
-              }}
-              disabled={isPaidVersion}
-              activeOpacity={0.7}
-              className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#09B83E", opacity: isPaidVersion ? 0.5 : 1 }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>💚 微信{isPaidVersion ? ' (需付费)' : ''}</Text>
-            </TouchableOpacity>
-
-            {/* 蓝牙 */}
-            <TouchableOpacity
-              onPress={() => {
-                if (Platform.OS !== "web") {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }
-                shareViaBluetooth("📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎");
-              }}
-              disabled={isPaidVersion}
-              activeOpacity={0.7}
-              className="rounded-lg py-2 px-4 items-center flex-row justify-center gap-2"
-              style={{ backgroundColor: "#007AFF", opacity: isPaidVersion ? 0.5 : 1 }}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: '600' }}>🔵 蓝牙{isPaidVersion ? ' (需付费)' : ''}</Text>
-            </TouchableOpacity>
-          </View>
+          {/* 一键分享 */}
+          <TouchableOpacity
+            onPress={() => {
+              if (Platform.OS !== "web") {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }
+              showShareMenu(
+                "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
+                "元一图灵-专业证件照"
+              );
+            }}
+            disabled={!isPaid}
+            activeOpacity={0.7}
+            className="rounded-lg py-3 px-4 mb-4 items-center"
+            style={{
+              backgroundColor: !isPaid ? "#E2E8F0" : "#34C759",
+              opacity: !isPaid ? 0.6 : 1,
+            }}
+          >
+            <Text style={{ color: !isPaid ? COLORS.muted : COLORS.white, fontSize: 14, fontWeight: '600' }}>
+              {!isPaid ? "🔒 分享（需付费）" : "🔗 分享"}
+            </Text>
+          </TouchableOpacity>
 
           {/* 付费下载 */}
           <TouchableOpacity

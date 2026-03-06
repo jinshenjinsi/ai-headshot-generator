@@ -7,6 +7,12 @@ export interface ShareOptions {
   type?: 'photo' | 'style' | 'repair';
 }
 
+export interface ShareMethod {
+  name: string;
+  icon: string;
+  action: () => void;
+}
+
 /**
  * 自定义分享功能，支持邮件、信息、微信、蓝牙
  */
@@ -99,4 +105,82 @@ export const getShareMessage = (type: 'photo' | 'style' | 'repair'): string => {
   };
   
   return messages[type];
+};
+
+/**
+ * 获取一键分享的所有可用分享方式
+ * 包括固定的四种方式（邮件、信息、微信、蓝牙）和动态检测的其他应用
+ */
+export const getShareMethods = async (message: string, subject: string): Promise<ShareMethod[]> => {
+  const methods: ShareMethod[] = [];
+
+  // 固定的四种分享方式
+  methods.push({
+    name: '📧 邮件',
+    icon: 'mail',
+    action: () => shareToEmail(subject, message),
+  });
+
+  methods.push({
+    name: '💬 信息',
+    icon: 'message',
+    action: () => shareToSMS(message),
+  });
+
+  methods.push({
+    name: '💚 微信',
+    icon: 'wechat',
+    action: () => shareToWeChat(message),
+  });
+
+  methods.push({
+    name: '🔵 蓝牙',
+    icon: 'bluetooth',
+    action: () => shareViaBluetooth(message),
+  });
+
+  // 动态检测其他应用（如QQ、微博、抖音等）
+  const otherApps = [
+    { name: '🐧 QQ', scheme: 'mqq://', action: () => Linking.openURL('mqq://') },
+    { name: '🌟 微博', scheme: 'sinaweibo://', action: () => Linking.openURL('sinaweibo://') },
+    { name: '🎵 抖音', scheme: 'snssdk1128://', action: () => Linking.openURL('snssdk1128://') },
+    { name: '📱 WhatsApp', scheme: 'whatsapp://', action: () => Linking.openURL('whatsapp://') },
+    { name: '📲 Telegram', scheme: 'tg://', action: () => Linking.openURL('tg://') },
+  ];
+
+  // 检测这些应用是否已安装
+  for (const app of otherApps) {
+    try {
+      const canOpen = await Linking.canOpenURL(app.scheme);
+      if (canOpen) {
+        methods.push({
+          name: app.name,
+          icon: app.name,
+          action: app.action,
+        });
+      }
+    } catch (error) {
+      // 应用检测失败，跳过
+      console.log(`Failed to check app: ${app.name}`);
+    }
+  }
+
+  return methods;
+};
+
+/**
+ * 显示一键分享菜单
+ */
+export const showShareMenu = async (message: string, subject: string) => {
+  const methods = await getShareMethods(message, subject);
+  
+  const options = [
+    ...methods.map(method => ({
+      text: method.name,
+      onPress: method.action,
+    })),
+    { text: '取消', onPress: () => {}, style: 'cancel' as const },
+  ];
+
+  Alert.alert('分享到', '选择分享方式', options);
 };
