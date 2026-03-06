@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform, PanResponder, Animated } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Image, Pressable, Platform, useWindowDimensions } from "react-native";
 import { useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -22,6 +22,7 @@ export default function PhotoEditScreen() {
   const type = params.type as string;
   const country = params.country as string;
   const background = params.background as string || "white";
+  const { width: screenWidth } = useWindowDimensions();
 
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
@@ -90,89 +91,97 @@ export default function PhotoEditScreen() {
     return "";
   };
 
-  const renderSlider = (label: string, value: number, setter: (v: number) => void, sliderType: string) => (
-    <View className="mb-6">
-      <View className="flex-row justify-between items-center mb-3">
-        <Text 
-          style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
+  const renderSlider = (label: string, value: number, setter: (v: number) => void, sliderType: string) => {
+    const sliderRef = useRef<View>(null);
+    // trackWidth用于计算点击位置，实际宽度由Pressable决定
+
+    return (
+      <View className="mb-6">
+        <View className="flex-row justify-between items-center mb-3">
+          <Text 
+            style={{ color: COLORS.text, fontSize: 14, fontWeight: '600' }}
+          >
+            {label}
+          </Text>
+          <Text 
+            style={{ color: COLORS.accent, fontSize: 14, fontWeight: '700' }}
+          >
+            {value}%
+          </Text>
+        </View>
+        
+        {/* 快速调整按钮 */}
+        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+          {[80, 90, 100, 110, 120].map((val) => (
+            <TouchableOpacity
+              key={val}
+              onPress={() => handleSliderChange(val, setter)}
+              style={{
+                flex: 1,
+                paddingVertical: 6,
+                backgroundColor: value === val ? COLORS.accent : COLORS.background,
+                borderWidth: 1,
+                borderColor: value === val ? COLORS.accent : COLORS.border,
+                borderRadius: 6,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
+                {getButtonLabel(val, sliderType)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        {/* 滑条轨道 */}
+        <Pressable
+          ref={sliderRef}
+          onPress={(e) => {
+            const locationX = (e.nativeEvent as any).locationX || 0;
+            const pressableWidth = (e.currentTarget as any).offsetWidth || screenWidth - 40;
+            // 将点击位置转换为0-200的值
+            const newValue = Math.round((locationX / pressableWidth) * 200);
+            handleSliderChange(newValue, setter);
+          }}
+          style={{
+            height: 50,
+            backgroundColor: COLORS.border,
+            borderRadius: 25,
+            justifyContent: 'center',
+            paddingHorizontal: 4,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
         >
-          {label}
-        </Text>
-        <Text 
-          style={{ color: COLORS.accent, fontSize: 14, fontWeight: '700' }}
-        >
-          {value}%
-        </Text>
-      </View>
-      
-      {/* 快速调整按钮 */}
-      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-        {[80, 90, 100, 110, 120].map((val) => (
-          <TouchableOpacity
-            key={val}
-            onPress={() => handleSliderChange(val, setter)}
-            style={{
-              flex: 1,
-              paddingVertical: 6,
-              backgroundColor: value === val ? COLORS.accent : COLORS.background,
-              borderWidth: 1,
-              borderColor: value === val ? COLORS.accent : COLORS.border,
-              borderRadius: 6,
-              alignItems: 'center',
+          {/* 填充部分 - 从左到右 */}
+          <View 
+            style={{ 
+              position: 'absolute',
+              left: 4,
+              top: 4,
+              width: `${(value / 200) * 100}%`,
+              height: 42,
+              backgroundColor: COLORS.accent,
+              borderRadius: 21,
+            }}
+          />
+          
+          {/* 数值显示 */}
+          <Text 
+            style={{ 
+              color: value > 100 ? COLORS.white : COLORS.text,
+              fontSize: 12,
+              fontWeight: '600',
+              textAlign: 'center',
+              zIndex: 10,
             }}
           >
-            <Text style={{ color: value === val ? COLORS.white : COLORS.text, fontSize: 11, fontWeight: '600' }}>
-              {getButtonLabel(val, sliderType)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+            {value}%
+          </Text>
+        </Pressable>
       </View>
-      
-      {/* 滑条轨道 - 使用Pressable处理点击 */}
-      <Pressable
-        onPress={(e) => {
-          const locationX = (e.nativeEvent as any).locationX || 0;
-          const trackWidth = 280;
-          const percentage = Math.max(0, Math.min(200, Math.round((locationX / trackWidth) * 200)));
-          handleSliderChange(percentage, setter);
-        }}
-        style={{
-          height: 50,
-          backgroundColor: COLORS.border,
-          borderRadius: 25,
-          justifyContent: 'center',
-          paddingHorizontal: 4,
-          position: 'relative',
-        }}
-      >
-        {/* 填充部分 */}
-        <View 
-          style={{ 
-            position: 'absolute',
-            left: 4,
-            top: 4,
-            width: `${(value / 200) * 100}%`,
-            height: 42,
-            backgroundColor: COLORS.accent,
-            borderRadius: 21,
-          }}
-        />
-        
-        {/* 数值显示 */}
-        <Text 
-          style={{ 
-            color: value > 100 ? COLORS.white : COLORS.text,
-            fontSize: 12,
-            fontWeight: '600',
-            textAlign: 'center',
-            zIndex: 10,
-          }}
-        >
-          {value}%
-        </Text>
-      </Pressable>
-    </View>
-  );
+    );
+  };
 
   return (
     <ScreenContainer className="bg-background">
