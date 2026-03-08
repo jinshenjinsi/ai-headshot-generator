@@ -52,6 +52,7 @@ export const appRouter = router({
         z.object({
           imageUrl: z.string().url(),
           style: z.string().default("professional"),
+          regenerateCount: z.number().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -63,6 +64,7 @@ export const appRouter = router({
           const result = await generateHeadshotWithBailian({
             imageUrl: input.imageUrl,
             style: input.style,
+            regenerateCount: input.regenerateCount,
           });
 
           if (!result.success) {

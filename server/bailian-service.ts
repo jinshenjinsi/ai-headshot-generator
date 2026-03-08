@@ -10,6 +10,7 @@ interface GenerateHeadshotParams {
   imageUrl: string;
   style: string;
   prompt?: string;
+  regenerateCount?: number; // 0 = 第一次生成，1-3 = 重新生成次数
 }
 
 interface GenerateHeadshotResult {
@@ -55,7 +56,18 @@ export async function generateHeadshotWithBailian(
     };
 
     const stylePrompt = stylePrompts[params.style] || params.style;
-    const finalPrompt = params.prompt || stylePrompt;
+    
+    // 根据regenerateCount调整提示词，提示大模型使用不同的底片
+    let finalPrompt = params.prompt || stylePrompt;
+    if (params.regenerateCount && params.regenerateCount > 0) {
+      const regenerateHints = [
+        "使用不同的背景色和光线效果",
+        "使用不同的构图和角度",
+        "使用不同的表情和姿态",
+      ];
+      const hint = regenerateHints[params.regenerateCount - 1] || regenerateHints[2];
+      finalPrompt = `${stylePrompt}。${hint}。`;
+    }
 
     // 调用wan2.6-image模型
     console.log("[Bailian] 调用wan2.6-image API...");

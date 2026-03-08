@@ -1,4 +1,3 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Platform, Share, Linking } from "react-native";
 import Slider from "@react-native-community/slider";
 import { showShareMenu } from "@/lib/share-utils";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const COLORS = {
   primary: "#1A365D",
@@ -49,6 +49,54 @@ const COUNTRY_SPECS: { [key: string]: string } = {
   newzealand: "35×45mm",
 };
 
+// 压缩图片到指定最大尺寸
+const compressImage = async (base64: string, maxSize: number): Promise<string> => {
+  try {
+    // 在Web环境中使用Canvas压缩
+    if (Platform.OS === 'web') {
+      const canvas = document.createElement('canvas') as any;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return base64;
+
+      const img = new (window as any).Image();
+      img.src = `data:image/png;base64,${base64}`;
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          
+          // 计算缩放比例
+          if (width > height) {
+            if (width > maxSize) {
+              height = Math.round((height * maxSize) / width);
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = Math.round((width * maxSize) / height);
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/png').split(',')[1];
+          resolve(compressedBase64);
+        };
+      });
+    }
+    
+    // 在React Native中，直接返回原始base64
+    return base64;
+  } catch (error) {
+    console.error('Image compression error:', error);
+    return base64;
+  }
+};
+
 // 固定的推荐尺寸（1寸和2寸）
 const QUICK_SIZES = [
   { name: "1寸", width: 25, height: 35, specs: "25×35mm" },
@@ -69,6 +117,9 @@ export default function PhotoResultScreen() {
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
+  const [regenerateCount, setRegenerateCount] = useState(0);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const MAX_REGENERATE = 3;
 
   const handleDownload = async (width?: number, height?: number) => {
     if (Platform.OS !== "web") {
@@ -96,11 +147,14 @@ export default function PhotoResultScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      // 压缩预览版（1024px 分辨率，手机屏幕看不出模糊）
+      const compressedBase64 = await compressImage(base64, 1024);
+
       // 创建临时文件
       const fileName = `photo_${sizeLabel}_${Date.now()}.png`;
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
       
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
+      await FileSystem.writeAsStringAsync(fileUri, compressedBase64, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
@@ -120,6 +174,30 @@ export default function PhotoResultScreen() {
     }
   };
 
+
+  const handleRegenerate = async () => {
+    if (regenerateCount >= MAX_REGENERATE) {
+      Alert.alert("已达上限", "该照片已达到最大重新生成次数（3次），请更换原片重新生成");
+      return;
+    }
+
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
+    setIsRegenerating(true);
+    try {
+      const newCount = regenerateCount + 1;
+      setRegenerateCount(newCount);
+      Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+    } catch (error) {
+      Alert.alert("重新生成失败", "请重试");
+      console.error("Regenerate error:", error);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   const handleDownloadPaid = async () => {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -127,13 +205,14 @@ export default function PhotoResultScreen() {
     
     // 设置为已付费，分享和下载都将可用
     setIsPaid(true);
-    setIsDownloading(true);    try {
+    setIsDownloading(true);
+    try {
       // 使用自定义尺寸或国家默认尺寸
       const finalWidth = parseInt(customWidth) || 35;
       const finalHeight = parseInt(customHeight) || 45;
       const sizeLabel = `${finalWidth}×${finalHeight}mm`;
 
-      // 获取图片的base64数据
+      // 获取图片的base64数据（原始高清版本）
       const base64 = await FileSystem.readAsStringAsync(image, {
         encoding: FileSystem.EncodingType.Base64,
       });
@@ -452,18 +531,39 @@ export default function PhotoResultScreen() {
                 "元一图灵-专业证件照"
               );
             }}
-            disabled={!isPaid}
             activeOpacity={0.7}
             className="rounded-lg py-3 px-4 mb-4 items-center"
             style={{
-              backgroundColor: !isPaid ? "#E2E8F0" : "#34C759",
-              opacity: !isPaid ? 0.6 : 1,
+              backgroundColor: "#34C759",
             }}
           >
-            <Text style={{ color: !isPaid ? COLORS.muted : COLORS.white, fontSize: 14, fontWeight: '600' }}>
-              {!isPaid ? "🔒 分享（需付费）" : "🔗 分享"}
+            <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+              🔗 分享
             </Text>
           </TouchableOpacity>
+
+          {/* 重新生成按钮 */}
+          <TouchableOpacity
+            onPress={handleRegenerate}
+            disabled={isRegenerating || regenerateCount >= MAX_REGENERATE}
+            activeOpacity={0.7}
+            className="rounded-lg py-3 px-4 mb-4 items-center"
+            style={{
+              backgroundColor: regenerateCount >= MAX_REGENERATE ? COLORS.muted : COLORS.primary,
+              opacity: isRegenerating ? 0.6 : 1,
+            }}
+          >
+            <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+              {isRegenerating ? "重新生成中..." : `🔄 重新生成 (${regenerateCount}/${MAX_REGENERATE})`}
+            </Text>
+          </TouchableOpacity>
+
+          {/* 友情提醒 */}
+          {regenerateCount < MAX_REGENERATE && (
+            <Text style={{ color: COLORS.muted, fontSize: 12, textAlign: 'center', marginBottom: 8 }}>
+              💡 提示：更换更清晰的正脸照片可获得更好的效果
+            </Text>
+          )}
 
           {/* 付费下载 */}
           <TouchableOpacity

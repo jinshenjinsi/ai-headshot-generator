@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert, Modal, Pressable, Linking } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Platform, Image, Alert, Modal, Pressable, Linking, Share } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import * as FileSystem from "expo-file-system/legacy";
@@ -6,7 +6,6 @@ import * as MediaLibrary from "expo-media-library";
 import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import Slider from "@react-native-community/slider";
-import { Share } from "react-native";
 import { showShareMenu } from "@/lib/share-utils";
 
 const COLORS = {
@@ -18,6 +17,54 @@ const COLORS = {
   muted: "#718096",
   border: "#E2E8F0",
   success: "#10B981",
+};
+
+// 压缩图片到指定最大尺寸
+const compressImage = async (base64: string, maxSize: number): Promise<string> => {
+  try {
+    // 在Web环境中使用Canvas压缩
+    if (Platform.OS === 'web') {
+      const canvas = document.createElement('canvas') as any;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return base64;
+
+      const img = new (window as any).Image();
+      img.src = `data:image/png;base64,${base64}`;
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          
+          // 计算缩放比例
+          if (width > height) {
+            if (width > maxSize) {
+              height = Math.round((height * maxSize) / width);
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width = Math.round((width * maxSize) / height);
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/png').split(',')[1];
+          resolve(compressedBase64);
+        };
+      });
+    }
+    
+    // 在React Native中，直接返回原始base64
+    return base64;
+  } catch (error) {
+    console.error('Image compression error:', error);
+    return base64;
+  }
 };
 
 export default function RepairResultScreen() {
@@ -34,6 +81,9 @@ export default function RepairResultScreen() {
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
+  const [regenerateCount, setRegenerateCount] = useState(0);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const MAX_REGENERATE = 3;
 
   const QUICK_SIZES = [
     { width: 50, height: 75, name: "5寸" },
@@ -56,11 +106,14 @@ export default function RepairResultScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      // 压缩预览版（1024px 分辨率，手机屏幕看不出模糊）
+      const compressedBase64 = await compressImage(base64, 1024);
+
       // 创建临时文件
       const fileName = `repair_${selectedScale}_${Date.now()}.png`;
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
       
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
+      await FileSystem.writeAsStringAsync(fileUri, compressedBase64, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
@@ -77,6 +130,30 @@ export default function RepairResultScreen() {
       console.error("Download error:", error);
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+
+  const handleRegenerate = async () => {
+    if (regenerateCount >= MAX_REGENERATE) {
+      Alert.alert("已达上限", "该照片已达到最大重新生成次数（3次），请更换原片重新生成");
+      return;
+    }
+
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
+    setIsRegenerating(true);
+    try {
+      const newCount = regenerateCount + 1;
+      setRegenerateCount(newCount);
+      Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+    } catch (error) {
+      Alert.alert("重新生成失败", "请重试");
+      console.error("Regenerate error:", error);
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -367,16 +444,14 @@ export default function RepairResultScreen() {
                     "元一图灵-照片修复"
                   );
                 }}
-                disabled={!isPaid}
                 activeOpacity={0.7}
-                className="rounded-lg py-3 items-center"
-                style={{
-                  backgroundColor: !isPaid ? "#E2E8F0" : "#34C759",
-                  opacity: !isPaid ? 0.6 : 1,
-                }}
-              >
-                <Text style={{ color: !isPaid ? COLORS.muted : COLORS.white, fontSize: 14, fontWeight: "600" }}>
-                  {!isPaid ? "🔒 分享（需付费）" : "🔗 分享"}
+            className="rounded-lg py-3 px-4 mb-4 items-center"
+            style={{
+              backgroundColor: "#34C759",
+            }}
+          >
+            <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
+              🔗 分享
                 </Text>
               </TouchableOpacity>
 
