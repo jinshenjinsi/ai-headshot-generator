@@ -501,7 +501,8 @@ export default function RepairResultScreen() {
               width: '90%',
               height: '80%',
               resizeMode: 'contain',
-            }}
+              ...(Platform.OS === 'web' && { filter: `brightness(${brightness}%) contrast(${contrast}%)` }),
+            } as any}
           />
           <Text style={{ color: COLORS.white, fontSize: 12, marginTop: 16, fontWeight: '600' }}>
             点击关闭预览

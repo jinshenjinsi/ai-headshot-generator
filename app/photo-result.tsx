@@ -188,8 +188,34 @@ export default function PhotoResultScreen() {
     setIsRegenerating(true);
     try {
       const newCount = regenerateCount + 1;
-      setRegenerateCount(newCount);
-      Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+      
+      // 调用API重新生成
+      const response = await fetch('/api/trpc/generateBailian', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl: image,
+          style: 'professional',
+          regenerateCount: newCount,
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success || result.imageUrl) {
+        router.replace({
+          pathname: '/photo-result',
+          params: {
+            image: result.imageUrl || result.originalUrl,
+            type: type,
+            country: country,
+          },
+        });
+        setRegenerateCount(newCount);
+        Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+      } else {
+        Alert.alert("重新生成失败", "请重试");
+      }
     } catch (error) {
       Alert.alert("重新生成失败", "请重试");
       console.error("Regenerate error:", error);
@@ -526,10 +552,10 @@ export default function PhotoResultScreen() {
               if (Platform.OS !== "web") {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
-              showShareMenu(
-                "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
-                "元一图灵-专业证件照"
-              );
+              Share.share({
+                message: "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
+                title: "元一图灵-专业证件照",
+              }).catch(err => console.log("Share failed:", err));
             }}
             activeOpacity={0.7}
             className="rounded-lg py-3 px-4 mb-4 items-center"
