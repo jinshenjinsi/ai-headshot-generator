@@ -40,4 +40,37 @@ export const systemRouter = router({
       message: "Latest version installed",
     };
   }),
+  // User feedback endpoint
+  submitFeedback: publicProcedure
+    .input(
+      z.object({
+        type: z.enum(['bug', 'feature', 'general']),
+        title: z.string().min(1, 'title is required'),
+        content: z.string().min(1, 'content is required'),
+        email: z.string().email().optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      try {
+        console.log('[Feedback] Received feedback:', input);
+        
+        // Store feedback in database or send email
+        // For now, just log it
+        const timestamp = new Date().toISOString();
+        const feedbackData = {
+          timestamp,
+          ...input,
+        };
+        
+        console.log('[Feedback] Stored:', JSON.stringify(feedbackData, null, 2));
+        
+        return {
+          success: true,
+          message: 'Thank you for your feedback!',
+        };
+      } catch (error) {
+        console.error('[Feedback] Error:', error);
+        throw new Error('Failed to submit feedback');
+      }
+    }),
 });

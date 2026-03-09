@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAppUpdate } from "@/hooks/use-app-update";
+import { FeedbackModal } from "@/components/feedback-modal";
 
 const COLORS = {
   primary: "#1A365D",
@@ -54,6 +55,7 @@ export default function HomeScreen() {
   const [stylePrompt, setStylePrompt] = React.useState(() => getRandomPrompt('style'));
   const [repairPrompt, setRepairPrompt] = React.useState(() => getRandomPrompt('repair'));
   const [version, setVersion] = useState('1.0.9');
+  const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
 
   const handlePhotoGeneration = () => {
     if (Platform.OS !== "web") {
@@ -77,6 +79,13 @@ export default function HomeScreen() {
     }
     setRepairPrompt(getRandomPrompt('repair'));
     router.push("/repair-upload" as any);
+  };
+
+  const handleFeedback = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setFeedbackModalVisible(true);
   };
 
   return (
@@ -256,13 +265,30 @@ export default function HomeScreen() {
                 隐私保护，照片不上传服务器
               </Text>
             </View>
-            {/* 版本信息 */}
-            <Text style={{ fontSize: 11, color: COLORS.lightText, marginTop: 8, textAlign: 'center' }}>
-              v{version}
-            </Text>
+            {/* 版本信息和反馈按钮 */}
+            <View className="flex-row items-center justify-center gap-2 mt-8">
+              <Text style={{ fontSize: 11, color: COLORS.lightText }}>
+                v{version}
+              </Text>
+              <Text style={{ fontSize: 11, color: COLORS.lightText }}>•</Text>
+              <TouchableOpacity
+                onPress={handleFeedback}
+                activeOpacity={0.7}
+              >
+                <Text style={{ fontSize: 11, color: COLORS.accent, fontWeight: '600' }}>
+                  意见反馈
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        visible={feedbackModalVisible}
+        onClose={() => setFeedbackModalVisible(false)}
+      />
     </ScreenContainer>
   );
 }
