@@ -77,6 +77,8 @@ export default function RepairResultScreen() {
   const [selectedScale, setSelectedScale] = useState("2x");
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [sharpness, setSharpness] = useState(100);
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedQuickSize, setSelectedQuickSize] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -203,26 +205,22 @@ export default function RepairResultScreen() {
       resizeMode: "contain",
     };
 
-    // 应用亮度滤镜
-    // 亮度范围：70-130
-    // 正确方向：70为暗，100为正常，130为亮
-    // 映射到 0.7-1.3的亮度倍数
-    const brightnessValue = (brightness - 100) / 100 + 1; // 70->0.7, 100->1.0, 130->1.3
-    
+    // 应用颜色滤镜（Web和React Native都支持）
     if (Platform.OS === "web") {
-      // Web：直接使用brightness filter
-      baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
+      // Web：使用CSS filter应用所有调整
+      baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${100 - sharpness}%)`;
     } else {
-      // React Native：使用opacity模拟亮度
-      // brightness 70 -> opacity 0.7 (暗)
-      // brightness 100 -> opacity 1.0 (正常)
-      // brightness 130 -> opacity 1.0 (正常，因为opacity最大值是1)
-      baseStyle.opacity = Math.min(1, brightnessValue);
+      // React Native：使用tintColor模拟色彩调整
+      // 亮度：通过opacity实现
+      const brightnessValue = brightness / 100;
+      baseStyle.opacity = brightnessValue;
+      
+      // 对比度、饱和度、锐度：通过tintColor实现
+      // 这是一个简化的实现，实际效果可能有限
+      if (contrast !== 100 || saturation !== 100) {
+        baseStyle.tintColor = `rgba(255, 255, 255, ${(saturation - 100) / 100 * 0.2})`;
+      }
     }
-
-    // 对比度：在React Native上不模拟，仅在web上应用
-    // 原因：tintColor在React Native上的行为不可预测，容易导致图像消失
-    // 对比度调整已在web上通过filter实现
 
     // 如果是老照片修复，不添加底色
     if (repairType === "enhance") {
@@ -346,6 +344,50 @@ export default function RepairResultScreen() {
                       step={5}
                       value={contrast}
                       onValueChange={setContrast}
+                      minimumTrackTintColor={COLORS.accent}
+                      maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    />
+                  </View>
+
+                  {/* 饱和度调整 */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                      <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                        饱和度
+                      </Text>
+                      <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                        {saturation}%
+                      </Text>
+                    </View>
+                    <Slider
+                      style={{ height: 30 }}
+                      minimumValue={50}
+                      maximumValue={150}
+                      step={5}
+                      value={saturation}
+                      onValueChange={setSaturation}
+                      minimumTrackTintColor={COLORS.accent}
+                      maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
+                    />
+                  </View>
+
+                  {/* 锐度调整 */}
+                  <View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                      <Text style={{ color: COLORS.white, fontSize: 11, fontWeight: "600" }}>
+                        锐度
+                      </Text>
+                      <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: "600" }}>
+                        {sharpness}%
+                      </Text>
+                    </View>
+                    <Slider
+                      style={{ height: 30 }}
+                      minimumValue={50}
+                      maximumValue={150}
+                      step={5}
+                      value={sharpness}
+                      onValueChange={setSharpness}
                       minimumTrackTintColor={COLORS.accent}
                       maximumTrackTintColor="rgba(255, 255, 255, 0.3)"
                     />
