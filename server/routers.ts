@@ -29,19 +29,30 @@ export const appRouter = router({
         const { storagePut } = await import("./storage");
         
         try {
+          console.log("[Upload] Starting photo upload...");
+          console.log("[Upload] File name:", input.fileName);
+          console.log("[Upload] Base64 length:", input.photoBase64.length);
+          
           const base64Data = input.photoBase64.replace(/^data:image\/\w+;base64,/, "");
+          console.log("[Upload] Cleaned base64 length:", base64Data.length);
+          
           const buffer = Buffer.from(base64Data, "base64");
+          console.log("[Upload] Buffer size:", buffer.length, "bytes");
           
           const timestamp = Date.now();
           const key = `headshots/uploads/${timestamp}-${input.fileName}`;
           const result = await storagePut(key, buffer, "image/jpeg");
+          console.log("[Upload] ✅ Upload successful");
+          console.log("[Upload] Result URL:", result.url);
           
           return {
             success: true,
             url: result.url,
           };
         } catch (error) {
-          console.error("Photo upload failed:", error);
+          console.error("[Upload] ❌ Photo upload failed:", error);
+          console.error("[Upload] Error type:", error instanceof Error ? error.constructor.name : typeof error);
+          console.error("[Upload] Error message:", error instanceof Error ? error.message : String(error));
           throw new Error("Failed to upload photo");
         }
       }),

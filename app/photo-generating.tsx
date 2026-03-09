@@ -229,7 +229,23 @@ export default function PhotoGeneratingScreen() {
 
     } catch (error) {
       console.error("Generation error:", error);
-      setStatusMessage("生成失败,请重试");
+      console.error("Error type:", error instanceof Error ? error.constructor.name : typeof error);
+      console.error("Error message:", error instanceof Error ? error.message : String(error));
+      console.error("Error stack:", error instanceof Error ? error.stack : "no stack");
+      
+      // 提取更详细的错误信息
+      let errorMsg = "生成失败,请重试";
+      if (error instanceof Error) {
+        if (error.message.includes("照片上传失败")) {
+          errorMsg = "上传失败";
+        } else if (error.message.includes("生成失败")) {
+          errorMsg = "生成失败";
+        } else {
+          errorMsg = error.message;
+        }
+      }
+      
+      setStatusMessage(errorMsg);
       setTimeout(() => {
         router.back();
       }, 2000);

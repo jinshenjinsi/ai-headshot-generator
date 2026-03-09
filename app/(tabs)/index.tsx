@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View, TouchableOpacity, Platform, Image } from "react-native";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { ScreenContainer } from "@/components/screen-container";
+import { useAppUpdate } from "@/hooks/use-app-update";
 
 const COLORS = {
   primary: "#1A365D",
@@ -48,9 +49,11 @@ function getRandomPrompt(category: 'photo' | 'style' | 'repair'): string {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { isDownloading } = useAppUpdate();
   const [photoPrompt, setPhotoPrompt] = React.useState(() => getRandomPrompt('photo'));
   const [stylePrompt, setStylePrompt] = React.useState(() => getRandomPrompt('style'));
   const [repairPrompt, setRepairPrompt] = React.useState(() => getRandomPrompt('repair'));
+  const [version, setVersion] = useState('1.0.9');
 
   const handlePhotoGeneration = () => {
     if (Platform.OS !== "web") {
@@ -253,9 +256,14 @@ export default function HomeScreen() {
                 隐私保护，照片不上传服务器
               </Text>
             </View>
+            {/* 版本信息 */}
+            <Text style={{ fontSize: 11, color: COLORS.lightText, marginTop: 8, textAlign: 'center' }}>
+              v{version}
+            </Text>
           </View>
         </View>
       </ScrollView>
     </ScreenContainer>
   );
 }
+

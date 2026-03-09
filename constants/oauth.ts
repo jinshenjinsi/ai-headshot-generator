@@ -13,9 +13,11 @@ const env = {
   appId: process.env.EXPO_PUBLIC_APP_ID ?? "",
   ownerId: process.env.EXPO_PUBLIC_OWNER_OPEN_ID ?? "",
   ownerName: process.env.EXPO_PUBLIC_OWNER_NAME ?? "",
-  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://218.244.144.154:3000",
+  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://nonspontaneously-subcompensational-devyn.ngrok-free.dev",
   deepLinkScheme: schemeFromBundleId,
 };
+
+console.log("[OAuth Config] API Base URL:", env.apiBaseUrl);
 
 export const OAUTH_PORTAL_URL = env.portal;
 export const OAUTH_SERVER_URL = env.server;

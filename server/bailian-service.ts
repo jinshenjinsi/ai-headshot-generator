@@ -22,6 +22,11 @@ interface GenerateHeadshotResult {
 const BAILIAN_API_KEY = process.env.ALIYUN_BAILIAN_API_KEY;
 const BAILIAN_API_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
 
+console.log("[Bailian Init] API Key exists:", !!BAILIAN_API_KEY);
+if (BAILIAN_API_KEY) {
+  console.log("[Bailian Init] API Key prefix:", BAILIAN_API_KEY.substring(0, 10) + "...");
+}
+
 /**
  * Generate professional headshot using Alibaba Cloud Bailian wan2.6-image
  * Supports image editing and style transformation
@@ -37,7 +42,8 @@ export async function generateHeadshotWithBailian(
   }
 
   try {
-    console.log("[Bailian] 开始生成头像...");
+    console.log("[Bailian] === 开始生成头像 ===");
+    console.log("[Bailian] API Key configured:", !!BAILIAN_API_KEY);
     console.log(`[Bailian] 风格: ${params.style}`);
     console.log(`[Bailian] 输入图片URL: ${params.imageUrl}`);
 
@@ -71,6 +77,7 @@ export async function generateHeadshotWithBailian(
 
     // 调用wan2.6-image模型
     console.log("[Bailian] 调用wan2.6-image API...");
+    console.log("[Bailian] API URL:", BAILIAN_API_URL);
 
     const response = await axios.post(
       BAILIAN_API_URL,
