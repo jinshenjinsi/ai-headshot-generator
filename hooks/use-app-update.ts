@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Platform } from "react-native";
-import * as FileSystem from "expo-file-system/legacy";
-import * as IntentLauncher from "expo-intent-launcher";
+import { Alert, Platform, Linking } from "react-native";
 import { trpc } from "@/lib/trpc";
 
 interface UpdateInfo {
@@ -56,54 +54,26 @@ export function useAppUpdate() {
         return;
       }
 
-      // Download APK to cache directory
-      const fileName = `ai-headshot-${Date.now()}.apk`;
-      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+      console.log("[Update] Opening download URL:", downloadUrl);
       
-      console.log("[Update] Downloading APK from:", downloadUrl);
-      console.log("[Update] Saving to:", fileUri);
-
-      const downloadResult = await FileSystem.downloadAsync(downloadUrl, fileUri);
+      // Open the download URL in browser/system downloader
+      const canOpen = await Linking.canOpenURL(downloadUrl);
       
-      if (downloadResult.status !== 200) {
-        throw new Error(`Download failed with status ${downloadResult.status}`);
+      if (canOpen) {
+        await Linking.openURL(downloadUrl);
+        Alert.alert(
+          "下载已开始",
+          "APK文件已开始下载。下载完成后，点击安装按钮进行安装。"
+        );
+      } else {
+        Alert.alert("错误", "无法打开下载链接");
       }
-
-      console.log("[Update] Download successful");
-      
-      // Install APK
-      await installAPK(fileUri);
       
     } catch (error) {
       console.error("[Update] Error:", error);
-      Alert.alert("更新失败", `下载或安装失败: ${error instanceof Error ? error.message : String(error)}`);
+      Alert.alert("更新失败", `错误: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsDownloading(false);
-    }
-  };
-
-  const installAPK = async (apkPath: string) => {
-    try {
-      console.log("[Update] Installing APK from:", apkPath);
-      
-      // Use Intent Launcher to open the APK for installation
-      if (Platform.OS === "android") {
-        const fileUri = `file://${apkPath}`;
-        
-        // Use the package installer intent
-        await IntentLauncher.startActivityAsync(
-          IntentLauncher.ActivityAction.INSTALL_PACKAGE,
-          {
-            data: fileUri,
-            flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-          }
-        );
-        
-        console.log("[Update] Installation initiated");
-      }
-    } catch (error) {
-      console.error("[Update] Installation error:", error);
-      throw error;
     }
   };
 

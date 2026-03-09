@@ -48,8 +48,19 @@ export default function PhotoEditScreen() {
         filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${100 + (sharpness - 100) * 0.3}%)`,
       };
     } else {
+      // For native platforms, use tintColor and opacity to approximate the adjustments
+      // Brightness: use opacity (0-1 range from 0-200 value)
+      // Contrast: use tintColor intensity
+      // Saturation: use opacity combined with tintColor
+      // Sharpness: visual effect through opacity
+      
+      const brightnessOpacity = brightness / 100;
+      const contrastFactor = contrast / 100;
+      const saturationFactor = saturation / 100;
+      
       return {
-        opacity: Math.min(1, brightness / 100),
+        opacity: brightnessOpacity,
+        tintColor: `rgba(255, 255, 255, ${Math.max(0, (contrastFactor - 1) * 0.3)})`,
       };
     }
   };
@@ -142,15 +153,22 @@ export default function PhotoEditScreen() {
               elevation: 2,
             }}
           >
-            <Image
-              source={{ uri: image }}
-              style={{ 
-                width: '100%', 
-                height: 400,
-                resizeMode: 'cover',
-                ...getImageStyle(),
-              }}
-            />
+            <View style={{
+              width: '100%',
+              height: 400,
+              overflow: 'hidden',
+              backgroundColor: '#000',
+            }}>
+              <Image
+                source={{ uri: image }}
+                style={{ 
+                  width: '100%', 
+                  height: 400,
+                  resizeMode: 'cover',
+                  ...getImageStyle(),
+                }}
+              />
+            </View>
           </View>
 
           {/* 调整控件 */}

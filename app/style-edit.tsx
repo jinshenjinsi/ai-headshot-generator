@@ -46,8 +46,13 @@ export default function StyleEditScreen() {
         filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) brightness(${100 + (sharpness - 100) * 0.3}%)`,
       };
     } else {
+      // For native platforms, use tintColor and opacity to approximate the adjustments
+      const brightnessOpacity = brightness / 100;
+      const contrastFactor = contrast / 100;
+      
       return {
-        opacity: Math.min(1, brightness / 100),
+        opacity: brightnessOpacity,
+        tintColor: `rgba(255, 255, 255, ${Math.max(0, (contrastFactor - 1) * 0.3)})`,
       };
     }
   };
