@@ -7,6 +7,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useState } from "react";
 import Slider from "@react-native-community/slider";
 import { showShareMenu } from "@/lib/share-utils";
+import { trpc } from "@/lib/trpc";
 
 const COLORS = {
   primary: "#1A365D",
@@ -71,6 +72,7 @@ export default function StyleResultScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const image = params.image as string;
+  const generateMutation = trpc.headshot.generateBailian.useMutation();
 
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
@@ -142,8 +144,26 @@ export default function StyleResultScreen() {
     setIsRegenerating(true);
     try {
       const newCount = regenerateCount + 1;
-      setRegenerateCount(newCount);
-      Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+      
+      // 调用API重新生成（使用tRPC）
+      const result = await generateMutation.mutateAsync({
+        imageUrl: image,
+        style: 'artistic',
+        regenerateCount: newCount,
+      });
+      
+      if (result.success && result.imageUrl) {
+        router.replace({
+          pathname: '/style-result',
+          params: {
+            image: result.imageUrl,
+          },
+        });
+        setRegenerateCount(newCount);
+        Alert.alert("成功", `已重新生成（${newCount}/3次）`);
+      } else {
+        Alert.alert("重新生成失败", "请重试");
+      }
     } catch (error) {
       Alert.alert("重新生成失败", "请重试");
       console.error("Regenerate error:", error);

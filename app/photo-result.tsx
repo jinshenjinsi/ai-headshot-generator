@@ -7,6 +7,7 @@ import { ScrollView, View, Text, TouchableOpacity, Image, Alert, TextInput, Plat
 import Slider from "@react-native-community/slider";
 import { showShareMenu } from "@/lib/share-utils";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { trpc } from "@/lib/trpc";
 
 const COLORS = {
   primary: "#1A365D",
@@ -109,6 +110,7 @@ export default function PhotoResultScreen() {
   const image = params.image as string;
   const type = params.type as string;
   const country = params.country as string;
+  const generateMutation = trpc.headshot.generateBailian.useMutation();
 
   const [customWidth, setCustomWidth] = useState("35");
   const [customHeight, setCustomHeight] = useState("45");
@@ -189,24 +191,18 @@ export default function PhotoResultScreen() {
     try {
       const newCount = regenerateCount + 1;
       
-      // 调用API重新生成
-      const response = await fetch('/api/trpc/generateBailian', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageUrl: image,
-          style: 'professional',
-          regenerateCount: newCount,
-        }),
+      // 调用API重新生成（使用tRPC）
+      const result = await generateMutation.mutateAsync({
+        imageUrl: image,
+        style: 'professional',
+        regenerateCount: newCount,
       });
       
-      const result = await response.json();
-      
-      if (result.success || result.imageUrl) {
+      if (result.success && result.imageUrl) {
         router.replace({
           pathname: '/photo-result',
           params: {
-            image: result.imageUrl || result.originalUrl,
+            image: result.imageUrl,
             type: type,
             country: country,
           },
