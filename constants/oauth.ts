@@ -13,7 +13,7 @@ const env = {
   appId: process.env.EXPO_PUBLIC_APP_ID ?? "",
   ownerId: process.env.EXPO_PUBLIC_OWNER_OPEN_ID ?? "",
   ownerName: process.env.EXPO_PUBLIC_OWNER_NAME ?? "",
-  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://218.244.144.154:3001",
+  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://218.244.144.154:3000",
   deepLinkScheme: schemeFromBundleId,
 };
 
@@ -32,22 +32,28 @@ export const API_BASE_URL = env.apiBaseUrl;
  * URL pattern: https://PORT-sandboxid.region.domain
  */
 export function getApiBaseUrl(): string {
-  // If API_BASE_URL is set, use it
+  // Priority 1: If API_BASE_URL is set in environment, always use it
   if (API_BASE_URL) {
-    return API_BASE_URL.replace(/\/$/, "");
+    const url = API_BASE_URL.replace(/\/$/, "");
+    console.log("[getApiBaseUrl] Using API_BASE_URL:", url);
+    return url;
   }
 
-  // On web, derive from current hostname by replacing port 8081 with 3000
+  // Priority 2: On web, derive from current hostname by replacing port 8081 with 3000
   if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
     const { protocol, hostname } = window.location;
+    console.log("[getApiBaseUrl] Web platform detected, hostname:", hostname);
     // Pattern: 8081-sandboxid.region.domain -> 3000-sandboxid.region.domain
     const apiHostname = hostname.replace(/^8081-/, "3000-");
     if (apiHostname !== hostname) {
-      return `${protocol}//${apiHostname}`;
+      const url = `${protocol}//${apiHostname}`;
+      console.log("[getApiBaseUrl] Derived web API URL:", url);
+      return url;
     }
   }
 
   // Fallback to empty (will use relative URL)
+  console.warn("[getApiBaseUrl] WARNING: No API_BASE_URL configured and not on web platform. Using relative URL.");
   return "";
 }
 

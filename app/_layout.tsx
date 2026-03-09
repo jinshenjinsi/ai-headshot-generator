@@ -19,6 +19,7 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
+import { SplashScreenComponent } from "@/components/splash-screen";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -33,6 +34,7 @@ export default function RootLayout() {
 
   const [insets, setInsets] = useState<EdgeInsets>(initialInsets);
   const [frame, setFrame] = useState<Rect>(initialFrame);
+  const [appIsReady, setAppIsReady] = useState(false);
 
   // Initialize Manus runtime for cookie injection from parent container
   useEffect(() => {
@@ -79,6 +81,11 @@ export default function RootLayout() {
     };
   }, [initialInsets, initialFrame]);
 
+  // Show splash screen on app startup (native platforms only)
+  if (!appIsReady && Platform.OS !== "web") {
+    return <SplashScreenComponent onFinish={() => setAppIsReady(true)} />;
+  }
+
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppProvider>
@@ -90,6 +97,30 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="oauth/callback" />
+            {/* Photo generation routes */}
+            <Stack.Screen name="photo-upload" />
+            <Stack.Screen name="photo-edit" />
+            <Stack.Screen name="photo-type" />
+            <Stack.Screen name="photo-config" />
+            <Stack.Screen name="photo-country" />
+            <Stack.Screen name="photo-visa-country" />
+            <Stack.Screen name="photo-generating" />
+            <Stack.Screen name="photo-result" />
+            {/* Style generation routes */}
+            <Stack.Screen name="style-upload" />
+            <Stack.Screen name="style-edit" />
+            <Stack.Screen name="style-selection" />
+            <Stack.Screen name="style-choose" />
+            <Stack.Screen name="generating-style" />
+            <Stack.Screen name="style-result" />
+            {/* Repair routes */}
+            <Stack.Screen name="repair-upload" />
+            <Stack.Screen name="repair-generating" />
+            <Stack.Screen name="repair-result" />
+            {/* Legacy routes */}
+            <Stack.Screen name="upload" />
+            <Stack.Screen name="generating" />
+            <Stack.Screen name="result" />
           </Stack>
           <StatusBar style="auto" />
           </QueryClientProvider>
