@@ -29,20 +29,12 @@ export const API_BASE_URL = env.apiBaseUrl;
 /**
  * Get the API base URL, supporting dynamic port discovery.
  * 
- * Priority:
- * 1. Use EXPO_PUBLIC_API_BASE_URL if set
- * 2. On web, try ports 3000-3010 to find the actual backend
- * 3. Fallback to default port 3000
+ * IMPORTANT: On web platform, always use dynamic port discovery
+ * to support openclaw's dynamic port allocation (3000-3010).
+ * Ignore EXPO_PUBLIC_API_BASE_URL on web to avoid hardcoded IPs.
  */
 export function getApiBaseUrl(): string {
-  // Priority 1: If API_BASE_URL is set in environment, always use it
-  if (API_BASE_URL) {
-    const url = API_BASE_URL.replace(/\/$/, "");
-    console.log("[getApiBaseUrl] Using API_BASE_URL:", url);
-    return url;
-  }
-
-  // Priority 2: On web, derive from current hostname and try multiple ports
+  // On web, ALWAYS use dynamic port discovery (ignore hardcoded API_BASE_URL)
   if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
     const { protocol, hostname } = window.location;
     console.log("[getApiBaseUrl] Web platform detected, hostname:", hostname);
@@ -50,15 +42,20 @@ export function getApiBaseUrl(): string {
     // Extract base hostname (remove port prefix like "8081-")
     const baseHostname = hostname.replace(/^\d+-/, "");
     
-    // Try ports 3000-3010 synchronously by constructing URLs
-    // The actual port discovery will happen when the first request is made
+    // Try ports 3000-3010 to find the actual backend
     const tryPorts = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010];
     
-    // For now, return the first port and let the request fail if it's wrong
-    // The backend will respond with the correct port in headers if needed
+    // Return the first port - if it fails, the client will retry other ports
     const firstPort = tryPorts[0];
     const url = `${protocol}//${firstPort}-${baseHostname}`;
-    console.log("[getApiBaseUrl] Trying API URL:", url);
+    console.log("[getApiBaseUrl] Using dynamic port discovery URL:", url);
+    return url;
+  }
+
+  // On native platforms, use EXPO_PUBLIC_API_BASE_URL if set
+  if (API_BASE_URL) {
+    const url = API_BASE_URL.replace(/\/$/, "");
+    console.log("[getApiBaseUrl] Using API_BASE_URL (native platform):", url);
     return url;
   }
 
