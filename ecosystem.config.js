@@ -11,10 +11,10 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3000,
-        // Database configuration
-        DATABASE_URL: "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c.pg.rds.aliyuncs.com:5432/postgres",
+        // Database configuration - read from environment or use default
+        DATABASE_URL: process.env.DATABASE_URL || "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c.pg.rds.aliyuncs.com:5432/postgres",
         // OAuth configuration
-        OAUTH_SERVER_URL: "http://218.244.144.154:3000",
+        OAUTH_SERVER_URL: process.env.OAUTH_SERVER_URL || "http://218.244.144.154:3000",
         // Bailian API configuration - these should be set via environment
         BAILIAN_API_KEY: process.env.BAILIAN_API_KEY || "",
         BAILIAN_AGENT_ID: process.env.BAILIAN_AGENT_ID || "",
