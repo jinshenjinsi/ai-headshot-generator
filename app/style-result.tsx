@@ -356,23 +356,36 @@ export default function StyleResultScreen() {
             </Text>
 
             <View className="gap-2">
-              {QUICK_SIZES.map((size, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleDownload()}
-                  activeOpacity={0.7}
-                  disabled={isDownloading}
-                  className="rounded-lg py-3 items-center"
-                  style={{
-                    backgroundColor: COLORS.primary,
-                    opacity: isDownloading ? 0.6 : 1,
-                  }}
-                >
-                  <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
-                    {isDownloading ? "下载中..." : `${size.name}(${size.width}×${size.height}mm)`}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {QUICK_SIZES.map((size, index) => {
+                const isSelected = selectedQuickSize === index;
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      setSelectedQuickSize(index);
+                      if (Platform.OS !== "web") {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      }
+                    }}
+                    activeOpacity={0.7}
+                    disabled={isDownloading}
+                    className="rounded-lg py-3 px-4 items-center flex-row justify-between"
+                    style={{
+                      backgroundColor: isSelected ? "#10B981" : COLORS.primary,
+                      opacity: isDownloading ? 0.6 : 1,
+                      borderWidth: isSelected ? 2 : 0,
+                      borderColor: isSelected ? COLORS.accent : "transparent",
+                    }}
+                  >
+                    <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600', flex: 1 }}>
+                      {isDownloading ? "下载中..." : `${size.name}(${size.width}×${size.height}mm)`}
+                    </Text>
+                    {isSelected && (
+                      <Text style={{ color: COLORS.white, fontSize: 16, marginLeft: 8 }}>✓</Text>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
 
@@ -403,13 +416,18 @@ export default function StyleResultScreen() {
               {/* 一键分享 */}
               <TouchableOpacity
                 onPress={() => {
-                  if (Platform.OS !== "web") {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  try {
+                    if (Platform.OS !== "web") {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }
+                    showShareMenu(
+                      "✨ 我用「元一图灵」生成了一张专业美照，效果真的不错！😎\n\n创意头像生成器，一键转换为你喜欢的艺术风格。油画、水彩、素描、漫画等风格任选。",
+                      "元一图灵-专业美照"
+                    );
+                  } catch (error) {
+                    console.error('Share error:', error);
+                    Alert.alert('分享失败', '请稍后重试');
                   }
-                  showShareMenu(
-                    "✨ 我用「元一图灵」生成了一张专业美照，效果真的不错！😎\n\n创意头像生成器，一键转换为你喜欢的艺术风格。油画、水彩、素描、漫画等风格任选。",
-                    "元一图灵-专业美照"
-                  );
                 }}
                 activeOpacity={0.7}
             className="rounded-lg py-3 px-4 mb-4 items-center"
