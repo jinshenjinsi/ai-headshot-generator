@@ -81,6 +81,8 @@ export default function StyleResultScreen() {
   const [isPaid, setIsPaid] = useState(false);
   const [regenerateCount, setRegenerateCount] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
   const MAX_REGENERATE = 3;
 
   const QUICK_SIZES = [
@@ -272,10 +274,30 @@ export default function StyleResultScreen() {
             }}
           >
             <View style={{ position: 'relative', width: '100%', height: 400 }}>
-              <Image
-                source={{ uri: image }}
-                style={getImageStyle()}
-              />
+              {imageError ? (
+                <View style={{
+                  width: '100%',
+                  height: 400,
+                  backgroundColor: '#f0f0f0',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 8,
+                }}>
+                  <Text style={{ color: '#999', fontSize: 14, textAlign: 'center', paddingHorizontal: 20 }}>
+                    图像加载失败: {imageError}
+                  </Text>
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: image }}
+                  style={getImageStyle()}
+                  onLoad={() => setImageLoaded(true)}
+                  onError={(error) => {
+                    console.error('Image load error:', error);
+                    setImageError('无法加载图像，请检查网络连接');
+                  }}
+                />
+              )}
               {/* 色彩调整面板 - 覆盖在图片上方 */}
               <View 
                 style={{
@@ -416,6 +438,7 @@ export default function StyleResultScreen() {
               {/* 一键分享 */}
               <TouchableOpacity
                 onPress={() => {
+                  console.log('Share button pressed');
                   try {
                     if (Platform.OS !== "web") {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -430,9 +453,11 @@ export default function StyleResultScreen() {
                   }
                 }}
                 activeOpacity={0.7}
+                disabled={false}
             className="rounded-lg py-3 px-4 mb-4 items-center"
             style={{
               backgroundColor: "#34C759",
+              zIndex: 10,
             }}
           >
             <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>

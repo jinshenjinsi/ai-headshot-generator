@@ -195,15 +195,53 @@ export const getShareMethods = async (message: string, subject: string): Promise
  * 显示一键分享菜单
  */
 export const showShareMenu = async (message: string, subject: string) => {
-  const methods = await getShareMethods(message, subject);
-  
-  const options = [
-    ...methods.map(method => ({
-      text: method.name,
-      onPress: method.action,
-    })),
-    { text: '取消', onPress: () => {}, style: 'cancel' as const },
-  ];
+  try {
+    console.log('[Share] Starting share menu...');
+    console.log('[Share] Message:', message.substring(0, 50));
+    
+    const methods = await getShareMethods(message, subject);
+    console.log('[Share] Available methods:', methods.map(m => m.name));
+    
+    if (methods.length === 0) {
+      console.warn('[Share] No share methods available');
+      Alert.alert('提示', '没有可用的分享方式，请检查是否安装了相关应用');
+      return;
+    }
+    
+    // 构建选项数组
+    const options = [
+      ...methods.map(method => ({
+        text: method.name,
+        onPress: () => {
+          console.log('[Share] Selected method:', method.name);
+          try {
+            // 使用setTimeout确保在Alert关闭after执行
+            setTimeout(() => {
+              try {
+                method.action();
+                console.log('[Share] Method action executed successfully');
+              } catch (actionError) {
+                console.error('[Share] Method action error:', actionError);
+                Alert.alert('错误', '分享失败，请重试');
+              }
+            }, 100);
+          } catch (error) {
+            console.error('[Share] Method wrapper error:', error);
+            Alert.alert('错误', '分享失败，请重试');
+          }
+        },
+      })),
+      { 
+        text: '取消', 
+        onPress: () => console.log('[Share] Cancelled'), 
+        style: 'cancel' as const 
+      },
+    ];
 
-  Alert.alert('分享到', '选择分享方式', options);
+    console.log('[Share] Showing alert with', options.length, 'options');
+    Alert.alert('分享到', '选择分享方式', options);
+  } catch (error) {
+    console.error('[Share] Error in showShareMenu:', error);
+    Alert.alert('错误', '分享菜单打开失败，请重试');
+  }
 };
