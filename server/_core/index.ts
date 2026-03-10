@@ -64,6 +64,35 @@ async function startServer() {
     res.json({ ok: true, timestamp: Date.now() });
   });
 
+  // Photo retrieval endpoint
+  app.get("/api/photos/:photoId", async (req, res) => {
+    try {
+      const { getPhotoByPhotoId: getPhoto } = await import("../db");
+      const { photoId } = req.params;
+
+      if (!photoId) {
+        res.status(400).json({ error: "Photo ID is required" });
+        return;
+      }
+
+      const photo = await getPhoto(photoId);
+
+      if (!photo) {
+        res.status(404).json({ error: "Photo not found" });
+        return;
+      }
+
+      // Return the photo as base64 data URL or binary
+      res.setHeader("Content-Type", photo.mimeType);
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      const buffer = Buffer.from(photo.imageBase64, "base64");
+      res.send(buffer);
+    } catch (error) {
+      console.error("[Photo] Error retrieving photo:", error);
+      res.status(500).json({ error: "Failed to retrieve photo" });
+    }
+  });
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({

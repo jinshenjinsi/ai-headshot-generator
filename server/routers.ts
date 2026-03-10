@@ -26,28 +26,41 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const { storagePut } = await import("./storage");
+        const { savePhoto } = await import("./db");
+        const { randomUUID } = await import("crypto");
         
         try {
-          console.log("[Upload] Starting photo upload...");
+          console.log("[Upload] Starting photo upload to database...");
           console.log("[Upload] File name:", input.fileName);
           console.log("[Upload] Base64 length:", input.photoBase64.length);
           
           const base64Data = input.photoBase64.replace(/^data:image\/\w+;base64,/, "");
           console.log("[Upload] Cleaned base64 length:", base64Data.length);
           
-          const buffer = Buffer.from(base64Data, "base64");
-          console.log("[Upload] Buffer size:", buffer.length, "bytes");
+          const fileSize = Buffer.from(base64Data, "base64").length;
+          console.log("[Upload] File size:", fileSize, "bytes");
           
-          const timestamp = Date.now();
-          const key = `headshots/uploads/${timestamp}-${input.fileName}`;
-          const result = await storagePut(key, buffer, "image/jpeg");
+          // Generate a unique photo ID
+          const photoId = randomUUID();
+          
+          // Save to database
+          const photo = await savePhoto({
+            fileName: input.fileName,
+            imageBase64: base64Data,
+            mimeType: "image/jpeg",
+            fileSize: fileSize,
+            photoId: photoId,
+          });
+          
+          // Generate a URL to retrieve the photo
+          const photoUrl = `/api/photos/${photoId}`;
           console.log("[Upload] ✅ Upload successful");
-          console.log("[Upload] Result URL:", result.url);
+          console.log("[Upload] Photo ID:", photoId);
           
           return {
             success: true,
-            url: result.url,
+            url: photoUrl,
+            photoId: photoId,
           };
         } catch (error) {
           console.error("[Upload] ❌ Photo upload failed:", error);
@@ -99,121 +112,27 @@ export const appRouter = router({
       .input(
         z.object({
           imageUrl: z.string().url(),
-          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
-          gender: z.enum(["none", "male", "female"]).optional(),
-        })
-      )
-      .mutation(async ({ input }) => {
-        const { generateProfessionalHeadshot } = await import("./replicate-service");
-        
-        try {
-          const result = await generateProfessionalHeadshot({
-            imageUrl: input.imageUrl,
-            background: input.background,
-            gender: input.gender,
-          });
-
-          if (!result.success) {
-            throw new Error(result.error || "Failed to generate headshot");
-          }
-
-          return {
-            success: true,
-            imageUrl: result.imageUrl!,
-          };
-        } catch (error) {
-          console.error("Headshot generation failed:", error);
-          throw new Error("Failed to generate headshot");
-        }
-      }),
-
-    generateTwoStep: publicProcedure
-      .input(
-        z.object({
-          imageUrl: z.string().url(),
-          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
-          gender: z.enum(["none", "male", "female"]).optional(),
-        })
-      )
-      .mutation(async ({ input }) => {
-        const { generateHeadshotTwoStep } = await import("./headshot-two-step-service");
-        
-        try {
-          const result = await generateHeadshotTwoStep({
-            userImageUrl: input.imageUrl,
-            background: input.background,
-            gender: input.gender,
-          });
-
-          if (!result.success) {
-            throw new Error(result.error || "Failed to generate headshot with two-step method");
-          }
-
-          return {
-            success: true,
-            imageUrl: result.finalImageUrl!,
-            backgroundImageUrl: result.backgroundImageUrl,
-          };
-        } catch (error) {
-          console.error("Two-step headshot generation failed:", error);
-          throw new Error("Failed to generate headshot with two-step method");
-        }
-      }),
-
-    generateIdeogram: publicProcedure
-      .input(
-        z.object({
-          imageUrl: z.string().url(),
-          prompt: z.string(),
-          background: z.enum(["white", "black", "neutral", "gray", "office"]).optional(),
-          gender: z.enum(["none", "male", "female"]).optional(),
+          style: z.string().default("professional"),
+          regenerateCount: z.number().optional(),
         })
       )
       .mutation(async ({ input }) => {
         const { generateHeadshotWithBailian } = await import("./bailian-service");
         
         try {
-          const lightingVariations = [
-            "soft diffused lighting",
-            "natural window light",
-            "professional studio lighting",
-            "dramatic side lighting",
-            "balanced key light",
-          ];
-          
-          const angleVariations = [
-            "straight-on angle",
-            "slight 3/4 angle",
-            "head tilted slightly",
-            "shoulders angled",
-            "centered composition",
-          ];
-          
-          const detailVariations = [
-            "crisp details",
-            "subtle texture",
-            "smooth skin tone",
-            "natural skin texture",
-            "professional retouching",
-          ];
-          
-          const randomLighting = lightingVariations[Math.floor(Math.random() * lightingVariations.length)];
-          const randomAngle = angleVariations[Math.floor(Math.random() * angleVariations.length)];
-          const randomDetail = detailVariations[Math.floor(Math.random() * detailVariations.length)];
-          
-          const prompt = `${input.prompt} Additional details: ${randomLighting}, ${randomAngle}, ${randomDetail}.`;
+          console.log("[Router] Starting generation...");
           
           const result = await generateHeadshotWithBailian({
             imageUrl: input.imageUrl,
-            style: "professional",
-            prompt: prompt,
+            style: input.style,
+            regenerateCount: input.regenerateCount,
           });
 
           if (!result.success) {
-            throw new Error(result.error || "Failed to generate headshot with Bailian API");
+            throw new Error(result.error || "Failed to generate headshot");
           }
 
-          console.log("Generation successful");
+          console.log("[Router] Generation successful");
 
           return {
             success: true,
@@ -221,8 +140,8 @@ export const appRouter = router({
             originalUrl: result.imageUrl,
           };
         } catch (error) {
-          console.error("Ideogram-character generation failed:", error);
-          throw new Error("Failed to generate headshot with ideogram-character");
+          console.error("[Router] Generation failed:", error);
+          throw new Error("Failed to generate headshot");
         }
       }),
   }),
