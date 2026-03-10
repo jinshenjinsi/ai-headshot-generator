@@ -199,9 +199,13 @@ export default function GeneratingStyleScreen() {
       });
 
       if (!result.success || !result.imageUrl) {
-        throw new Error("生成失败");
+        console.error('[Generation] Generation failed:', result);
+        throw new Error("生成失败：" + (result.error || "未知错误"));
       }
 
+      // 验证生成的图像URL是否有效
+      console.log('[Generation] Generated image URL:', result.imageUrl);
+      
       setProgress(90);
       setStatusMessage("正在优化图像质量...");
 
@@ -210,8 +214,10 @@ export default function GeneratingStyleScreen() {
       setProgress(100);
       setStatusMessage("完成!");
 
-      // 扣除免费次数
+      // 只有生成成功才扣除免费次数
+      console.log('[Generation] Deducting free usage count...');
       await usePhotoAndStyleFree();
+      console.log('[Generation] Free usage count deducted successfully');
 
       setTimeout(() => {
         router.replace({
@@ -225,8 +231,11 @@ export default function GeneratingStyleScreen() {
       }, 500);
 
     } catch (error) {
-      console.error("Generation error:", error);
-      setStatusMessage("生成失败,请重试");
+      console.error("[Generation] Generation error:", error);
+      console.log('[Generation] Generation failed - free usage count NOT deducted');
+      
+      const errorMessage = error instanceof Error ? error.message : "生成失败,请重试";
+      setStatusMessage(errorMessage);
       setTimeout(() => {
         router.back();
       }, 2000);

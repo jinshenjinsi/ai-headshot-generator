@@ -6,6 +6,7 @@ import { useColors } from "@/hooks/use-colors";
 import { useApp } from "@/lib/app-context";
 import { trpc } from "@/lib/trpc";
 import * as FileSystem from "expo-file-system/legacy";
+import { usePhotoAndStyleFree } from "@/lib/free-usage-service";
 
 // 专业头像拍摄技巧
 const PHOTOGRAPHY_TIPS = [
@@ -198,7 +199,8 @@ export default function GeneratingScreen() {
       });
 
       if (!result.success || !result.imageUrl) {
-        throw new Error("生成失败");
+        console.error('[Generation] Generation failed:', result);
+        throw new Error("生成失败：" + (result.error || "未知错误"));
       }
 
       console.log("Generation success:", result.imageUrl);
@@ -216,14 +218,22 @@ export default function GeneratingScreen() {
       setGeneratedImage(result.imageUrl);  // 带水印的预览版
       setOriginalImageUrl(result.originalUrl || null);  // 高清无水印原图
 
+      // 只有生成成功才扣除免费次数
+      console.log('[Generation] Deducting free usage count...');
+      await usePhotoAndStyleFree();
+      console.log('[Generation] Free usage count deducted successfully');
+
       // 跳转到结果页面
       setTimeout(() => {
         router.push("/result" as any);
       }, 500);
 
     } catch (error) {
-      console.error("Generation error:", error);
-      setStatusMessage("生成失败,请重试");
+      console.error("[Generation] Generation error:", error);
+      console.log('[Generation] Generation failed - free usage count NOT deducted');
+      
+      const errorMessage = error instanceof Error ? error.message : "生成失败,请重试";
+      setStatusMessage(errorMessage);
       setTimeout(() => {
         router.back();
       }, 2000);
