@@ -1,3 +1,6 @@
+// Load environment variables from .env file if it exists
+require('dotenv').config();
+
 module.exports = {
   apps: [
     {
@@ -8,6 +11,8 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: 3000,
+        // Database configuration
+        DATABASE_URL: "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c.pg.rds.aliyuncs.com:5432/postgres",
         // OAuth configuration
         OAUTH_SERVER_URL: "http://218.244.144.154:3000",
         // Bailian API configuration - these should be set via environment
