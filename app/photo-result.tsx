@@ -551,6 +551,7 @@ export default function PhotoResultScreen() {
               Share.share({
                 message: "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
                 title: "元一图灵-专业证件照",
+                url: image,  // 添加生成的图片
               }).catch(err => console.log("Share failed:", err));
             }}
             activeOpacity={0.7}
