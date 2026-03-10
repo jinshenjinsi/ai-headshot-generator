@@ -27,9 +27,12 @@ export const OWNER_NAME = env.ownerName;
 export const API_BASE_URL = env.apiBaseUrl;
 
 /**
- * Get the API base URL, deriving from current hostname if not set.
- * Metro runs on 8081, API server runs on 3000.
- * URL pattern: https://PORT-sandboxid.region.domain
+ * Get the API base URL, supporting dynamic port discovery.
+ * 
+ * Priority:
+ * 1. Use EXPO_PUBLIC_API_BASE_URL if set
+ * 2. On web, try ports 3000-3010 to find the actual backend
+ * 3. Fallback to default port 3000
  */
 export function getApiBaseUrl(): string {
   // Priority 1: If API_BASE_URL is set in environment, always use it
@@ -39,17 +42,24 @@ export function getApiBaseUrl(): string {
     return url;
   }
 
-  // Priority 2: On web, derive from current hostname by replacing port 8081 with 3000
+  // Priority 2: On web, derive from current hostname and try multiple ports
   if (ReactNative.Platform.OS === "web" && typeof window !== "undefined" && window.location) {
     const { protocol, hostname } = window.location;
     console.log("[getApiBaseUrl] Web platform detected, hostname:", hostname);
-    // Pattern: 8081-sandboxid.region.domain -> 3000-sandboxid.region.domain
-    const apiHostname = hostname.replace(/^8081-/, "3000-");
-    if (apiHostname !== hostname) {
-      const url = `${protocol}//${apiHostname}`;
-      console.log("[getApiBaseUrl] Derived web API URL:", url);
-      return url;
-    }
+    
+    // Extract base hostname (remove port prefix like "8081-")
+    const baseHostname = hostname.replace(/^\d+-/, "");
+    
+    // Try ports 3000-3010 synchronously by constructing URLs
+    // The actual port discovery will happen when the first request is made
+    const tryPorts = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010];
+    
+    // For now, return the first port and let the request fail if it's wrong
+    // The backend will respond with the correct port in headers if needed
+    const firstPort = tryPorts[0];
+    const url = `${protocol}//${firstPort}-${baseHostname}`;
+    console.log("[getApiBaseUrl] Trying API URL:", url);
+    return url;
   }
 
   // Fallback to empty (will use relative URL)

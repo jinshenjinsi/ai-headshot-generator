@@ -102,18 +102,14 @@ async function startServer() {
   );
 
   const preferredPort = parseInt(process.env.PORT || "3000");
-  
-  // Force use of preferred port - if busy, let it fail so PM2 can restart
-  server.listen(preferredPort, () => {
-    console.log(`[api] server listening on port ${preferredPort}`);
-  });
-  
-  server.on('error', (err: any) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`Port ${preferredPort} is already in use. Exiting to allow PM2 restart.`);
-      process.exit(1);
-    }
-    throw err;
+  const port = await findAvailablePort(preferredPort);
+
+  if (port !== preferredPort) {
+    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+  }
+
+  server.listen(port, () => {
+    console.log(`[api] server listening on port ${port}`);
   });
 
 }
