@@ -79,41 +79,70 @@ export async function generateHeadshotWithBailian(
     console.log("[Bailian] 调用wan2.6-image API...");
     console.log("[Bailian] API URL:", BAILIAN_API_URL);
 
-    const response = await axios.post(
-      BAILIAN_API_URL,
-      {
-        model: "wan2.6-image",
-        input: {
-          messages: [
-            {
-              role: "user",
-              content: [
+    // 重试机制：最多重试3次
+    let response;
+    let lastError: any = null;
+    const maxRetries = 3;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[Bailian] 尝试第 ${attempt}/${maxRetries} 次...`);
+        
+        response = await axios.post(
+          BAILIAN_API_URL,
+          {
+            model: "wan2.6-image",
+            input: {
+              messages: [
                 {
-                  text: finalPrompt,
-                },
-                {
-                  image: params.imageUrl,
+                  role: "user",
+                  content: [
+                    {
+                      text: finalPrompt,
+                    },
+                    {
+                      image: params.imageUrl,
+                    },
+                  ],
                 },
               ],
             },
-          ],
-        },
-        parameters: {
-          prompt_extend: true,
-          watermark: false,
-          n: 1,
-          enable_interleave: false,
-          size: "1024*1024",
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${BAILIAN_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 120000,
+            parameters: {
+              prompt_extend: true,
+              watermark: false,
+              n: 1,
+              enable_interleave: false,
+              size: "1024*1024",
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${BAILIAN_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            timeout: 180000, // 增加到180秒
+          }
+        );
+        
+        // 成功则跳出重试循环
+        console.log(`[Bailian] 第 ${attempt} 次尝试成功`);
+        break;
+      } catch (error) {
+        lastError = error;
+        console.error(`[Bailian] 第 ${attempt} 次尝试失败:`, error instanceof Error ? error.message : String(error));
+        
+        if (attempt < maxRetries) {
+          // 等待后重试
+          const waitTime = 1000 * attempt; // 1秒、2秒、3秒
+          console.log(`[Bailian] 等待 ${waitTime}ms 后重试...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
       }
-    );
+    }
+    
+    if (!response) {
+      throw lastError || new Error("Failed after all retries");
+    }
 
     console.log("[Bailian] API响应状态:", response.status);
 

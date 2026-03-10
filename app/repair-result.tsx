@@ -232,16 +232,9 @@ export default function RepairResultScreen() {
       // Web：使用CSS filter应用所有调整
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${100 - sharpness}%)`;
     } else {
-      // React Native：使用tintColor模拟色彩调整
-      // 亮度：通过opacity实现
-      const brightnessValue = brightness / 100;
-      baseStyle.opacity = brightnessValue;
-      
-      // 对比度、饱和度、锐度：通过tintColor实现
-      // 这是一个简化的实现，实际效果可能有限
-      if (contrast !== 100 || saturation !== 100) {
-        baseStyle.tintColor = `rgba(255, 255, 255, ${(saturation - 100) / 100 * 0.2})`;
-      }
+      // React Native：使用更有效的效果
+      baseStyle.tintColor = brightness > 100 ? '#ffffff' : '#000000';
+      baseStyle.opacity = 0.7 + (Math.abs(brightness - 100) / 100) * 0.3;
     }
 
     // 如果是老照片修复，不添加底色

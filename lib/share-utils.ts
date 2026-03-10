@@ -64,21 +64,44 @@ export const shareToSMS = (message: string) => {
 };
 
 /**
- * 分享到微信
+ * 分享到微信 - 支持多个URL scheme
  */
 export const shareToWeChat = (message: string) => {
-  // 微信的URL scheme
-  const wechatUrl = `weixin://`;
-  
-  Linking.canOpenURL(wechatUrl).then(supported => {
-    if (supported) {
-      // 微信已安装，尝试打开
-      Linking.openURL(wechatUrl);
-      Alert.alert('提示', '请在微信中手动分享此内容');
-    } else {
+  // 支持多个微信URL scheme（iOS、Android、Mac）
+  const possibleSchemes = [
+    'weixin://',      // 标准微信scheme
+    'wechat://',      // 备用scheme
+    'wxapi://',       // API scheme
+  ];
+
+  const tryNextScheme = (index: number) => {
+    if (index >= possibleSchemes.length) {
       Alert.alert('未安装微信', '请先安装微信应用');
+      return;
     }
-  });
+
+    const scheme = possibleSchemes[index];
+    Linking.canOpenURL(scheme)
+      .then(supported => {
+        if (supported) {
+          // 微信已安装，尝试打开
+          Linking.openURL(scheme).catch(() => {
+            // 如果打开失败，尝试下一个scheme
+            tryNextScheme(index + 1);
+          });
+          Alert.alert('提示', '请在微信中手动分享此内容');
+        } else {
+          // 尝试下一个scheme
+          tryNextScheme(index + 1);
+        }
+      })
+      .catch(() => {
+        // 如果检查失败，尝试下一个scheme
+        tryNextScheme(index + 1);
+      });
+  };
+
+  tryNextScheme(0);
 };
 
 /**

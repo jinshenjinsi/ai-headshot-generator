@@ -271,17 +271,15 @@ export default function PhotoResultScreen() {
       resizeMode: "cover",
     };
 
-    // 应用亮度滤镜
-    // 亮度范围：70-130
-    // 正确方向：70为暗，100为正常，130为亮
-    const brightnessValue = (brightness - 100) / 100 + 1; // 70->0.7, 100->1.0, 130->1.3
-    
     if (Platform.OS === "web") {
       // Web：直接使用brightness filter
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
     } else {
-      // React Native：使用opacity模拟亮度
-      baseStyle.opacity = Math.min(1, brightnessValue);
+      // React Native：使用tintColor模拟亮度和对比度
+      // 亮度：70-130，100为正常
+      // 对比度：70-130，100为正常
+      baseStyle.tintColor = brightness > 100 ? '#ffffff' : '#000000';
+      baseStyle.opacity = 0.7 + (Math.abs(brightness - 100) / 100) * 0.3;
     }
 
     return baseStyle;
@@ -544,15 +542,24 @@ export default function PhotoResultScreen() {
 
           {/* 一键分享 */}
           <TouchableOpacity
-            onPress={() => {
+            onPress={async () => {
               if (Platform.OS !== "web") {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               }
-              Share.share({
-                message: "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
-                title: "元一图灵-专业证件照",
-                url: image,  // 添加生成的图片
-              }).catch(err => console.log("Share failed:", err));
+              try {
+                // 在Android上，Share API支持本地文件路径
+                // 在iOS上，需要使用file:// URL
+                const shareUrl = Platform.OS === 'ios' ? `file://${image}` : image;
+                
+                Share.share({
+                  message: "📷 我用「元一图灵」生成了一张专业证件照，效果真的不错！😎\n\n不需要去照相馆，在家就能一键生成专业证件照。支持护照、签证、工作证等多种用途。",
+                  title: "元一图灵-专业证件照",
+                  url: shareUrl,  // 添加生成的图片文件路径
+                }).catch(err => console.log("Share failed:", err));
+              } catch (error) {
+                console.error("Share error:", error);
+                Alert.alert("分享失败", "无法分享图片，请重试");
+              }
             }}
             activeOpacity={0.7}
             className="rounded-lg py-3 px-4 mb-4 items-center"

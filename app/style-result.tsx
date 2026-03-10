@@ -218,17 +218,13 @@ export default function StyleResultScreen() {
       resizeMode: "cover",
     };
 
-    // 应用亮度滤镜
-    // 亮度范围：70-130
-    // 正确方向：70为暗，100为正常，130为亮
-    const brightnessValue = (brightness - 100) / 100 + 1; // 70->0.7, 100->1.0, 130->1.3
-    
     if (Platform.OS === "web") {
       // Web：直接使用brightness filter
       baseStyle.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
     } else {
-      // React Native：使用opacity模拟亮度
-      baseStyle.opacity = Math.min(1, brightnessValue);
+      // React Native：使用tintColor模拟亮度和对比度
+      baseStyle.tintColor = brightness > 100 ? '#ffffff' : '#000000';
+      baseStyle.opacity = 0.7 + (Math.abs(brightness - 100) / 100) * 0.3;
     }
 
     return baseStyle;

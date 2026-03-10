@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { View, ActivityIndicator } from "react-native";
-import { VideoView, useVideoPlayer } from "expo-video";
+import React, { useEffect, useState } from "react";
+import { View, Image, Animated, Easing } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 
 // Keep the splash screen visible while we load
@@ -12,25 +11,35 @@ interface SplashScreenComponentProps {
 
 export function SplashScreenComponent({ onFinish }: SplashScreenComponentProps) {
   const [isReady, setIsReady] = useState(false);
-  const videoRef = useRef(null);
-
-  const player = useVideoPlayer(
-    require("@/assets/videos/splash-animation.mp4"),
-    (player) => {
-      player.loop = false;
-      player.play();
-    }
-  );
+  const fadeAnim = new Animated.Value(0);
+  const scaleAnim = new Animated.Value(0.8);
 
   useEffect(() => {
+    // Start animation immediately
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Hide splash screen after 3 seconds
     const timer = setTimeout(() => {
       setIsReady(true);
       SplashScreen.hideAsync();
       onFinish?.();
-    }, 3500); // 3 seconds for video + 500ms buffer
+    }, 3000);
 
     return () => clearTimeout(timer);
-  }, [onFinish]);
+  }, [onFinish, fadeAnim, scaleAnim]);
 
   return (
     <View
@@ -41,30 +50,50 @@ export function SplashScreenComponent({ onFinish }: SplashScreenComponentProps) 
         alignItems: "center",
       }}
     >
-      <VideoView
-        ref={videoRef}
-        player={player}
+      <Animated.View
         style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
+          justifyContent: "center",
+          alignItems: "center",
         }}
-        nativeControls={false}
-        contentFit="cover"
-      />
-
-      {/* Fallback loading indicator if video doesn't load */}
-      {!isReady && (
+      >
+        <Image
+          source={require("@/assets/images/yuanyi-icon.png")}
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: 30,
+            marginBottom: 20,
+          }}
+        />
         <View
           style={{
-            position: "absolute",
-            justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <ActivityIndicator size="large" color="#D4AF37" />
+          <Animated.Text
+            style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              color: "#D4AF37",
+              opacity: fadeAnim,
+              marginBottom: 8,
+            }}
+          >
+            元一图灵
+          </Animated.Text>
+          <Animated.Text
+            style={{
+              fontSize: 14,
+              color: "#FFFFFF",
+              opacity: fadeAnim,
+            }}
+          >
+            专业证件照一键生成
+          </Animated.Text>
         </View>
-      )}
+      </Animated.View>
     </View>
   );
 }
