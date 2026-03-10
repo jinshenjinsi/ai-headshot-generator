@@ -224,7 +224,7 @@ export const showShareMenu = async (message: string, subject: string) => {
                 console.error('[Share] Method action error:', actionError);
                 Alert.alert('错误', '分享失败，请重试');
               }
-            }, 100);
+            }, 300);
           } catch (error) {
             console.error('[Share] Method wrapper error:', error);
             Alert.alert('错误', '分享失败，请重试');

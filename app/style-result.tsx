@@ -454,10 +454,14 @@ export default function StyleResultScreen() {
                 }}
                 activeOpacity={0.7}
                 disabled={false}
-            className="rounded-lg py-3 px-4 mb-4 items-center"
             style={{
               backgroundColor: "#34C759",
               zIndex: 10,
+              borderRadius: 8,
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              marginBottom: 16,
+              alignItems: 'center',
             }}
           >
             <Text style={{ color: COLORS.white, fontSize: 14, fontWeight: '600' }}>
