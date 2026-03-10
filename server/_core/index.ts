@@ -7,6 +7,14 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 
+// Ensure DATABASE_URL is set for database operations
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c.pg.rds.aliyuncs.com:5432/postgres";
+  console.log("[Server] DATABASE_URL was not set, using fallback value");
+}
+
+console.log("[Server] DATABASE_URL configured:", process.env.DATABASE_URL.substring(0, 50) + "...");
+
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const server = net.createServer();
