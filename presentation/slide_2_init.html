@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目初始化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #FFFFFF;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            padding: 60px 80px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 40px;
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #000000;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+        
+        .key-points {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 20px;
+        }
+        
+        .point {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            color: #000000;
+        }
+        
+        .point-icon {
+            color: #FF3B30;
+            font-weight: 900;
+            flex-shrink: 0;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 24px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .code-block {
+            background: #F2F2F2;
+            border-left: 4px solid #FF3B30;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        
+        .step-desc {
+            font-size: 13px;
+            color: #333333;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="left-column">
+            <div class="title">项目初始化</div>
+            <div class="subtitle">从零开始设置项目的完整步骤</div>
+            
+            <div class="key-points">
+                <div class="point">
+                    <div class="point-icon">✓</div>
+                    <span>使用pnpm作为包管理器（比npm快3倍）</span>
+                </div>
+                <div class="point">
+                    <div class="point-icon">✓</div>
+                    <span>自动安装所有依赖（React Native、Expo等）</span>
+                </div>
+                <div class="point">
+                    <div class="point-icon">✓</div>
+                    <span>配置TypeScript编译环境</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <div class="step">
+                <div class="step-title">步骤1：创建项目</div>
+                <div class="code-block">webdev_init_project \
+  --name ai-headshot-generator \
+  --template expo-mobile</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-title">步骤2：安装依赖</div>
+                <div class="code-block">pnpm install</div>
+                <div class="step-desc">自动下载并安装所有npm包</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-title">步骤3：验证安装</div>
+                <div class="code-block">pnpm check</div>
+                <div class="step-desc">检查TypeScript类型和项目配置</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

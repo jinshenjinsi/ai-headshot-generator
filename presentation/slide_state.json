@@ -1,0 +1,228 @@
+{
+  "project_info": {
+    "title": "项目概述",
+    "created": 1773148253.142092,
+    "last_updated": 1773148289.6673317,
+    "total_slides": 18
+  },
+  "slides": [
+    {
+      "id": "slide_1_overview",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "slide_2_init",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "slide_3_dev_start",
+      "state": "edit_pending",
+      "pageNum": 3
+    },
+    {
+      "id": "slide_4_testing",
+      "state": "edit_pending",
+      "pageNum": 4
+    },
+    {
+      "id": "slide_5_quality",
+      "state": "edit_pending",
+      "pageNum": 5
+    },
+    {
+      "id": "slide_6_database",
+      "state": "edit_pending",
+      "pageNum": 6
+    },
+    {
+      "id": "slide_7_build",
+      "state": "edit_pending",
+      "pageNum": 7
+    },
+    {
+      "id": "slide_8_git",
+      "state": "edit_pending",
+      "pageNum": 8
+    },
+    {
+      "id": "slide_9_pm2",
+      "state": "edit_pending",
+      "pageNum": 9
+    },
+    {
+      "id": "slide_10_logs",
+      "state": "edit_pending",
+      "pageNum": 10
+    },
+    {
+      "id": "slide_11_ssh",
+      "state": "edit_pending",
+      "pageNum": 11
+    },
+    {
+      "id": "slide_12_deploy",
+      "state": "edit_pending",
+      "pageNum": 12
+    },
+    {
+      "id": "slide_13_env",
+      "state": "edit_pending",
+      "pageNum": 13
+    },
+    {
+      "id": "slide_14_troubleshoot",
+      "state": "edit_pending",
+      "pageNum": 14
+    },
+    {
+      "id": "slide_15_reference",
+      "state": "edit_pending",
+      "pageNum": 15
+    },
+    {
+      "id": "slide_16_summary",
+      "state": "edit_pending",
+      "pageNum": 16
+    },
+    {
+      "id": "slide_17_resources",
+      "state": "edit_pending",
+      "pageNum": 17
+    },
+    {
+      "id": "slide_18_nextsteps",
+      "state": "edit_pending",
+      "pageNum": 18
+    }
+  ],
+  "outline": [
+    {
+      "id": "slide_1_overview",
+      "title": "项目概述",
+      "summary": "介绍元一图灵项目的核心功能、技术栈和架构",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_2_init",
+      "title": "项目初始化",
+      "summary": "从零开始设置项目的步骤，包括创建项目、安装依赖和验证",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_3_dev_start",
+      "title": "启动开发服务",
+      "summary": "启动前端和后端开发服务器的各种方式",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_4_testing",
+      "title": "测试应用",
+      "summary": "在Web、iOS、Android和真机上测试应用的方法",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_5_quality",
+      "title": "代码质量检查",
+      "summary": "TypeScript检查、代码格式化、Lint和单元测试",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_6_database",
+      "title": "数据库操作",
+      "summary": "使用Drizzle ORM进行数据库迁移和管理",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_7_build",
+      "title": "编译和构建",
+      "summary": "生产环境编译流程和启动生产服务器",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_8_git",
+      "title": "版本控制",
+      "summary": "Git操作和版本历史管理",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_9_pm2",
+      "title": "PM2进程管理",
+      "summary": "使用PM2启动、重启、停止和监控应用",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_10_logs",
+      "title": "查看日志",
+      "summary": "监控和调试应用日志的各种方式",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_11_ssh",
+      "title": "SSH远程操作",
+      "summary": "在服务器上执行命令的方法",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_12_deploy",
+      "title": "完整部署流程",
+      "summary": "从开发到生产的完整部署步骤",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_13_env",
+      "title": "环境变量配置",
+      "summary": "开发和生产环境的环境变量配置",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_14_troubleshoot",
+      "title": "常见问题解决",
+      "summary": "快速排查和解决常见问题的方法",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_15_reference",
+      "title": "快速参考",
+      "summary": "最常用命令的快速查询卡片",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_16_summary",
+      "title": "最佳实践",
+      "summary": "开发工作流的最佳实践和关键指标",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_17_resources",
+      "title": "资源和文档",
+      "summary": "相关文档、官方链接和联系方式",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    },
+    {
+      "id": "slide_18_nextsteps",
+      "title": "下一步行动",
+      "summary": "短期、中期和长期任务建议",
+      "image_plan": "Use a suitable image if needed",
+      "slide_template_key": ""
+    }
+  ]
+}
