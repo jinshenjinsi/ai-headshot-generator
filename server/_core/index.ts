@@ -9,7 +9,7 @@ import { createContext } from "./context";
 
 // Ensure DATABASE_URL is set for database operations
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c.pg.rds.aliyuncs.com:5432/postgres";
+  process.env.DATABASE_URL = "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c3o.pg.rds.aliyuncs.com:5432/postgres";
   console.log("[Server] DATABASE_URL was not set, using fallback value");
 }
 

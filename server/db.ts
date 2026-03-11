@@ -1,3 +1,13 @@
+// CRITICAL: Set DATABASE_URL before any other module reads it
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "postgresql://postgres:Ai-headshot123@pgm-bp1fjoyt926vgd7c3o.pg.rds.aliyuncs.com:5432/postgres";
+  console.log("[DB Init] DATABASE_URL was not set, using fallback value");
+}
+console.log("[DB Init] DATABASE_URL:", process.env.DATABASE_URL ? "SET (" + process.env.DATABASE_URL.substring(0, 30) + "...)" : "NOT SET");
+
+// Database connection options
+const DB_SSL = process.env.DATABASE_SSL !== "false"; // Default to SSL enabled
+
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -15,7 +25,12 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       console.log("[Database] Attempting to connect to:", process.env.DATABASE_URL.substring(0, 50) + "...");
-      const client = postgres(process.env.DATABASE_URL);
+      console.log("[Database] SSL enabled:", DB_SSL);
+      const client = postgres(process.env.DATABASE_URL, {
+        ssl: DB_SSL ? { rejectUnauthorized: false } : false,
+        connect_timeout: 10,
+        max: 5,
+      });
       _db = drizzle(client);
       console.log("[Database] Connection successful!");
     } catch (error) {
