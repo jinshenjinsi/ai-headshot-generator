@@ -6,7 +6,7 @@ if (!process.env.DATABASE_URL) {
 console.log("[DB Init] DATABASE_URL:", process.env.DATABASE_URL ? "SET (" + process.env.DATABASE_URL.substring(0, 30) + "...)" : "NOT SET");
 
 // Database connection options
-const DB_SSL = process.env.DATABASE_SSL !== "false"; // Default to SSL enabled
+const DB_SSL = process.env.DATABASE_SSL === "true"; // Default to SSL disabled for Alibaba Cloud RDS
 
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
